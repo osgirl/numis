@@ -4,11 +4,12 @@ module.exports = function(grunt) {
 	// Unified Watch Object
 	var watchFiles = {
 		serverViews: ['app/views/**/*.*'],
-		serverJS: ['gruntfile.js', 'server.js', 'config/**/*.js', 'app/**/*.js'],
+		serverJS: 	 ['gruntfile.js', 'server.js', 'config/**/*.js', 'app/**/*.js'],
+		appServerJS: ['app/**/*.js', '!'],
 		clientViews: ['public/modules/**/views/**/*.html'],
-		clientJS: ['public/js/*.js', 'public/modules/**/*.js'],
-		clientCSS: ['public/modules/**/*.css'],
-		mochaTests: ['app/tests/**/*.js']
+		clientJS: 	 ['public/js/*.js', 'public/modules/**/*.js'],
+		clientCSS: 	 ['public/modules/**/*.css'],
+		mochaTests:  ['app/tests/**/*.js']
 	};
 
 	// Project Configuration
@@ -139,6 +140,37 @@ module.exports = function(grunt) {
 			unit: {
 				configFile: 'karma.conf.js'
 			}
+		},
+		clean: {
+			build: {
+				src: 'public/dist'
+			},
+			docs: {
+				src: ['public/docs', 'public/report']
+			}
+		},
+		ngdocs: {
+			options: {
+				dest: 'public/docs',
+				scripts: ['angular.js'],
+				html5Mode: true,
+				startPage: '/client',
+				title: 'Documentación',
+				bestMatch: true,
+			},
+			server: {
+				src: watchFiles.appServerJS,
+				title: 'Servidor',
+				api: true
+			},
+			client: {
+				src: watchFiles.clientJS,
+				title: 'Cliente',
+				api: true
+			}
+		},
+		'license-report': {
+			target: './public/docs/licenses.html'
 		}
 	});
 
@@ -159,6 +191,11 @@ module.exports = function(grunt) {
 
 	// Default task(s).
 	grunt.registerTask('default', ['lint', 'concurrent:default']);
+
+	// Documentation task(s).
+	grunt.registerTask('docs', ['clean:docs', 'ngdocs']);
+	//grunt.registerTask('docs', ['clean:docs', 'ngdocs', 'license-report']);
+
 
 	// Debug task.
 	grunt.registerTask('debug', ['lint', 'concurrent:debug']);
