@@ -1,5 +1,19 @@
 'use strict';
 
+/**
+ * @ngdoc controller
+ * @name module:users.controller:SettingsController
+ *
+ * @requires $cope
+ * @requires $http
+ * @requires $location
+ * @requires module:users.service:Users
+ * @requires module:users.service:Authentication
+ *
+ * @description
+ * Password controller
+ */
+
 angular.module('users').controller('SettingsController', ['$scope', '$http', '$location', 'Users', 'Authentication',
 	function($scope, $http, $location, Users, Authentication) {
 		$scope.user = Authentication.user;
@@ -7,7 +21,7 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 		// If user is not signed in then redirect back home
 		if (!$scope.user) $location.path('/');
 
-		// Check if there are additional accounts 
+		// Check if there are additional accounts
 		$scope.hasConnectedAdditionalSocialAccounts = function(provider) {
 			for (var i in $scope.user.additionalProvidersData) {
 				return true;

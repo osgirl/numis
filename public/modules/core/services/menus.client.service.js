@@ -1,5 +1,15 @@
 'use strict';
 
+/**
+ * @ngdoc service
+ * @name module:core.service:Menus
+ *
+ * @description
+ * AngularJS Menus Service
+ *
+ * In the 0.3.x version, MEAN.JS has introduced a new AngularJS service that helps you manage your application menus.
+ */
+
 //Menu service used for managing  menus
 angular.module('core').service('Menus', [
 
@@ -10,7 +20,7 @@ angular.module('core').service('Menus', [
 		// Define the menus object
 		this.menus = {};
 
-		// A private function for rendering decision 
+		// A private function for rendering decision
 		var shouldRender = function(user) {
 			if (user) {
 				if (!!~this.roles.indexOf('*')) {
@@ -46,6 +56,17 @@ angular.module('core').service('Menus', [
 			return false;
 		};
 
+		/**
+ 		 * @ngdoc method
+		 * @name module:core.service:Menus.getMenu
+		 * @methodOf module:core.service:Menus
+	 	 *
+		 * @param {Number} menuId Indicates the menu identifier
+		 * @return {Object} A menu object identified by the menuId argument
+		 *
+		 * @description
+		 * Returns The menu object identified by the menuId argument.
+		 */
 		// Get the menu object by menu id
 		this.getMenu = function(menuId) {
 			// Validate that the menu exists
@@ -55,6 +76,19 @@ angular.module('core').service('Menus', [
 			return this.menus[menuId];
 		};
 
+		/**
+		 * @ngdoc method
+		 * @name module:core.service:Menus.addMenu
+		 * @methodOf module:core.service:Menus
+		 *
+		 * @param {Number} menuId Indicates the menu identifier for future reference
+		 * @param {Boolean} isPublic Indicates whether a menu should be displayed only to authenticated users
+		 * @param {Array.<String>} [roles=&#91;'user'&#93;] An array indicating the roles that are allowed to view this menu
+		 * @return {Object} The menu object.
+		 *
+		 * @description
+		 * Creates a new menu object, which will be identified by the menuId argument.
+		 */
 		// Add new menu object by menu id
 		this.addMenu = function(menuId, isPublic, roles) {
 			// Create the new menu
@@ -78,6 +112,24 @@ angular.module('core').service('Menus', [
 			delete this.menus[menuId];
 		};
 
+		/**
+		 * @ngdoc method
+		 * @name module:core.service:Menus.addMenuItem
+		 * @methodOf module:core.service:Menus
+		 *
+		 * @param {Number} menuId Indicates the menu identifier.
+		 * @param {String} menuItemTitle A String title for the menu item.
+		 * @param {String} menuItemURL The path this menu item will link to.
+		 * @param {String} [menuItemType='item'] -
+		 * @param {String} [menuItemUIRoute=menuItemURL] The UIRoute value, which is used to define the URL scheme where this menu item is marked as active.
+		 * @param {Boolean} isPublic Indicates whether a menu item should be displayed only to authenticated users.
+		 * @param {Array.<String>} [roles=&#91;'user'&#93;] An array indicating the roles that are allowed to view this menu item.
+		 * @param {Number} [position=0] -
+		 * @return {Object} The menu object.
+		 *
+		 * @description
+		 * Creates a new menu item object.
+		 */
 		// Add menu item object
 		this.addMenuItem = function(menuId, menuItemTitle, menuItemURL, menuItemType, menuItemUIRoute, isPublic, roles, position) {
 			// Validate that the menu exists
@@ -101,6 +153,24 @@ angular.module('core').service('Menus', [
 			return this.menus[menuId];
 		};
 
+		/**
+		 * @ngdoc method
+		 * @name module:core.service:Menus.addSubMenuItem
+		 * @methodOf module:core.service:Menus
+		 *
+		 * @param {Number} menuId Indicates the menu identifier.
+		 * @param {String} rootMenuItemURL Indicates the root menu item identifier.
+		 * @param {String} menuItemTitle A String title for the menu item.
+		 * @param {String} menuItemURL The path this menu item will link to.
+		 * @param {String} [menuItemUIRoute=menuItemURL] The UIRoute value, which is used to define the URL scheme where this menu item is marked as active.
+		 * @param {Boolean} isPublic Indicates whether a menu item should be displayed only to authenticated users.
+		 * @param {Array.<String>} [roles=&#91;'user'&#93;] An array indicating the roles that are allowed to view this menu item.
+		 * @param {Number} [position=0] -
+		 * @return {Object} The menu object.
+		 *
+		 * @description
+		 * Adds a submenu item to an existing item object.
+		 */
 		// Add submenu item object
 		this.addSubMenuItem = function(menuId, rootMenuItemURL, menuItemTitle, menuItemURL, menuItemUIRoute, isPublic, roles, position) {
 			// Validate that the menu exists

@@ -1,5 +1,18 @@
 'use strict';
 
+/**
+ * @ngdoc controller
+ * @name module:users.controller:AuthenticationController
+ *
+ * @requires $cope
+ * @requires $http
+ * @requires $location
+ * @requires module:users.service:Authentication
+ *
+ * @description
+ * Authentication controller
+ */
+
 angular.module('users').controller('AuthenticationController', ['$scope', '$http', '$location', 'Authentication',
 	function($scope, $http, $location, Authentication) {
 		$scope.authentication = Authentication;

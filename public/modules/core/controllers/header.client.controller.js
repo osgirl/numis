@@ -1,5 +1,17 @@
 'use strict';
 
+/**
+ * @ngdoc controller
+ * @name module:core.controller:HeaderController
+ *
+ * @requires $cope
+ * @requires module:users.service:Authentication
+ * @requires module:core.service:Menus
+ *
+ * @description
+ * Header controller
+ */
+
 angular.module('core').controller('HeaderController', ['$scope', 'Authentication', 'Menus',
 	function($scope, Authentication, Menus) {
 		$scope.authentication = Authentication;

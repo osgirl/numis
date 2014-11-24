@@ -1,5 +1,12 @@
 'use strict';
 
+/**
+ * @ngdoc service
+ * @name module:users.service:Authentication
+ *
+ * @description -
+ */
+
 // Authentication service for user variables
 angular.module('users').factory('Authentication', [
 	function() {
