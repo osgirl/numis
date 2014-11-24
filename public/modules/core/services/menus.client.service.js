@@ -65,7 +65,7 @@ angular.module('core').service('Menus', [
 		 * @return {Object} A menu object identified by the menuId argument
 		 *
 		 * @description
-		 * Returns The menu object identified by the menuId argument.
+		 * Returns the menu object identified by the menuId argument.
 		 */
 		// Get the menu object by menu id
 		this.getMenu = function(menuId) {
@@ -103,6 +103,16 @@ angular.module('core').service('Menus', [
 			return this.menus[menuId];
 		};
 
+		/**
+		 * @ngdoc method
+		 * @name module:core.service:Menus.removeMenu
+		 * @methodOf module:core.service:Menus
+		 *
+		 * @param {Number} menuId Indicates the menu identifier
+		 *
+		 * @description
+		 * Delete the menu object identified by the menuId argument.
+		 */
 		// Remove existing menu object by menu id
 		this.removeMenu = function(menuId) {
 			// Validate that the menu exists
@@ -196,6 +206,18 @@ angular.module('core').service('Menus', [
 			return this.menus[menuId];
 		};
 
+		/**
+		 * @ngdoc method
+		 * @name module:core.service:Menus.removeMenuItem
+		 * @methodOf module:core.service:Menus
+		 *
+		 * @param {Number} menuId Indicates the menu identifier.
+		 * @param {String} menuItemURL The path this menu item link to.
+		 * @return {Object} The menu object.
+		 *
+		 * @description
+		 * Remove specified menu item.
+		 */
 		// Remove existing menu object by menu id
 		this.removeMenuItem = function(menuId, menuItemURL) {
 			// Validate that the menu exists
@@ -212,6 +234,19 @@ angular.module('core').service('Menus', [
 			return this.menus[menuId];
 		};
 
+
+		/**
+	 	 * @ngdoc method
+		 * @name module:core.service:Menus.removeSubMenuItem
+		 * @methodOf module:core.service:Menus
+		 *
+		 * @param {Number} menuId Indicates the menu identifier.
+		 * @param {String} submenuItemURL The path this submenu item link to.
+		 * @return {Object} The menu object.
+		 *
+		 * @description
+		 * Remove specified submenu item.
+		 */
 		// Remove existing menu object by menu id
 		this.removeSubMenuItem = function(menuId, submenuItemURL) {
 			// Validate that the menu exists
