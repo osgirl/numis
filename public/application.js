@@ -10,7 +10,28 @@ angular.module(ApplicationConfiguration.applicationModuleName).config(['$locatio
 	}
 ]);
 
-//Then define the init function for starting up the application
+// Add i18n to application from locales files
+angular.module(ApplicationConfiguration.applicationModuleName).config(['$translateProvider',
+	function($translateProvider) {
+		// Translate
+		$translateProvider
+		.useStaticFilesLoader({
+			prefix: 'locales/locale-',
+			suffix: '.json'
+		})
+		.registerAvailableLanguageKeys(['en', 'es'], {
+			'en-*': 'en',
+			'es-*': 'es'
+		})
+		.determinePreferredLanguage(function () {
+			//return document.documentElement.getAttribute('lang');
+			return 'es';
+		})
+		.fallbackLanguage('en');
+	}
+]);
+
+// Then define the init function for starting up the application
 angular.element(document).ready(function() {
 	//Fixing facebook bug with redirect
 	if (window.location.hash === '#_=_') window.location.hash = '#!';

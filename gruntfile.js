@@ -141,7 +141,20 @@ module.exports = function(grunt) {
 				configFile: 'karma.conf.js'
 			}
 		},
+		'merge-json': {
+			en: {
+				src: [ 'public/modules/**/locale-en.json', 'public/js/locale-en.json' ],
+				dest: 'public/locales/locale-en.json'
+			},
+			es: {
+				src: [ 'public/modules/**/locale-es.json', 'public/js/locale-es.json' ],
+				dest: 'public/locales/locale-es.json'
+			}
+		},
 		clean: {
+			locales: {
+				src: 'public/locales'
+			},
 			build: {
 				src: 'public/dist'
 			},
@@ -190,15 +203,17 @@ module.exports = function(grunt) {
 	});
 
 	// Default task(s).
-	grunt.registerTask('default', ['lint', 'concurrent:default']);
+	grunt.registerTask('default', ['lint', 'locales', 'concurrent:default']);
 
 	// Documentation task(s).
 	grunt.registerTask('docs', ['clean:docs', 'ngdocs']);
 	//grunt.registerTask('docs', ['clean:docs', 'ngdocs', 'license-report']);
 
+	// Create locales task(s)
+	grunt.registerTask('locales', ['clean:locales', 'merge-json']);
 
 	// Debug task.
-	grunt.registerTask('debug', ['lint', 'concurrent:debug']);
+	grunt.registerTask('debug', ['lint', 'locales', 'concurrent:debug']);
 
 	// Secure task(s).
 	grunt.registerTask('secure', ['env:secure', 'lint', 'concurrent:default']);
@@ -207,7 +222,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('lint', ['jshint', 'csslint']);
 
 	// Build task(s).
-	grunt.registerTask('build', ['lint', 'loadConfig', 'ngAnnotate', 'uglify', 'cssmin']);
+	grunt.registerTask('build', ['lint', 'locales', 'loadConfig', 'ngAnnotate', 'uglify', 'cssmin']);
 
 	// Test task.
 	grunt.registerTask('test', ['env:test', 'mochaTest', 'karma:unit']);

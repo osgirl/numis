@@ -1,0 +1,12 @@
+{
+    "core": {
+        "APP_TITLE": "Numis",
+        "Change_Password": "Change Password",
+        "Edit_Profile": "Edit Profile",
+        "Manage_Social_Accounts": "Manage Social Accounts",
+        "Sign_In": "Sign In",
+        "Sign_Up": "Sign Up",
+        "Signout": "Signout",
+        "Toggle_navigation": "Toggle navigation"
+    }
+}
