@@ -2,7 +2,7 @@
 
 /**
  * @ngdoc overview
- * @name module:core
+ * @name core
  *
  * @description
  * MEAN.JS Core Module

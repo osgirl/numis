@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc controller
- * @name module:users.controller:AuthenticationController
+ * @name users.controller:AuthenticationController
  *
  * @requires $cope
  * @requires $http
  * @requires $location
- * @requires module:users.service:Authentication
+ * @requires users.service:Authentication
  *
  * @description
  * Authentication controller
@@ -20,6 +20,11 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 		// If user is signed in then redirect back home
 		if ($scope.authentication.user) $location.path('/');
 
+		/**
+		* @ngdoc method
+		* @name users.controller:AuthenticationController.$scope·resetUserPassword
+		* @methodOf users.controller:AuthenticationController
+		*/
 		$scope.signup = function() {
 			$http.post('/auth/signup', $scope.credentials).success(function(response) {
 				// If successful we assign the response to the global user model
@@ -32,6 +37,11 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$http
 			});
 		};
 
+		/**
+		* @ngdoc method
+		* @name users.controller:AuthenticationController.$scope·resetUserPassword
+		* @methodOf users.controller:AuthenticationController
+		*/
 		$scope.signin = function() {
 			$http.post('/auth/signin', $scope.credentials).success(function(response) {
 				// If successful we assign the response to the global user model

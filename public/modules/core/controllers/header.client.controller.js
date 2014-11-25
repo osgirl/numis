@@ -2,11 +2,11 @@
 
 /**
  * @ngdoc controller
- * @name module:core.controller:HeaderController
+ * @name core.controller:HeaderController
  *
  * @requires $cope
  * @requires module:users.service:Authentication
- * @requires module:core.service:Menus
+ * @requires core.service:Menus
  *
  * @description
  * Header controller
@@ -18,6 +18,11 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
 		$scope.isCollapsed = false;
 		$scope.menu = Menus.getMenu('topbar');
 
+		/**
+		* @ngdoc method
+		* @name core.controller:HeaderController.$scope·toggleCollapsibleMenu
+		* @methodOf core.controller:HeaderController
+		*/
 		$scope.toggleCollapsibleMenu = function() {
 			$scope.isCollapsed = !$scope.isCollapsed;
 		};

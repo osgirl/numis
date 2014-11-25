@@ -2,13 +2,13 @@
 
 /**
  * @ngdoc controller
- * @name module:users.controller:SettingsController
+ * @name users.controller:SettingsController
  *
  * @requires $cope
  * @requires $http
  * @requires $location
- * @requires module:users.service:Users
- * @requires module:users.service:Authentication
+ * @requires users.service:Users
+ * @requires users.service:Authentication
  *
  * @description
  * Password controller
@@ -21,7 +21,14 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 		// If user is not signed in then redirect back home
 		if (!$scope.user) $location.path('/');
 
-		// Check if there are additional accounts
+		/**
+		* @ngdoc method
+		* @name users.controller:SettingsController.$scope·hasConnectedAdditionalSocialAccounts
+		* @methodOf users.controller:SettingsController
+		*
+		* @description
+		* Check if there are additional accounts
+		*/
 		$scope.hasConnectedAdditionalSocialAccounts = function(provider) {
 			for (var i in $scope.user.additionalProvidersData) {
 				return true;
@@ -30,12 +37,26 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 			return false;
 		};
 
-		// Check if provider is already in use with current user
+		/**
+		* @ngdoc method
+		* @name users.controller:SettingsController.$scope·isConnectedSocialAccount
+		* @methodOf users.controller:SettingsController
+		*
+		* @description
+		* Check if provider is already in use with current user
+		*/
 		$scope.isConnectedSocialAccount = function(provider) {
 			return $scope.user.provider === provider || ($scope.user.additionalProvidersData && $scope.user.additionalProvidersData[provider]);
 		};
 
-		// Remove a user social account
+		/**
+		* @ngdoc method
+		* @name users.controller:SettingsController.$scope·removeUserSocialAccount
+		* @methodOf users.controller:SettingsController
+		*
+		* @description
+		* Remove a user social account
+		*/
 		$scope.removeUserSocialAccount = function(provider) {
 			$scope.success = $scope.error = null;
 
@@ -52,7 +73,14 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 			});
 		};
 
-		// Update a user profile
+		/**
+		* @ngdoc method
+		* @name users.controller:SettingsController.$scope·updateUserProfile
+		* @methodOf users.controller:SettingsController
+		*
+		* @description
+		* Update a user profile
+		*/
 		$scope.updateUserProfile = function(isValid) {
 			if (isValid) {
 				$scope.success = $scope.error = null;
@@ -69,7 +97,14 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 			}
 		};
 
-		// Change user password
+		/**
+		* @ngdoc method
+		* @name users.controller:SettingsController.$scope·changeUserPassword
+		* @methodOf users.controller:SettingsController
+		*
+		* @description
+		* Change user password
+		*/
 		$scope.changeUserPassword = function() {
 			$scope.success = $scope.error = null;
 

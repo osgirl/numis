@@ -2,7 +2,7 @@
 
 /**
  * @ngdoc service
- * @name module:core.service:Menus
+ * @name core.service:Menus
  *
  * @description
  * AngularJS Menus Service
@@ -58,8 +58,8 @@ angular.module('core').service('Menus', [
 
 		/**
  		 * @ngdoc method
-		 * @name module:core.service:Menus.getMenu
-		 * @methodOf module:core.service:Menus
+		 * @name core.service:Menus.getMenu
+		 * @methodOf core.service:Menus
 	 	 *
 		 * @param {Number} menuId Indicates the menu identifier
 		 * @return {Object} A menu object identified by the menuId argument
@@ -78,8 +78,8 @@ angular.module('core').service('Menus', [
 
 		/**
 		 * @ngdoc method
-		 * @name module:core.service:Menus.addMenu
-		 * @methodOf module:core.service:Menus
+		 * @name core.service:Menus.addMenu
+		 * @methodOf core.service:Menus
 		 *
 		 * @param {Number} menuId Indicates the menu identifier for future reference
 		 * @param {Boolean} isPublic Indicates whether a menu should be displayed only to authenticated users
@@ -105,8 +105,8 @@ angular.module('core').service('Menus', [
 
 		/**
 		 * @ngdoc method
-		 * @name module:core.service:Menus.removeMenu
-		 * @methodOf module:core.service:Menus
+		 * @name core.service:Menus.removeMenu
+		 * @methodOf core.service:Menus
 		 *
 		 * @param {Number} menuId Indicates the menu identifier
 		 *
@@ -124,8 +124,8 @@ angular.module('core').service('Menus', [
 
 		/**
 		 * @ngdoc method
-		 * @name module:core.service:Menus.addMenuItem
-		 * @methodOf module:core.service:Menus
+		 * @name core.service:Menus.addMenuItem
+		 * @methodOf core.service:Menus
 		 *
 		 * @param {Number} menuId Indicates the menu identifier.
 		 * @param {String} menuItemTitle A String title for the menu item.
@@ -165,8 +165,8 @@ angular.module('core').service('Menus', [
 
 		/**
 		 * @ngdoc method
-		 * @name module:core.service:Menus.addSubMenuItem
-		 * @methodOf module:core.service:Menus
+		 * @name core.service:Menus.addSubMenuItem
+		 * @methodOf core.service:Menus
 		 *
 		 * @param {Number} menuId Indicates the menu identifier.
 		 * @param {String} rootMenuItemURL Indicates the root menu item identifier.
@@ -208,8 +208,8 @@ angular.module('core').service('Menus', [
 
 		/**
 		 * @ngdoc method
-		 * @name module:core.service:Menus.removeMenuItem
-		 * @methodOf module:core.service:Menus
+		 * @name core.service:Menus.removeMenuItem
+		 * @methodOf core.service:Menus
 		 *
 		 * @param {Number} menuId Indicates the menu identifier.
 		 * @param {String} menuItemURL The path this menu item link to.
@@ -237,8 +237,8 @@ angular.module('core').service('Menus', [
 
 		/**
 	 	 * @ngdoc method
-		 * @name module:core.service:Menus.removeSubMenuItem
-		 * @methodOf module:core.service:Menus
+		 * @name core.service:Menus.removeSubMenuItem
+		 * @methodOf core.service:Menus
 		 *
 		 * @param {Number} menuId Indicates the menu identifier.
 		 * @param {String} submenuItemURL The path this submenu item link to.

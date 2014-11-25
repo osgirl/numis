@@ -2,13 +2,13 @@
 
 /**
  * @ngdoc controller
- * @name module:users.controller:PasswordController
+ * @name users.controller:PasswordController
  *
  * @requires $cope
  * @requires $stateParams
  * @requires $http
  * @requires $location
- * @requires module:users.service:Authentication
+ * @requires users.service:Authentication
  *
  * @description
  * Password controller
@@ -21,7 +21,14 @@ angular.module('users').controller('PasswordController', ['$scope', '$stateParam
 		//If user is signed in then redirect back home
 		if ($scope.authentication.user) $location.path('/');
 
-		// Submit forgotten password account id
+		/**
+		* @ngdoc method
+		* @name users.controller:PasswordController.$scope·askForPasswordReset
+		* @methodOf users.controller:PasswordController
+		*
+		* @description
+		* Submit forgotten password account id
+		*/
 		$scope.askForPasswordReset = function() {
 			$scope.success = $scope.error = null;
 
@@ -37,7 +44,14 @@ angular.module('users').controller('PasswordController', ['$scope', '$stateParam
 			});
 		};
 
-		// Change user password
+		/**
+		* @ngdoc method
+		* @name users.controller:PasswordController.$scope·resetUserPassword
+		* @methodOf users.controller:PasswordController
+		*
+		* @description
+		* Change user password
+		*/
 		$scope.resetUserPassword = function() {
 			$scope.success = $scope.error = null;
 

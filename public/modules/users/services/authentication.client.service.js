@@ -2,7 +2,7 @@
 
 /**
  * @ngdoc service
- * @name module:users.service:Authentication
+ * @name users.service:Authentication
  *
  * @description -
  */

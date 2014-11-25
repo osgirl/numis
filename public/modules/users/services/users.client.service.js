@@ -2,7 +2,7 @@
 
 /**
  * @ngdoc service
- * @name module:users.service:Users
+ * @name users.service:Users
  *
  * @requires $resource
  *
@@ -15,8 +15,8 @@ angular.module('users').factory('Users', ['$resource',
 		return $resource('users', {}, {
 			/**
 			 * @ngdoc method
-			 * @name module:users.service:Users.update
-			 * @methodOf module:users.service:Users
+			 * @name users.service:Users.update
+			 * @methodOf users.service:Users
 			 */
 			update: {
 				method: 'PUT'

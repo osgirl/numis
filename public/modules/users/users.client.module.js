@@ -2,7 +2,7 @@
 
 /**
  * @ngdoc overview
- * @name module:users
+ * @name users
  *
  * @description
  * MEAN.JS User Module with Authentication

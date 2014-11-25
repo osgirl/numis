@@ -2,7 +2,7 @@
 
 /**
  * @ngdoc controller
- * @name module:core.controller:HomeController
+ * @name core.controller:HomeController
  *
  * @requires $cope
  * @requires users.service:Authentication
