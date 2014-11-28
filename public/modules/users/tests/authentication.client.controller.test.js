@@ -25,7 +25,22 @@
 		});
 
 		// Load the main application module
-		beforeEach(module(ApplicationConfiguration.applicationModuleName));
+		beforeEach(module(ApplicationConfiguration.applicationModuleName, function ($provide, $translateProvider) {
+
+			// Prevent XHR callfor locale files
+			$provide.factory('customLoader', function ($q) {
+				return function () {
+					var deferred = $q.defer();
+					deferred.resolve({});
+					return deferred.promise;
+				};
+			});
+
+			$translateProvider.useLoader('customLoader');
+
+			// Another option would be to always provide the preferred language
+			// $translateProvider.translations('en', {});
+		}));
 
 		// The injector ignores leading and trailing underscores here (i.e. _$httpBackend_).
 		// This allows us to inject a service but then attach it to a variable
