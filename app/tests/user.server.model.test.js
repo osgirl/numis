@@ -10,7 +10,7 @@ var should = require('should'),
 /**
  * Globals
  */
-var user, user2;
+var user, user2, user3;
 
 /**
  * Unit tests
@@ -35,6 +35,16 @@ describe('User Model Unit Tests:', function() {
 			password: 'password',
 			provider: 'local'
 		});
+		user3 = new User({
+			firstName: 'John',
+			lastName: 'Doe',
+			displayName: 'John Doe',
+			email: 'jdoe@test.com',
+			username: 'jdoe',
+			password: 'password',
+			provider: 'local',
+			homeAddress: 'Fake Street 123, 22150 Springfiled, Virginia USA'
+		});
 
 		done();
 	});
@@ -49,6 +59,10 @@ describe('User Model Unit Tests:', function() {
 
 		it('should be able to save without problems', function(done) {
 			user.save(done);
+		});
+
+		it('should be able to save user with home address without problems', function(done) {
+			user3.save(done);
 		});
 
 		it('should fail to save an existing user again', function(done) {

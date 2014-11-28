@@ -21,6 +21,12 @@ var validateLocalStrategyPassword = function(password) {
 	return (this.provider !== 'local' || (password && password.length > 6));
 };
 
+
+/**
+* Creates a new Person.
+* @class Person
+*/
+
 /**
  * User Schema
  */
@@ -88,6 +94,10 @@ var UserSchema = new Schema({
 	},
 	resetPasswordExpires: {
 		type: Date
+	},
+	homeAddress: {
+		type: String,
+		trim: true
 	}
 });
 
@@ -143,4 +153,11 @@ UserSchema.statics.findUniqueUsername = function(username, suffix, callback) {
 	});
 };
 
+// Compile a 'User' model using the UserSchema as the structure.
+// Mongoose also creates a MongoDB collection called 'users' for these documents.
+//
+// Notice that the 'User' model is capitalized, this is because when a model is compiled,
+// the result is a constructor function that is used to create instances of the model.
+// The instances created from the model constructor are documents which will be persisted
+// by Mongo.
 mongoose.model('User', UserSchema);
