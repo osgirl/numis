@@ -7,6 +7,14 @@
         "Sign_In": "Sign In",
         "Sign_Up": "Sign Up",
         "Signout": "Signout",
-        "Toggle_navigation": "Toggle navigation"
+        "Toggle_navigation": "Toggle navigation",
+        "FIELD_REQUIRED": "This field is required.",
+        "FIELD_LENGTHS": "Must be between {{min}} and {{max}} characters.",
+        "FIELD_MINLENGTH": "The minimum length is {{min}} characters",
+        "FIELD_MAXLENGTH": "The maximum length is {{max}} characters.",
+        "Yes": "Yes",
+        "No": "No",
+        "Ok": "Ok",
+        "Cancel": "Cancel"
     }
 }
