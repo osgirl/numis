@@ -1,14 +1,20 @@
 <section data-ng-controller="GroupbuysController">
     <div class="page-header">
-        <h1>New Groupbuy</h1>
+        <h1>{{'groupbuys.New_Groupbuy' | translate}}</h1>
     </div>
     <div class="col-md-12">
         <form class="form-horizontal" data-ng-submit="create()" novalidate>
             <fieldset>
                 <div class="form-group">
-                    <label class="control-label" for="name">Name</label>
+                    <label class="control-label" for="name">{{'groupbuys.Name' | translate}}</label>
                     <div class="controls">
-                        <input type="text" data-ng-model="name" id="name" class="form-control" placeholder="Name" required>
+                        <input type="text" data-ng-model="name" id="name" class="form-control" placeholder="{{'groupbuys.Name' | translate}}"required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="description">{{'groupbuys.Description' | translate}}</label>
+                    <div class="controls">
+                        <input type="text" data-ng-model="description" id="description" class="form-control" placeholder="{{'groupbuys.Description' | translate}}" required>
                     </div>
                 </div>
                 <div class="form-group">

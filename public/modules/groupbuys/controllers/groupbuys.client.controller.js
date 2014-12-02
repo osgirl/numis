@@ -25,7 +25,7 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 
 		// Remove existing Groupbuy
 		$scope.remove = function(groupbuy) {
-			if ( groupbuy ) { 
+			if ( groupbuy ) {
 				groupbuy.$remove();
 
 				for (var i in $scope.groupbuys) {
@@ -58,7 +58,7 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 
 		// Find existing Groupbuy
 		$scope.findOne = function() {
-			$scope.groupbuy = Groupbuys.get({ 
+			$scope.groupbuy = Groupbuys.get({
 				groupbuyId: $stateParams.groupbuyId
 			});
 		};

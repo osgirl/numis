@@ -24,11 +24,12 @@ var GroupbuySchema = new Schema({
 		trim: true
 	},
 	items: {
-
+		type: String
 	},
-	managers: {
-
-	},
+	managers: [{
+		type: Schema.ObjectId,
+		ref: 'User'
+	}],
 	members: [{
 		type: Schema.ObjectId,
 		ref: 'User'
@@ -54,7 +55,7 @@ var GroupbuySchema = new Schema({
 	}
 });
 
-GroupbuySchema.plugin(slug('name'));
+//GroupbuySchema.plugin(slug('name'));
 
 
 mongoose.model('Groupbuy', GroupbuySchema);
