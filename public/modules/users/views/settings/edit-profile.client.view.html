@@ -1,38 +1,47 @@
 <section class="row" data-ng-controller="SettingsController">
 	<h3 class="col-md-12 text-center">{{'users.Edit_your_profile' | translate}}</h3>
-	<div class="col-xs-offset-2 col-xs-8 col-md-offset-5 col-md-2 col-lg-offset-4 col-lg-4">
-		<form name="userForm" data-ng-submit="updateUserProfile(userForm.$valid)" class="signin form-horizontal" autocomplete="off">
-			<fieldset>
-				<div class="form-group">
-					<label for="firstName">{{'users.First_Name' | translate}}</label>
-					<input type="text" id="firstName" name="firstName" class="form-control" data-ng-model="user.firstName" placeholder="{{'users.First_Name' | translate}}">
-				</div>
-				<div class="form-group">
-					<label for="lastName">{{'users.Last_Name' | translate}}</label>
-					<input type="text" id="lastName" name="lastName" class="form-control" data-ng-model="user.lastName" placeholder="{{'users.Last_Name' | translate}}">
-				</div>
-				<div class="form-group">
-					<label for="email">{{'users.Email' | translate}}</label>
-					<input type="email" id="email" name="email" class="form-control" data-ng-model="user.email" placeholder="{{'users.Email' | translate}}">
-				</div>
-				<div class="form-group">
-					<label for="username">{{'users.Username' | translate}}</label>
-					<input type="text" id="username" name="username" class="form-control" data-ng-model="user.username" placeholder="{{'users.Username' | translate}}">
-				</div>
-				<div class="form-group">
-					<label for="username">{{'users.Home_Address' | translate}}</label>
-					<textarea id="homeAddress" name="homeAddress" class="form-control" data-ng-model="user.homeAddress" rows="3" placeholder="{{'users.Home_Address' | translate}}"></textarea>
-				</div>
-				<div class="text-center form-group">
-					<button type="submit" class="btn btn-large btn-primary">{{'users.Save_Profile' | translate}}</button>
-				</div>
-				<div data-ng-show="success" class="text-center text-success">
-					<strong>{{'users.Profile_Saved_Successfully' | translate}}</strong>
-				</div>
-				<div data-ng-show="error" class="text-center text-danger">
-					<strong data-ng-bind="error"></strong>
-				</div>
-			</fieldset>
-		</form>
+	<div class="col-xs-offset-2 col-xs-8 col-md-offset-4 col-md-4 col-lg-offset-4 col-lg-4">
+		<h3 class="col-xs-12 col-md-6 col-lg-6">{{user.username}}</h3>
+		<div class="col-xs-12 col-md-12 col-lg-12">
+			<form name="userForm" data-ng-submit="updateUserProfile(userForm.$valid)" class="signin form-horizontal" autocomplete="off">
+				<fieldset>
+					<div class="form-group">
+						<label for="firstName">{{'users.First_Name' | translate}}</label>
+						<input type="text" id="firstName" name="firstName" class="form-control" ng-required="true" data-ng-model="user.firstName" placeholder="{{'users.First_Name' | translate}}">
+						<span class="error-message" data-ng-show="userForm.firstName.$dirty && userForm.firstName.$error.required" translate="core.FIELD_REQUIRED"></span>
+					</div>
+					<div class="form-group">
+						<label for="lastName">{{'users.Last_Name' | translate}}</label>
+						<input type="text" id="lastName" name="lastName" class="form-control" ng-required="true" data-ng-model="user.lastName" placeholder="{{'users.Last_Name' | translate}}">
+						<span class="error-message" data-ng-show="userForm.lastName.$dirty && userForm.lastName.$error.required" translate="core.FIELD_REQUIRED"></span>
+					</div>
+					<div class="form-group">
+						<label for="email">{{'users.Email' | translate}}</label>
+						<input type="email" id="email" name="email" class="form-control" ng-required="true" data-ng-model="user.email" placeholder="{{'users.Email' | translate}}">
+						<span class="error-message" data-ng-show="userForm.email.$dirty && userForm.email.$error.required" translate="core.FIELD_REQUIRED"></span>
+					</div>
+					<div class="form-group" data-ng-show="isAdmin()">
+						<label for="username">{{'users.Username' | translate}}</label>
+						<input type="text" id="username" name="username" class="form-control" ng-required="true" ng-minlength="3" ng-maxlength="20" data-ng-model="user.username" placeholder="{{'users.Username' | translate}}">
+						<span class="error-message" data-ng-show="userForm.username.$dirty && userForm.username.$error.required" translate="core.FIELD_REQUIRED"></span>
+						<span class="error-message" data-ng-show="userForm.username.$dirty && userForm.username.$error.minlength" translate="core.FIELD_LENGTHS" translate-values="{min: 3, max: 20}"></span>
+						<span class="error-message" data-ng-show="userForm.username.$dirty && userForm.username.$error.maxlength" translate="core.FIELD_LENGTHS" translate-values="{min: 3, max: 20}"></span>
+					</div>
+					<div class="form-group">
+						<label for="username">{{'users.Home_Address' | translate}}</label>
+						<textarea id="homeAddress" name="homeAddress" class="form-control" data-ng-model="user.homeAddress" rows="3" placeholder="{{'users.Home_Address' | translate}}"></textarea>
+					</div>
+					<div class="text-center form-group">
+						<button type="submit" class="btn btn-large btn-primary" ng-disabled="userForm.$invalid">{{'users.Save_Profile' | translate}}</button>
+					</div>
+					<div data-ng-show="success" class="text-center text-success">
+						<strong>{{'users.Profile_Saved_Successfully' | translate}}</strong>
+					</div>
+					<div data-ng-show="error" class="text-center text-danger">
+						<strong data-ng-bind="error"></strong>
+					</div>
+				</fieldset>
+			</form>
+		</div>
 	</div>
 </section>
