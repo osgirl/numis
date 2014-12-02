@@ -1,6 +1,7 @@
 <section class="row" data-ng-controller="AuthenticationController">
+<!--
 	<h3 class="col-md-12 text-center">{{'users.Sign_up_social_accounts' | translate}}</h3>
-	<div class="col-md-12 text-center">
+	<div class="col-md-12 text-center social_auth">
 		<a href="/auth/facebook" class="undecorated-link">
 			<img src="/modules/users/img/buttons/facebook.png">
 		</a>
@@ -13,38 +14,47 @@
 		<a href="/auth/linkedin" class="undecorated-link">
 			<img src="/modules/users/img/buttons/linkedin.png">
 		</a>
-<!--
 		<a href="/auth/github" class="undecorated-link">
 			<img src="/modules/users/img/buttons/github.png">
 		</a>
--->
 	</div>
 	<h3 class="col-md-12 text-center">{{'users.Sign_up_local_account' | translate}}</h3>
-	<div class="col-xs-offset-2 col-xs-8 col-md-offset-5 col-md-2">
+-->
+	<h3 class="col-md-12 text-center">{{'users.Sign_up' | translate}}</h3>
+	<div class="col-xs-offset-2 col-xs-8 col-md-offset-5 col-md-2 col-lg-offset-4 col-lg-4">
 		<form name="userForm" data-ng-submit="signup()" class="signin form-horizontal" novalidate autocomplete="off">
 			<fieldset>
 				<div class="form-group">
 					<label for="firstName">{{'users.First_Name' | translate}}</label>
-					<input type="text" required id="firstName" name="firstName" class="form-control" data-ng-model="credentials.firstName" placeholder="{{'users.First_Name' | translate}}">
+					<input type="text" id="firstName" name="firstName" class="form-control" ng-required="true" data-ng-model="credentials.firstName" placeholder="{{'users.First_Name' | translate}}">
+					<span class="error-message" data-ng-show="userForm.firstName.$dirty && userForm.firstName.$error.required" translate="core.FIELD_REQUIRED"></span>
 				</div>
 				<div class="form-group">
 					<label for="lastName">{{'users.Last_Name' | translate}}</label>
-					<input type="text" id="lastName" name="lastName" class="form-control" data-ng-model="credentials.lastName" placeholder="{{'users.Last_Name' | translate}}">
+					<input type="text" id="lastName" name="lastName" class="form-control" ng-required="true" data-ng-model="credentials.lastName" placeholder="{{'users.Last_Name' | translate}}">
+					<span class="error-message" data-ng-show="userForm.lastName.$dirty && userForm.lastName.$error.required" translate="core.FIELD_REQUIRED"></span>
 				</div>
 				<div class="form-group">
 					<label for="email">{{'users.Email' | translate}}</label>
-					<input type="email" id="email" name="email" class="form-control" data-ng-model="credentials.email" placeholder="{{'users.Email' | translate}}">
+					<input type="email" id="email" name="email" class="form-control" ng-required="true" data-ng-model="credentials.email" placeholder="{{'users.Email' | translate}}">
+					<span class="error-message" data-ng-show="userForm.email.$dirty && userForm.email.$error.required" translate="core.FIELD_REQUIRED"></span>
 				</div>
 				<div class="form-group">
 					<label for="username">{{'users.Username' | translate}}</label>
-					<input type="text" id="username" name="username" class="form-control" data-ng-model="credentials.username" placeholder="{{'users.Username' | translate}}">
+					<input type="text" id="username" name="username" class="form-control" ng-required="true" ng-minlength="3" ng-maxlength="20" data-ng-model="credentials.username" placeholder="{{'users.Username' | translate}}">
+					<span class="error-message" data-ng-show="userForm.username.$dirty && userForm.username.$error.required" translate="core.FIELD_REQUIRED"></span>
+					<span class="error-message" data-ng-show="userForm.username.$dirty && userForm.username.$error.minlength" translate="core.FIELD_LENGTHS" translate-values="{min: 3, max: 20}"></span>
+					<span class="error-message" data-ng-show="userForm.username.$dirty && userForm.username.$error.maxlength" translate="core.FIELD_LENGTHS" translate-values="{min: 3, max: 20}"></span>
 				</div>
 				<div class="form-group">
 					<label for="password">{{'users.Password' | translate}}</label>
-					<input type="password" id="password" name="password" class="form-control" data-ng-model="credentials.password" placeholder="{{'users.Password' | translate}}">
+					<input type="password" id="password" name="password" class="form-control" ng-required="true" ng-minlength="8" data-ng-model="credentials.password" placeholder="{{'users.Password' | translate}}">
+					<span class="error-message" data-ng-show="userForm.password.$dirty && userForm.password.$error.required" translate="core.FIELD_REQUIRED"></span>
+					<span class="error-message" data-ng-show="userForm.password.$dirty && userForm.password.$error.minlength" translate="core.FIELD_MINLENGTH" translate-values="{min: 8}"></span>
 				</div>
 				<div class="text-center form-group">
-					<button type="submit" class="btn btn-large btn-primary">{{'users.Sign_up' | translate}}</button>&nbsp; or&nbsp;
+					<alert type="danger">Username already exists</alert>
+					<button type="submit" class="btn btn-large btn-primary" ng-disabled="userForm.$invalid">{{'users.Sign_up' | translate}}</button>&nbsp; or&nbsp;
 					<a href="/#!/signin" class="show-signup">{{'users.Sign_in' | translate}}</a>
 				</div>
 				<div data-ng-show="error" class="text-center text-danger">
