@@ -6,21 +6,25 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 		$scope.authentication = Authentication;
 
 		// Create new Groupbuy
-		$scope.create = function() {
-			// Create new Groupbuy object
-			var groupbuy = new Groupbuys ({
-				name: this.name
-			});
+		$scope.create = function(isValid) {
+			if (isValid) {
+				$scope.success = $scope.error = null;
+				// Create new Groupbuy object
+				var groupbuy = new Groupbuys ($scope.groupbuy);
 
-			// Redirect after save
-			groupbuy.$save(function(response) {
-				$location.path('groupbuys/' + response._id);
+				// Redirect after save
+				groupbuy.$save(function(response) {
+					$scope.success = true;
+					$location.path('groupbuys/' + response.slug);
 
-				// Clear form fields
-				$scope.name = '';
-			}, function(errorResponse) {
-				$scope.error = errorResponse.data.message;
-			});
+					// Clear form fields
+					$scope.name = '';
+				}, function(errorResponse) {
+					$scope.error = errorResponse.data.message;
+				});
+			} else {
+				$scope.submitted = true;
+			}
 		};
 
 		// Remove existing Groupbuy
@@ -59,7 +63,7 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 		// Find existing Groupbuy
 		$scope.findOne = function() {
 			$scope.groupbuy = Groupbuys.get({
-				groupbuyId: $stateParams.groupbuyId
+				groupbuySlug: $stateParams.groupbuySlug
 			});
 		};
 	}

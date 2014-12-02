@@ -4,8 +4,8 @@
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
-	Schema	 = mongoose.Schema,
-	slug	 = require('mongoose-slug-unique');
+	slug	 = require('mongoose-url-slugs'),
+	Schema	 = mongoose.Schema;
 
 /**
  * Groupbuy Schema
@@ -55,7 +55,7 @@ var GroupbuySchema = new Schema({
 	}
 });
 
-//GroupbuySchema.plugin(slug('name'));
+GroupbuySchema.plugin(slug('name'));
 
 
 mongoose.model('Groupbuy', GroupbuySchema);

@@ -72,7 +72,7 @@ exports.delete = function(req, res) {
 /**
  * List of Groupbuys
  */
-exports.list = function(req, res) { 
+exports.list = function(req, res) {
 	Groupbuy.find().sort('-created').populate('user', 'displayName').exec(function(err, groupbuys) {
 		if (err) {
 			return res.status(400).send({
@@ -87,10 +87,19 @@ exports.list = function(req, res) {
 /**
  * Groupbuy middleware
  */
-exports.groupbuyByID = function(req, res, next, id) { 
+exports.groupbuyByID = function(req, res, next, id) {
 	Groupbuy.findById(id).populate('user', 'displayName').exec(function(err, groupbuy) {
 		if (err) return next(err);
 		if (! groupbuy) return next(new Error('Failed to load Groupbuy ' + id));
+		req.groupbuy = groupbuy ;
+		next();
+	});
+};
+
+exports.groupbuyBySlug = function(req, res, next, slug) {
+	Groupbuy.findOne({'slug': slug}).populate('user', 'displayName').exec(function(err, groupbuy) {
+		if (err) return next(err);
+		if (! groupbuy) return next(new Error('Failed to load Groupbuy by slug ' + slug));
 		req.groupbuy = groupbuy ;
 		next();
 	});

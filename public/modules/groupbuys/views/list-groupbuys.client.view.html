@@ -3,7 +3,7 @@
         <h1>Groupbuys</h1>
     </div>
     <div class="list-group">
-        <a data-ng-repeat="groupbuy in groupbuys" data-ng-href="#!/groupbuys/{{groupbuy._id}}" class="list-group-item">
+        <a data-ng-repeat="groupbuy in groupbuys" data-ng-href="#!/groupbuys/{{groupbuy.slug}}" class="list-group-item">
 			<small class="list-group-item-text">
 				Posted on
 				<span data-ng-bind="groupbuy.created | date:'medium'"></span>

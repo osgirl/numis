@@ -9,11 +9,12 @@ module.exports = function(app) {
 		.get(groupbuys.list)
 		.post(users.requiresLogin, groupbuys.create);
 
-	app.route('/groupbuys/:groupbuyId')
+	app.route('/groupbuys/:groupbuySlug')
 		.get(groupbuys.read)
 		.put(users.requiresLogin, groupbuys.hasAuthorization, groupbuys.update)
 		.delete(users.requiresLogin, groupbuys.hasAuthorization, groupbuys.delete);
 
 	// Finish by binding the Groupbuy middleware
 	app.param('groupbuyId', groupbuys.groupbuyByID);
+	app.param('groupbuySlug', groupbuys.groupbuyBySlug);
 };
