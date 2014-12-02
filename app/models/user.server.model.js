@@ -4,8 +4,9 @@
  * Module dependencies.
  */
 var mongoose = require('mongoose'),
-	Schema = mongoose.Schema,
-	crypto = require('crypto');
+	slug	 = require('mongoose-url-slugs'),
+	crypto	 = require('crypto'),
+	Schema 	 = mongoose.Schema;
 
 /**
  * A Validation function for local strategy properties
@@ -100,6 +101,9 @@ var UserSchema = new Schema({
 		trim: true
 	}
 });
+
+UserSchema.plugin(slug('username'));
+
 
 /**
  * Hook a pre save method to hash the password
