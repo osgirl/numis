@@ -2,6 +2,8 @@
     "groupbuys": {
         "Name": "Nombre",
         "Description": "Descripción",
-        "New_Groupbuy": "Nueva compra en grupo"
+        "Groupbuys": "Compras en grupo",
+        "New_Groupbuy": "Nueva compra en grupo",
+        "List_Groupbuys": "Lista de compras en grupo"
     }
 }

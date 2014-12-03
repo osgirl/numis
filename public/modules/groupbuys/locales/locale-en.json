@@ -2,6 +2,8 @@
     "groupbuys": {
         "Name": "Name",
         "Description": "Description",
-        "New_Groupbuy": "New Groupbuy"
+        "Groupbuys": "Groupbuys",
+        "New_Groupbuy": "New Groupbuy",
+        "List_Groupbuys": "List Groupbuys"
     }
 }
