@@ -38,7 +38,8 @@ describe('Groupbuy CRUD tests', function() {
 		// Save a user to the test db and create new Groupbuy
 		user.save(function() {
 			groupbuy = {
-				name: 'Groupbuy Name'
+				name: 'Groupbuy Name',
+				description: 'Groupbuy Description'
 			};
 
 			done();
@@ -76,6 +77,7 @@ describe('Groupbuy CRUD tests', function() {
 								// Set assertions
 								(groupbuys[0].user._id).should.equal(userId);
 								(groupbuys[0].name).should.match('Groupbuy Name');
+								(groupbuys[0].description).should.match('Groupbuy Description');
 
 								// Call the assertion callback
 								done();
@@ -97,6 +99,7 @@ describe('Groupbuy CRUD tests', function() {
 	it('should not be able to save Groupbuy instance if no name is provided', function(done) {
 		// Invalidate name field
 		groupbuy.name = '';
+		groupbuy.slug = '_';
 
 		agent.post('/auth/signin')
 			.send(credentials)
@@ -115,7 +118,35 @@ describe('Groupbuy CRUD tests', function() {
 					.end(function(groupbuySaveErr, groupbuySaveRes) {
 						// Set message assertion
 						(groupbuySaveRes.body.message).should.match('Please fill Groupbuy name');
-						
+
+						// Handle Groupbuy save error
+						done(groupbuySaveErr);
+					});
+			});
+	});
+
+	it('should not be able to save Groupbuy instance if no description is provided', function(done) {
+		// Invalidate name field
+		groupbuy.description = '';
+
+		agent.post('/auth/signin')
+			.send(credentials)
+			.expect(200)
+			.end(function(signinErr, signinRes) {
+				// Handle signin error
+				if (signinErr) done(signinErr);
+
+				// Get the userId
+				var userId = user.id;
+
+				// Save a new Groupbuy
+				agent.post('/groupbuys')
+					.send(groupbuy)
+					.expect(400)
+					.end(function(groupbuySaveErr, groupbuySaveRes) {
+						// Set message assertion
+						(groupbuySaveRes.body.message).should.match('Please fill Groupbuy description');
+
 						// Handle Groupbuy save error
 						done(groupbuySaveErr);
 					});
@@ -145,7 +176,7 @@ describe('Groupbuy CRUD tests', function() {
 						groupbuy.name = 'WHY YOU GOTTA BE SO MEAN?';
 
 						// Update existing Groupbuy
-						agent.put('/groupbuys/' + groupbuySaveRes.body._id)
+						agent.put('/groupbuys/' + groupbuySaveRes.body.slug)
 							.send(groupbuy)
 							.expect(200)
 							.end(function(groupbuyUpdateErr, groupbuyUpdateRes) {
@@ -189,7 +220,7 @@ describe('Groupbuy CRUD tests', function() {
 
 		// Save the Groupbuy
 		groupbuyObj.save(function() {
-			request(app).get('/groupbuys/' + groupbuyObj._id)
+			request(app).get('/groupbuys/' + groupbuyObj.slug)
 				.end(function(req, res) {
 					// Set assertion
 					res.body.should.be.an.Object.with.property('name', groupbuy.name);
@@ -220,7 +251,7 @@ describe('Groupbuy CRUD tests', function() {
 						if (groupbuySaveErr) done(groupbuySaveErr);
 
 						// Delete existing Groupbuy
-						agent.delete('/groupbuys/' + groupbuySaveRes.body._id)
+						agent.delete('/groupbuys/' + groupbuySaveRes.body.slug)
 							.send(groupbuy)
 							.expect(200)
 							.end(function(groupbuyDeleteErr, groupbuyDeleteRes) {
@@ -228,7 +259,7 @@ describe('Groupbuy CRUD tests', function() {
 								if (groupbuyDeleteErr) done(groupbuyDeleteErr);
 
 								// Set assertions
-								(groupbuyDeleteRes.body._id).should.equal(groupbuySaveRes.body._id);
+								(groupbuyDeleteRes.body.slug).should.equal(groupbuySaveRes.body.slug);
 
 								// Call the assertion callback
 								done();
@@ -238,7 +269,7 @@ describe('Groupbuy CRUD tests', function() {
 	});
 
 	it('should not be able to delete Groupbuy instance if not signed in', function(done) {
-		// Set Groupbuy user 
+		// Set Groupbuy user
 		groupbuy.user = user;
 
 		// Create new Groupbuy model instance
@@ -247,7 +278,7 @@ describe('Groupbuy CRUD tests', function() {
 		// Save the Groupbuy
 		groupbuyObj.save(function() {
 			// Try deleting Groupbuy
-			request(app).delete('/groupbuys/' + groupbuyObj._id)
+			request(app).delete('/groupbuys/' + groupbuyObj.slug)
 			.expect(401)
 			.end(function(groupbuyDeleteErr, groupbuyDeleteRes) {
 				// Set message assertion

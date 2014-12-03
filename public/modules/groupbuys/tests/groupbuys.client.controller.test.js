@@ -5,10 +5,10 @@
 	describe('Groupbuys Controller Tests', function() {
 		// Initialize global variables
 		var GroupbuysController,
-		scope,
-		$httpBackend,
-		$stateParams,
-		$location;
+			scope,
+			$httpBackend,
+			$stateParams,
+			$location;
 
 		// The $resource service augments the response object with methods for updating and deleting the resource.
 		// If we were to use the standard toEqual matcher, our tests would fail because the test values would not match
@@ -88,14 +88,16 @@
 		it('$scope.findOne() should create an array with one Groupbuy object fetched from XHR using a groupbuyId URL parameter', inject(function(Groupbuys) {
 			// Define a sample Groupbuy object
 			var sampleGroupbuy = new Groupbuys({
-				name: 'New Groupbuy'
+				name: 'New Groupbuy',
+				description: 'This is a new groupbuy'
 			});
 
 			// Set the URL parameter
-			$stateParams.groupbuyId = '525a8422f6d0f87f0e407a33';
+			//$stateParams.groupbuyId = '525a8422f6d0f87f0e407a33';
+			$stateParams.groupbuySlug = 'new-groupbuy';
 
 			// Set GET response
-			$httpBackend.expectGET(/groupbuys\/([0-9a-fA-F]{24})$/).respond(sampleGroupbuy);
+			$httpBackend.expectGET(/groupbuys\/([0-9a-z\-]{10,80})$/).respond(sampleGroupbuy);
 
 			// Run controller functionality
 			scope.findOne();
@@ -108,64 +110,71 @@
 		it('$scope.create() with valid form data should send a POST request with the form input values and then locate to new object URL', inject(function(Groupbuys) {
 			// Create a sample Groupbuy object
 			var sampleGroupbuyPostData = new Groupbuys({
-				name: 'New Groupbuy'
+				name: 'New Groupbuy',
+				description: 'This is a new groupbuy'
 			});
 
 			// Create a sample Groupbuy response
 			var sampleGroupbuyResponse = new Groupbuys({
 				_id: '525cf20451979dea2c000001',
-				name: 'New Groupbuy'
+				name: 'New Groupbuy',
+				slug: 'new-groupbuy',
+				description: 'This is a new groupbuy'
 			});
 
 			// Fixture mock form input values
-			scope.name = 'New Groupbuy';
+			scope.groupbuy = {};
+			scope.groupbuy.name = 'New Groupbuy';
+			scope.groupbuy.description = 'This is a new groupbuy';
 
 			// Set POST response
 			$httpBackend.expectPOST('groupbuys', sampleGroupbuyPostData).respond(sampleGroupbuyResponse);
 
 			// Run controller functionality
-			scope.create();
+			scope.create(true);
 			$httpBackend.flush();
 
 			// Test form inputs are reset
 			expect(scope.name).toEqual('');
 
 			// Test URL redirection after the Groupbuy was created
-			expect($location.path()).toBe('/groupbuys/' + sampleGroupbuyResponse._id);
+			expect($location.path()).toBe('/groupbuys/' + sampleGroupbuyResponse.slug);
 		}));
 
 		it('$scope.update() should update a valid Groupbuy', inject(function(Groupbuys) {
 			// Define a sample Groupbuy put data
 			var sampleGroupbuyPutData = new Groupbuys({
 				_id: '525cf20451979dea2c000001',
-				name: 'New Groupbuy'
+				name: 'New Groupbuy',
+				slug: 'new-groupbuy'
 			});
 
 			// Mock Groupbuy in scope
 			scope.groupbuy = sampleGroupbuyPutData;
 
 			// Set PUT response
-			$httpBackend.expectPUT(/groupbuys\/([0-9a-fA-F]{24})$/).respond();
+			$httpBackend.expectPUT(/groupbuys\/([0-9a-z\-]{10,80})$/).respond();
 
 			// Run controller functionality
 			scope.update();
 			$httpBackend.flush();
 
 			// Test URL location to new object
-			expect($location.path()).toBe('/groupbuys/' + sampleGroupbuyPutData._id);
+			expect($location.path()).toBe('/groupbuys/' + sampleGroupbuyPutData.slug);
 		}));
 
-		it('$scope.remove() should send a DELETE request with a valid groupbuyId and remove the Groupbuy from the scope', inject(function(Groupbuys) {
+		it('$scope.remove() should send a DELETE request with a valid groupbuySlug and remove the Groupbuy from the scope', inject(function(Groupbuys) {
 			// Create new Groupbuy object
 			var sampleGroupbuy = new Groupbuys({
-				_id: '525a8422f6d0f87f0e407a33'
+				_id: '525a8422f6d0f87f0e407a33',
+				slug: 'new-groupbuy'
 			});
 
 			// Create new Groupbuys array and include the Groupbuy
 			scope.groupbuys = [sampleGroupbuy];
 
 			// Set expected DELETE response
-			$httpBackend.expectDELETE(/groupbuys\/([0-9a-fA-F]{24})$/).respond(204);
+			$httpBackend.expectDELETE(/groupbuys\/([0-9a-z\-]{10,80})$/).respond(204);
 
 			// Run controller functionality
 			scope.remove(sampleGroupbuy);

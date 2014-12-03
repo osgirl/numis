@@ -27,9 +27,10 @@ describe('Groupbuy Model Unit Tests:', function() {
 			password: 'password'
 		});
 
-		user.save(function() { 
+		user.save(function() {
 			groupbuy = new Groupbuy({
 				name: 'Groupbuy Name',
+				description: 'Groupbuy Description',
 				user: user
 			});
 
@@ -45,7 +46,7 @@ describe('Groupbuy Model Unit Tests:', function() {
 			});
 		});
 
-		it('should be able to show an error when try to save without name', function(done) { 
+		it('should be able to show an error when try to save without name', function(done) {
 			groupbuy.name = '';
 
 			return groupbuy.save(function(err) {
@@ -55,7 +56,7 @@ describe('Groupbuy Model Unit Tests:', function() {
 		});
 	});
 
-	afterEach(function(done) { 
+	afterEach(function(done) {
 		Groupbuy.remove().exec();
 		User.remove().exec();
 

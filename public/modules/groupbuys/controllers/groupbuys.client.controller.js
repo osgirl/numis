@@ -49,7 +49,7 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 			var groupbuy = $scope.groupbuy;
 
 			groupbuy.$update(function() {
-				$location.path('groupbuys/' + groupbuy._id);
+				$location.path('groupbuys/' + groupbuy.slug);
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
 			});
