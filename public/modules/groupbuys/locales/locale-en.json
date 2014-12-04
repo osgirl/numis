@@ -4,6 +4,16 @@
         "Description": "Description",
         "Groupbuys": "Groupbuys",
         "New_Groupbuy": "New Groupbuy",
-        "List_Groupbuys": "List Groupbuys"
+        "List_Groupbuys": "List Groupbuys",
+        "Information": "Information",
+        "Items": "Items",
+        "Buyers": "Buyers",
+        "Requests": "Requests",
+        "Requests_summary": "Requests summary",
+        "Messaging": "Messaging",
+        "Payments": "Payments",
+        "Deliveries": "Deliveries",
+        "Managers": "Managers",
+        "Configuration": "Configuration"
     }
 }

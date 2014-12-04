@@ -17,6 +17,10 @@ angular.module('groupbuys').config(['$stateProvider',
 				url: '/groupbuys/:groupbuySlug',
 				templateUrl: 'modules/groupbuys/views/view-groupbuy.client.view.html'
 			}).
+			state('manageGroupbuy', {
+				url: '/groupbuys/:groupbuySlug/manage',
+				templateUrl: 'modules/groupbuys/views/view-groupbuy.client.view.html'
+			}).
 			state('editGroupbuy', {
 				url: '/groupbuys/:groupbuySlug/edit',
 				templateUrl: 'modules/groupbuys/views/edit-groupbuy.client.view.html'

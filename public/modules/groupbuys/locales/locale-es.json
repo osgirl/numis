@@ -4,6 +4,16 @@
         "Description": "Descripción",
         "Groupbuys": "Compras en grupo",
         "New_Groupbuy": "Nueva compra en grupo",
-        "List_Groupbuys": "Lista de compras en grupo"
+        "List_Groupbuys": "Lista de compras en grupo",
+        "Information": "Información",
+        "Items": "Items",
+        "Buyers": "Participantes",
+        "Requests": "Solicitudes",
+        "Requests_summary": "Resumen de peticiones",
+        "Messaging": "Mensajeria",
+        "Payments": "Pagos",
+        "Deliveries": "Envios",
+        "Managers": "Gestores",
+        "Configuration": "Configuración"
     }
 }
