@@ -14,6 +14,12 @@
         "Payments": "Pagos",
         "Deliveries": "Envios",
         "Managers": "Gestores",
-        "Configuration": "Configuración"
+        "Configuration": "Configuración",
+        "Update": "Actualizar",
+        "Updates": "Actualizaciones",
+        "Add_Update": "Añadir actualización",
+        "Add_Updates": "Añadir actualizaciones",
+        "New_Update": "Nueva actualización",
+        "Written_on": "Escrito el día"
     }
 }

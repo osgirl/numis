@@ -14,6 +14,12 @@
         "Payments": "Payments",
         "Deliveries": "Deliveries",
         "Managers": "Managers",
-        "Configuration": "Configuration"
+        "Configuration": "Configuration",
+        "Update": "Update",
+        "Updates": "Updates",
+        "Add_Update": "Add update",
+        "Add_Updates": "Add updates",
+        "New_Update": "New update",
+        "Written_on": "Written on"
     }
 }

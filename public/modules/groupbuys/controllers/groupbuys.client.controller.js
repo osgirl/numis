@@ -50,7 +50,7 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 			var groupbuy = $scope.groupbuy;
 
 			groupbuy.$update(function() {
-				$location.path('groupbuys/' + groupbuy.slug);
+
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
 			});
@@ -72,7 +72,7 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 		* @methodOf groupbuys.controller:GroupbuysController
 
 		@description
-		* Loads the groupbuy and tabs in the scope.
+		* Loads the groupbuy, userRole and tabs in the scope.
 		*/
 		$scope.findOne = function() {
 			$scope.groupbuy = Groupbuys.get({
@@ -80,6 +80,7 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 			});
 
 			$scope.groupbuy.$promise.then(function() {
+				$scope.userRole = $scope.userRole();
 				$scope.loadTabs();
 			});
 		};
@@ -95,21 +96,22 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 		*/
 		$scope.userRole = function() {
 
-			var role = "none";
+			var role = 'none';
+			var manage = false;
 
 			var userId = $scope.authentication.user._id;
 
-			var fullURL = $location.path().split("/");
-			if (fullURL[fullURL.length - 1] == "manage") {
-				var manage = true;
+			var fullURL = $location.path().split('/');
+			if (fullURL[fullURL.length - 1] === 'manage') {
+				manage = true;
 			}
 
-			if ( $scope.groupbuy.members.length > 0 && $scope.groupbuy.members.indexOf('userId') !== -1 ) {
-				role = "member";
+			if ( $scope.groupbuy.members.length > 0 && $scope.groupbuy.members.indexOf(userId) !== -1 ) {
+				role = 'member';
 			}
 
-			if ( manage && $scope.groupbuy.managers.length > 0 && $scope.groupbuy.managers.indexOf('userId') !== -1 ) {
-				role = "manager";
+			if ( manage && $scope.groupbuy.managers.length > 0 && $scope.groupbuy.managers.indexOf(userId) !== -1 ) {
+				role = 'manager';
 			}
 
 			return role;
@@ -138,8 +140,8 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 					'groupbuys.Managers',
 					'groupbuys.Configuration'
 			]).then(function (translations) {
-				switch ( $scope.userRole() ){
-				    case "manager":
+				switch ( $scope.userRole ){
+				    case 'manager':
 				        $scope.tabs = [
 							{
 								title: translations['groupbuys.Information'],
@@ -175,7 +177,7 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 							}
 						];
 				        break;
-				    case "member":
+				    case 'member':
 				        $scope.tabs = [
 							{
 								title: translations['groupbuys.Information'],
@@ -202,7 +204,6 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 							}
 						];
 				        break;
-				    case "none":
 				    default:
 						$scope.tabs = [
 							{

@@ -1,5 +1,80 @@
 <section data-ng-controller="groupbuys.tab.info.controller">
-<p>
-  PESTAÑA DE INFORMACION GENERAL
-</p>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+
+            <!-- Panel de descripcion -->
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{'groupbuys.Description' | translate}}</h3>
+                    </div>
+
+                    <p data-ng-bind-html="groupbuy.description" data-ng-hide="(userRole == 'manager')"></p>
+
+                    <form data-ng-show="(userRole == 'manager')" data-ng-submit="update()" novalidate>
+
+                        <div class="form-group">
+                            <textarea id="description" name="description" class="form-control" data-ng-model="groupbuy.description" ng-required="true" rows="5" placeholder="descripcion"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="submit" value="{{'groupbuys.Update' | translate}}" class="btn btn-default">
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+            <!-- FIN Panel de descripcion -->
+
+            <!-- Panel de actualizaciones -->
+            <div data-ng-hide="(userRole == 'none')">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+
+                        <div data-ng-show="(userRole == 'manager')">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">{{'groupbuys.Add_Updates' | translate}}</h3>
+                            </div>
+
+                            <form data-ng-submit="addUpdate()" novalidate>
+
+                                <div class="form-group">
+                                    <textarea id="description" name="description" class="form-control" data-ng-model="newUpdate"  rows="5" placeholder="{{'groupbuys.New_Update' | translate}}"></textarea>
+                                </div>
+
+                                <div data-ng-show="error" class="text-danger">
+                                    <strong data-ng-bind="error"></strong>
+                                </div>
+
+                                <div class="form-group">
+                                    <input type="submit" value="{{'groupbuys.Add_Update' | translate}}" class="btn btn-default">
+                                </div>
+
+                            </form>
+
+                            <hr>
+                        </div>
+
+                        <div >
+                            <div class="panel-heading">
+                                <h3 class="panel-title">{{'groupbuys.Updates' | translate}}:</h3>
+                            </div>
+                            <div data-ng-repeat="updateElement in groupbuy.updates.slice().reverse() track by $index">
+                                <span data-ng-bind-html="updateElement.textInfo"></span><br>
+                                <span>{{'groupbuys.Written_on' | translate}}: {{updateElement.publishDate | date : 'd/M/yyyy H:mm:ss'}}</span><br>
+                                <hr>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- FIN Panel de actualizaciones -->
+
+          </div>
+    </div>
+<!--  FIN Panel de la pestaña -->
+
 </section>

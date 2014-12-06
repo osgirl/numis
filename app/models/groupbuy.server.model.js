@@ -39,6 +39,14 @@ var GroupbuySchema = new Schema({
 		enum: ['new', 'published', 'payments', 'paid', 'shipments', 'closed', 'cancelled', 'deleted'],
 		default: 'new'
 	},
+	updates: [{
+		publishDate: {
+			type: Date
+		},
+		textInfo: {
+			type: String
+		}
+	}],
 	visibility: {
 
 	},

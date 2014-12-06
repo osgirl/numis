@@ -1,11 +1,32 @@
 <section data-ng-controller="GroupbuysController" data-ng-init="findOne()">
 	<div class="page-header">
 		<h1 data-ng-bind="groupbuy.name"></h1>
+		<h3 data-ng-bind="groupbuy.status"></h3>
 	</div>
- <tabset>
-    <tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disabled="tab.disabled" hidden="tab.hide">
-		<div ng-include="tab.template"></div>
-    </tab>
-  </tabset>
+	<tabset>
+		<tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disabled="tab.disabled">
+			<div ng-include="tab.template"></div>
+		</tab>
+	</tabset>
+
+
+<div class="pull-right" data-ng-show="((authentication.user) && (authentication.user._id == groupbuy.user._id))">
+	<a class="btn btn-primary" href="/#!/groupbuys/{{groupbuy.slug}}/edit">
+		<i class="glyphicon glyphicon-edit"></i>
+	</a>
+	<a class="btn btn-primary" data-ng-click="remove();">
+		<i class="glyphicon glyphicon-trash"></i>
+	</a>
+</div>
+<small>
+	<em class="text-muted">
+		Posted on
+		<span data-ng-bind="groupbuy.created | date:'mediumDate'"></span>
+		by
+		<span data-ng-bind="groupbuy.user.displayName"></span>
+	</em>
+</small>
+<span> - User role: <span data-ng-bind=userRole></span></span>
+
 
 </section>
