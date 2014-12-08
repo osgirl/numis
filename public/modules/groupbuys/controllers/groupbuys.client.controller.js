@@ -1,12 +1,34 @@
 'use strict';
 
+/**
+ * @ngdoc controller
+ * @name groupbuys.controller:GroupbuysController
+ *
+ * @requires $cope
+ * @requires $stateParams
+ * @requires $location
+ * @requires $translate
+ * @requires users.service:Authentication
+ * @requires users.service:Groupbuys
+ *
+ * @description
+ * Controlador encargado de la gestión de las Compras en Grupo.
+ */
+
 // Groupbuys controller
 angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys',
 	function($scope, $stateParams, $location, $translate, Authentication, Groupbuys) {
 		$scope.authentication = Authentication;
 		//$locationProvider.html5Mode(true); // Mode HTML5
 
-		// Create new Groupbuy
+		/**
+		 * @ngdoc method
+		 * @name groupbuys.controller:GroupbuysController.$scope·create
+		 * @methodOf groupbuys.controller:GroupbuysController
+		 *
+		 * @description
+		 * Create new Groupbuy
+		 */
 		$scope.create = function(isValid) {
 			if (isValid) {
 				$scope.success = $scope.error = null;
@@ -28,7 +50,14 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 			}
 		};
 
-		// Remove existing Groupbuy
+		/**
+		 * @ngdoc method
+		 * @name groupbuys.controller:GroupbuysController.$scope·remove
+		 * @methodOf groupbuys.controller:GroupbuysController
+		 *
+		 * @description
+		 * Remove existing Groupbuy
+		 */
 		$scope.remove = function(groupbuy) {
 			if ( groupbuy ) {
 				groupbuy.$remove();
@@ -45,7 +74,14 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 			}
 		};
 
-		// Update existing Groupbuy
+		/**
+		 * @ngdoc method
+		 * @name groupbuys.controller:GroupbuysController.$scope·create
+		 * @methodOf groupbuys.controller:GroupbuysController
+		 *
+		 * @description
+		 * Update existing Groupbuy
+		 */
 		$scope.update = function() {
 			var groupbuy = $scope.groupbuy;
 
@@ -62,18 +98,14 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 		};
 
 
-
-// =================== NEW FUNCTIONS ================
-
-
-		/*
-		@ngdoc method
-		* @name groupbuys.controller:GroupbuysController.$findOne
-		* @methodOf groupbuys.controller:GroupbuysController
-
-		@description
-		* Loads the groupbuy, userRole and tabs in the scope.
-		*/
+		/**
+		 * @ngdoc method
+		 * @name groupbuys.controller:GroupbuysController.$scope·findOne
+		 * @methodOf groupbuys.controller:GroupbuysController
+		 *
+		 * @description
+		 * Loads the groupbuy, userRole and tabs in the scope.
+		 */
 		$scope.findOne = function() {
 			$scope.groupbuy = Groupbuys.get({
 				groupbuySlug: $stateParams.groupbuySlug
@@ -86,14 +118,14 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 		};
 
 
-		/*
-		@ngdoc method
-		* @name groupbuys.controller:GroupbuysController.$userRole
-		* @methodOf groupbuys.controller:GroupbuysController
-
-		@description
-		* Return the role ('manager', 'member', 'none') of the user in the groupbuy according to the url provided.
-		*/
+		/**
+		 * @ngdoc method
+		 * @name groupbuys.controller:GroupbuysController.$scope·userRole
+		 * @methodOf groupbuys.controller:GroupbuysController
+		 *
+		 * @description
+		 * Return the role ('manager', 'member', 'none') of the user in the groupbuy according to the url provided.
+		 */
 		$scope.userRole = function() {
 
 			var role = 'none';
@@ -118,14 +150,14 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 		};
 
 
-		/*
-		@ngdoc method
-		* @name groupbuys.controller:GroupbuysController.$loadTabs
-		* @methodOf groupbuys.controller:GroupbuysController
-
-		@description
-		* Loads the proper tabs in the scope based on the role of the user
-		*/
+		/**
+		 * @ngdoc method
+		 * @name groupbuys.controller:GroupbuysController.$scope·loadTabs
+		 * @methodOf groupbuys.controller:GroupbuysController
+		 *
+		 * @description
+		 * Loads the proper tabs in the scope based on the role of the user
+		 */
 		$scope.loadTabs =  function() {
 			// Create the tabs menu according to the permissions of the user:
 		  	$translate([
