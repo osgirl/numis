@@ -127,26 +127,29 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 		 * Return the role ('manager', 'member', 'none') of the user in the groupbuy according to the url provided.
 		 */
 		$scope.userRole = function() {
-
 			var role = 'none';
 			var manage = false;
 
-			var userId = $scope.authentication.user._id;
+			if ($scope.authentication && $scope.authentication.user) {
+				var userId  = $scope.authentication.user._id,
+					fullUrl = $location.path().split('/');
 
-			var fullURL = $location.path().split('/');
-			if (fullURL[fullURL.length - 1] === 'manage') {
-				manage = true;
+				if (fullUrl[fullUrl.length - 1] === 'manage') {
+					manage = true;
+				}
+
+				if ( $scope.groupbuy.members.length > 0 && $scope.groupbuy.members.indexOf(userId) !== -1 ) {
+					role = 'member';
+				}
+
+				if ( manage && $scope.groupbuy.managers.length > 0 && $scope.groupbuy.managers.indexOf(userId) !== -1 ) {
+					role = 'manager';
+				}
+
+				return role;
+			} else {
+				return null;
 			}
-
-			if ( $scope.groupbuy.members.length > 0 && $scope.groupbuy.members.indexOf(userId) !== -1 ) {
-				role = 'member';
-			}
-
-			if ( manage && $scope.groupbuy.managers.length > 0 && $scope.groupbuy.managers.indexOf(userId) !== -1 ) {
-				role = 'manager';
-			}
-
-			return role;
 		};
 
 
