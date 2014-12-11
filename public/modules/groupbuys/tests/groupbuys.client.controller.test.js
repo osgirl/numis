@@ -239,6 +239,33 @@
 			// Test URL location to new object
 			expect($location.path()).toBe('/groupbuys/' + sampleGroupbuyPutData.slug + '/manage');
 		}));
+		
+		it('$scope.addUpdate() should NOT add an empty update to a valid Groupbuy', inject(function(Groupbuys) {
+			// Define a sample Groupbuy put data
+			var sampleGroupbuyPutData = new Groupbuys({
+				_id: '525cf20451979dea2c000001',
+				name: 'New Groupbuy',
+				slug: 'new-groupbuy',
+				description: 'This is a new groupbuy',
+				updates: []
+			});
+
+			// Mock Groupbuy in scope
+			scope.groupbuy = sampleGroupbuyPutData;
+
+			// Set PUT response
+			$httpBackend.expectPUT(/groupbuys\/([0-9a-z\-]{10,80})$/).respond();
+
+			// Set the update content
+			scope.newUpdate = '';
+
+			// Run controller functionality
+			scope.addUpdate();
+
+			// Test the update content
+			expect(scope.groupbuy.updates.length).toBe(0);
+
+		}));
 
 	});
 }());

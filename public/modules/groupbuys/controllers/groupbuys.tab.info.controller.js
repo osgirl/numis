@@ -18,14 +18,16 @@ angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope', 
     */
     $scope.addUpdate = function() {
 
-        var elementToAdd = {};
-        elementToAdd.publishDate = Date.now();
-        elementToAdd.textInfo = $scope.newUpdate;
+        if ($scope.newUpdate != '' ) {
+            var elementToAdd = {};
+            elementToAdd.publishDate = Date.now();
+            elementToAdd.textInfo = $scope.newUpdate;
 
-        $scope.groupbuy.updates.push(elementToAdd);
+            $scope.groupbuy.updates.push(elementToAdd);
 
-        $scope.update();
-        $location.path('groupbuys/' + $scope.groupbuy.slug + '/manage');
+            $scope.update();
+            $location.path('groupbuys/' + $scope.groupbuy.slug + '/manage');
+        }
     };
 
 
