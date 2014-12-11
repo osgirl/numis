@@ -4,7 +4,9 @@
 	// Groupbuys Controller Spec
 	describe('Groupbuys Controller Tests', function() {
 		// Initialize global variables
-		var GroupbuysController,
+		var AuthenticationController,
+			GroupbuysController,
+			GroupbuysTabInfoController,
 			scope,
 			$httpBackend,
 			$stateParams,
@@ -63,6 +65,12 @@
 			GroupbuysController = $controller('GroupbuysController', {
 				$scope: scope
 			});
+
+			// Initialize the Authentication controller
+			AuthenticationController = $controller('AuthenticationController', {
+				$scope: scope
+			});
+
 		}));
 
 		it('$scope.find() should create an array with at least one Groupbuy object fetched from XHR', inject(function(Groupbuys) {
@@ -108,6 +116,11 @@
 		}));
 
 		it('$scope.create() with valid form data should send a POST request with the form input values and then locate to new object URL', inject(function(Groupbuys) {
+			// Login
+			$httpBackend.when('POST', '/auth/signin').respond(200, 'Fred');
+			scope.signin();
+			$httpBackend.flush();
+
 			// Create a sample Groupbuy object
 			var sampleGroupbuyPostData = new Groupbuys({
 				name: 'New Groupbuy',
@@ -136,9 +149,11 @@
 
 			// Test form inputs are reset
 			expect(scope.name).toEqual('');
+			expect(scope.description).toEqual('');
+
 
 			// Test URL redirection after the Groupbuy was created
-			expect($location.path()).toBe('/groupbuys/' + sampleGroupbuyResponse.slug);
+			expect($location.path()).toBe('/groupbuys/' + sampleGroupbuyResponse.slug + '/manage');
 		}));
 
 		it('$scope.update() should update a valid Groupbuy', inject(function(Groupbuys) {
@@ -146,7 +161,8 @@
 			var sampleGroupbuyPutData = new Groupbuys({
 				_id: '525cf20451979dea2c000001',
 				name: 'New Groupbuy',
-				slug: 'new-groupbuy'
+				slug: 'new-groupbuy',
+				description: 'This is a new groupbuy'
 			});
 
 			// Mock Groupbuy in scope
@@ -160,7 +176,7 @@
 			$httpBackend.flush();
 
 			// Test URL location to new object
-			expect($location.path()).toBe('/groupbuys/' + sampleGroupbuyPutData.slug);
+			expect($location.path()).toBe('/groupbuys/' + sampleGroupbuyPutData.slug + '/manage');
 		}));
 
 		it('$scope.remove() should send a DELETE request with a valid groupbuySlug and remove the Groupbuy from the scope', inject(function(Groupbuys) {
@@ -183,5 +199,7 @@
 			// Test array after successful delete
 			expect(scope.groupbuys.length).toBe(0);
 		}));
+
+
 	});
 }());

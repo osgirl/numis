@@ -35,13 +35,24 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 				// Create new Groupbuy object
 				var groupbuy = new Groupbuys ($scope.groupbuy);
 
+				// Add creation user to the groupbuy
+
+				if ($scope.authentication && $scope.authentication.user) {
+					// TO-DO: Make this a list
+					groupbuy.managers = $scope.authentication.user._id;
+					groupbuy.members = $scope.authentication.user._id;
+				} else {
+					return null;
+				}
+
 				// Redirect after save
 				groupbuy.$save(function(response) {
 					$scope.success = true;
-					$location.path('groupbuys/' + response.slug);
+					$location.path('groupbuys/' + response.slug + '/manage');
 
 					// Clear form fields
 					$scope.name = '';
+					$scope.description = '';
 				}, function(errorResponse) {
 					$scope.error = errorResponse.data.message;
 				});
@@ -86,7 +97,7 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 			var groupbuy = $scope.groupbuy;
 
 			groupbuy.$update(function() {
-
+				$location.path('groupbuys/' + groupbuy.slug +'/manage');
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
 			});
