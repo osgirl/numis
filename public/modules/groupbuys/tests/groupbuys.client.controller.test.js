@@ -71,6 +71,11 @@
 				$scope: scope
 			});
 
+			// Initialize the tabs controllers
+			GroupbuysTabInfoController = $controller('GroupbuysTabInfoController', {
+				$scope: scope
+			});
+
 		}));
 
 		it('$scope.find() should create an array with at least one Groupbuy object fetched from XHR', inject(function(Groupbuys) {
@@ -200,6 +205,40 @@
 			expect(scope.groupbuys.length).toBe(0);
 		}));
 
+// --------------------------
+// Tabs controllers TESTS
+
+		// Tests for GroupbuysTabInfoController
+		it('$scope.addUpdate() should add an update to a valid Groupbuy', inject(function(Groupbuys) {
+			// Define a sample Groupbuy put data
+			var sampleGroupbuyPutData = new Groupbuys({
+				_id: '525cf20451979dea2c000001',
+				name: 'New Groupbuy',
+				slug: 'new-groupbuy',
+				description: 'This is a new groupbuy',
+				updates: []
+			});
+
+			// Mock Groupbuy in scope
+			scope.groupbuy = sampleGroupbuyPutData;
+
+			// Set PUT response
+			$httpBackend.expectPUT(/groupbuys\/([0-9a-z\-]{10,80})$/).respond();
+
+			// Set the update content
+			scope.newUpdate = 'Content of the update.';
+
+			// Run controller functionality
+			scope.addUpdate();
+			$httpBackend.flush();
+
+			// Test the update content
+			expect(scope.groupbuy.updates.length).toBe(1);
+			expect(scope.groupbuy.updates[0].textInfo).toBe('Content of the update.');
+
+			// Test URL location to new object
+			expect($location.path()).toBe('/groupbuys/' + sampleGroupbuyPutData.slug + '/manage');
+		}));
 
 	});
 }());
