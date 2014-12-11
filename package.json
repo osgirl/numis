@@ -55,6 +55,7 @@
     "swig": "~1.4.1"
   },
   "devDependencies": {
+    "express-mongoose-docs": "^0.3.1",
     "grunt-concurrent": "~1.0.0",
     "grunt-contrib-clean": "^0.6.0",
     "grunt-contrib-csslint": "^0.3.1",

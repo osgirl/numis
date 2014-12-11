@@ -118,6 +118,52 @@ module.exports = function(db) {
 		require(path.resolve(routePath))(app);
 	});
 
+
+	// Show all routes registered in Web Server
+	/*jshint -W083 */
+	if (process.env.NODE_ENV === 'development') {
+		// Documentación online '/apiDocs/'
+		var docs = require('express-mongoose-docs');
+		docs(app);
+
+		// Docuemntación en el log al arrancar.
+		var space = function (x) {
+			var res = '';
+			while(x--) res += ' ';
+			return res;
+		};
+
+		var listRoutes = function () {
+			for (var i = 0; i < arguments.length;  i++) {
+				if(arguments[i].stack instanceof Array){
+					console.log('');
+					arguments[i].stack.forEach(function(a) {
+						var route = a.route;
+						if (route) {
+							var lastRoute = {};
+							route.stack.forEach(function(r) {
+								var method = r.method.toUpperCase();
+
+								if (lastRoute.method !== method || lastRoute.path !== route.path) {
+									console.log(space(4), method, space(8 - method.length), route.path);
+									lastRoute = {
+										method: method,
+										path: route.path
+									};
+								}
+
+							});
+						}
+					});
+					console.log('\n');
+				}
+			}
+		};
+		console.log('RESTful API: ');
+		listRoutes(app._router );
+	}
+
+
 	// Assume 'not found' in the error msgs is a 404. this is somewhat silly, but valid, you can do whatever you like, set properties, use instanceof etc.
 	app.use(function(err, req, res, next) {
 		// If the error object doesn't exists
