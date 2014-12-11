@@ -18,7 +18,7 @@ angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope', 
     */
     $scope.addUpdate = function() {
 
-        if ($scope.newUpdate != '' ) {
+        if ($scope.newUpdate !== '' ) {
             var elementToAdd = {};
             elementToAdd.publishDate = Date.now();
             elementToAdd.textInfo = $scope.newUpdate;
