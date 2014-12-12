@@ -1,5 +1,62 @@
 <section data-ng-controller="GroupbuysTabManagersController">
-<p>
-  PESTAÑA DE LOS GESTORES
-</p>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+
+            <!--  Gestores actuales -->
+            <div class="panel panel-default">
+                <div class="panel-body">
+
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{'groupbuys.Managers' | translate}}</h3>
+                    </div>
+
+                    <div data-ng-repeat="manager in groupbuy.managers track by $index">
+                        <span data-ng-show="(userRole == 'manager')">
+                            <button type="button" class="btn btn-danger" aria-label="" data-ng-click="deleteManager(manager);">
+                                <span class="glyphicon glyphicon-minus-sign" aria-hidden="true"></span>
+                            </button>
+                        </span>
+                        <span data-ng-bind-html="manager"></span>
+                    </div>
+                    <br />
+                    <div data-ng-show="error && (userRole == 'manager')" class="alert alert-danger" role="alert">
+                        <strong data-ng-bind="error"></strong>
+                    </div>
+
+                </div>
+            </div>
+            <!--  FIN Gestores actuales -->
+
+            <!--  Añadir gestor -->
+            <div class="panel panel-default" data-ng-show="(userRole == 'manager')">
+                <div class="panel-body">
+
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{'groupbuys.Add_Manager' | translate}}</h3>
+                    </div>
+
+                    <span>{{'groupbuys.Search' | translate}}:</span>
+                    <form>
+                        <input type="text" data-ng-model="filterUsers" id="error" class="form-control" placeholder="{{'groupbuys.Filter' | translate}}" >
+                    </form>
+
+                    <hr>
+
+                    <div ng-repeat="user in usersList | filter:filterUsers track by $index ">
+
+                        <button type="button" class="btn btn-success" aria-label="" data-ng-click="addManager(user);">
+                            <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                        </button>
+                        <span>{{user}}</span>
+
+                    </div>
+
+                </div>
+            </div>
+            <!--  FIN Añadir gestor -->
+
+        </div>
+    </div>
+    <!--  FIN Panel de la pestaña -->
 </section>

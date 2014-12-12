@@ -25,7 +25,7 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 		$scope.tinymceOptions = {
 			resize: false,
 			menubar: false,
-			statusbar : false,
+			statusbar: false,
 			plugins: 'textcolor image table',
 			toolbar1: 'bold italic underline strikethrough | forecolor backcolor fontsizeselect | removeformat',
 			toolbar2: 'alignleft aligncenter alignright | bullist numlist outdent indent | table image'
@@ -48,10 +48,11 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 				var groupbuy = new Groupbuys ($scope.groupbuy);
 
 				// Add creation user to the groupbuy
-
 				if ($scope.authentication && $scope.authentication.user) {
-					// TO-DO: Make this a list
-					groupbuy.managers = $scope.authentication.user._id;
+					groupbuy.managers = [];
+					groupbuy.managers.push($scope.authentication.user._id);
+
+// TODO: Make this a list
 					groupbuy.members = $scope.authentication.user._id;
 				} else {
 					return null;

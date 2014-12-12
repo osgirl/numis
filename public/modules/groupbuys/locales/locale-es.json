@@ -20,6 +20,9 @@
         "Add_Update": "Añadir actualización",
         "Add_Updates": "Añadir actualizaciones",
         "New_Update": "Nueva actualización",
-        "Written_on": "Escrito el día"
+        "Written_on": "Escrito el día",
+        "Add_Manager": "Añadir gestor",
+        "Search": "Buscar",
+        "Filter": "Filtrar"
     }
 }
