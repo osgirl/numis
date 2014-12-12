@@ -21,6 +21,18 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 		$scope.authentication = Authentication;
 		//$locationProvider.html5Mode(true); // Mode HTML5
 
+		// Configuration of tinyMCE
+		$scope.tinymceOptions = {
+			resize: false,
+			menubar: false,
+			statusbar : false,
+			plugins: 'textcolor image table',
+			toolbar1: 'bold italic underline strikethrough | forecolor backcolor fontsizeselect | removeformat',
+			toolbar2: 'alignleft aligncenter alignright | bullist numlist outdent indent | table image'
+		};
+
+
+
 		/**
 		 * @ngdoc method
 		 * @name groupbuys.controller:GroupbuysController.$scope·create
