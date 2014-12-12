@@ -10,8 +10,8 @@ angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope', 
 
     /*
     @ngdoc method
-    * @name groupbuys.controller:groupbuys.tab.info.controller.$addUpdate
-    * @methodOf groupbuys.controller:groupbuys.tab.info.controller
+    * @name groupbuys.controller:GroupbuysTabInfoController.$addUpdate
+    * @methodOf groupbuys.controller:GroupbuysTabInfoController
 
     @description
     * Adds an update to the groupbuy.
