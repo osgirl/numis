@@ -5,10 +5,10 @@
 
             <!-- Panel de descripcion -->
             <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{'groupbuys.Description' | translate}}</h3>
+                </div>
                 <div class="panel-body">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">{{'groupbuys.Description' | translate}}</h3>
-                    </div>
 
                     <p data-ng-bind-html="groupbuy.description" data-ng-hide="(userRole == 'manager')"></p>
 
@@ -30,8 +30,11 @@
 
             <!-- Panel de actualizaciones -->
             <div class="panel panel-default" data-ng-hide="(userRole == 'none')">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{'groupbuys.Updates' | translate}}:</h3>
+                </div>
                 <div class="panel-body">
-
+                    
                     <div data-ng-show="(userRole == 'manager')">
                         <div class="panel-heading">
                             <h3 class="panel-title">{{'groupbuys.Add_Updates' | translate}}</h3>
@@ -57,9 +60,6 @@
                     </div>
 
                     <div >
-                        <div class="panel-heading">
-                            <h3 class="panel-title">{{'groupbuys.Updates' | translate}}:</h3>
-                        </div>
                         <div data-ng-repeat="updateElement in groupbuy.updates.slice().reverse() track by $index">
                             <span data-ng-bind-html="updateElement.textInfo"></span><br>
                             <span>{{'groupbuys.Written_on' | translate}}: {{updateElement.publishDate | date : 'd/M/yyyy H:mm:ss'}}</span><br>

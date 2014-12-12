@@ -5,11 +5,10 @@
 
             <!--  Gestores actuales -->
             <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{'groupbuys.Managers' | translate}}</h3>
+                </div>
                 <div class="panel-body">
-
-                    <div class="panel-heading">
-                        <h3 class="panel-title">{{'groupbuys.Managers' | translate}}</h3>
-                    </div>
 
                     <div data-ng-repeat="manager in groupbuy.managers track by $index">
                         <span data-ng-show="(userRole == 'manager')">
@@ -30,11 +29,11 @@
 
             <!--  Añadir gestor -->
             <div class="panel panel-default" data-ng-show="(userRole == 'manager')">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{'groupbuys.Add_Manager' | translate}}</h3>
+                </div>
                 <div class="panel-body">
 
-                    <div class="panel-heading">
-                        <h3 class="panel-title">{{'groupbuys.Add_Manager' | translate}}</h3>
-                    </div>
 
                     <span>{{'groupbuys.Search' | translate}}:</span>
                     <form>
