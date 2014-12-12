@@ -14,7 +14,7 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label" for="description">{{'groupbuys.Description' | translate}}</label>
-                    <textarea id="description" name="description" class="form-control" data-ng-model="groupbuy.description" ng-required="true" rows="5" placeholder="{{'groupbuys.Description' | translate}}"></textarea>
+                    <textarea id="description" name="description" class="form-control" data-ng-model="groupbuy.description" ng-required="true" rows="5" placeholder="{{'groupbuys.Description' | translate}}" ui-tinymce="tinymceOptions"></textarea>
                     <span class="error-message" data-ng-show="groupbuyForm.description.$dirty && groupbuyForm.description.$error.required" translate="core.FIELD_REQUIRED"></span>
                 </div>
                 <div class="text-center form-group">

@@ -12,10 +12,10 @@
 
                     <p data-ng-bind-html="groupbuy.description" data-ng-hide="(userRole == 'manager')"></p>
 
-                    <form data-ng-show="(userRole == 'manager')" data-ng-submit="update()" novalidate>
+                    <form data-ng-show="(userRole == 'manager')" data-ng-submit="update()" name="descripcionForm" novalidate>
 
                         <div class="form-group">
-                            <textarea id="description" name="description" class="form-control" data-ng-model="groupbuy.description" ng-required="true" rows="5" placeholder="descripcion"></textarea>
+                            <textarea id="description" name="description" class="form-control" data-ng-model="groupbuy.description" ng-required="true" rows="5" placeholder="descripcion" ui-tinymce="tinymceOptions"></textarea>
                         </div>
 
                         <div class="form-group">
@@ -37,10 +37,10 @@
                             <h3 class="panel-title">{{'groupbuys.Add_Updates' | translate}}</h3>
                         </div>
 
-                        <form data-ng-submit="addUpdate()" novalidate>
+                        <form data-ng-submit="addUpdate()" name="updateForm" novalidate>
 
                             <div class="form-group">
-                                <textarea id="description" name="description" class="form-control" data-ng-model="newUpdate"  rows="5" placeholder="{{'groupbuys.New_Update' | translate}}"></textarea>
+                                <textarea id="newUpdate" name="newUpdate" class="form-control" data-ng-model="newUpdate"  rows="5" placeholder="{{'groupbuys.New_Update' | translate}}" ui-tinymce="tinymceOptions"></textarea>
                             </div>
 
                             <div data-ng-show="error" class="text-danger">
