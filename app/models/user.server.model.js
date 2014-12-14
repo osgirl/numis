@@ -19,7 +19,7 @@ var validateLocalStrategyProperty = function(property) {
  * A Validation function for local strategy password
  */
 var validateLocalStrategyPassword = function(password) {
-	return (this.provider !== 'local' || (password && password.length > 6));
+	return (this.provider !== 'local' || (password && password.length >= 8));
 };
 
 
@@ -57,7 +57,7 @@ var UserSchema = new Schema({
 	},
 	username: {
 		type: String,
-		unique: 'testing error message',
+		unique: 'Username is not available. Please select another one.',
 		required: 'Please fill in a username',
 		trim: true
 	},
