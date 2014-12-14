@@ -15,7 +15,8 @@ var GroupbuySchema = new Schema({
 		type: String,
 		default: '',
 		required: 'Please fill Groupbuy name',
-		trim: true
+		trim: true,
+		match: [/.{10,80}/, 'Name must be between 10 and 80 characters.']
 	},
 	description: {
 		type: String,
