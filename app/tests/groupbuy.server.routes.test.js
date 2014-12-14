@@ -1,3 +1,5 @@
+/*jshint expr: true*/
+
 'use strict';
 
 var should = require('should'),
@@ -46,7 +48,7 @@ describe('Groupbuy CRUD tests', function() {
 		});
 	});
 
-	it('should be able to save Groupbuy instance if logged in', function(done) {
+	it('NU_T_G002_E101: should be able to save Groupbuy instance if logged in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -58,15 +60,15 @@ describe('Groupbuy CRUD tests', function() {
 				var userId = user.id;
 
 				// Save a new Groupbuy
-				agent.post('/groupbuys')
+				agent.post('/api/v1/groupbuys')
 					.send(groupbuy)
-					.expect(200)
+					.expect(201)
 					.end(function(groupbuySaveErr, groupbuySaveRes) {
 						// Handle Groupbuy save error
 						if (groupbuySaveErr) done(groupbuySaveErr);
 
 						// Get a list of Groupbuys
-						agent.get('/groupbuys')
+						agent.get('/api/v1/groupbuys')
 							.end(function(groupbuysGetErr, groupbuysGetRes) {
 								// Handle Groupbuy save error
 								if (groupbuysGetErr) done(groupbuysGetErr);
@@ -75,7 +77,8 @@ describe('Groupbuy CRUD tests', function() {
 								var groupbuys = groupbuysGetRes.body;
 
 								// Set assertions
-								(groupbuys[0].user._id).should.equal(userId);
+								//groupbuys.should.be.an.Array.with.lengthOf(1);
+								// (groupbuys[0].user._id).should.equal(userId); // El listado de compras no devuelve al creador de cada una
 								(groupbuys[0].name).should.match('Groupbuy Name');
 								(groupbuys[0].description).should.match('Groupbuy Description');
 
@@ -86,8 +89,8 @@ describe('Groupbuy CRUD tests', function() {
 			});
 	});
 
-	it('should not be able to save Groupbuy instance if not logged in', function(done) {
-		agent.post('/groupbuys')
+	it('NU_T_G002_E102: should not be able to save Groupbuy instance if not logged in', function(done) {
+		agent.post('/api/v1/groupbuys')
 			.send(groupbuy)
 			.expect(401)
 			.end(function(groupbuySaveErr, groupbuySaveRes) {
@@ -96,7 +99,7 @@ describe('Groupbuy CRUD tests', function() {
 			});
 	});
 
-	it('should not be able to save Groupbuy instance if no name is provided', function(done) {
+	it('NU_T_G002_E103: should not be able to save Groupbuy instance if no name is provided', function(done) {
 		// Invalidate name field
 		groupbuy.name = '';
 		groupbuy.slug = '_';
@@ -112,12 +115,15 @@ describe('Groupbuy CRUD tests', function() {
 				var userId = user.id;
 
 				// Save a new Groupbuy
-				agent.post('/groupbuys')
+				agent.post('/api/v1/groupbuys')
 					.send(groupbuy)
 					.expect(400)
 					.end(function(groupbuySaveErr, groupbuySaveRes) {
 						// Set message assertion
-						(groupbuySaveRes.body.message).should.match('Please fill Groupbuy name');
+						(groupbuySaveRes.body.name).should.match('ValidationError');
+						(groupbuySaveRes.body.errors.name.path).should.match('name');
+						(groupbuySaveRes.body.errors.name.type).should.match('required');
+						//(groupbuySaveRes.body.message).should.match('Please fill Groupbuy name');
 
 						// Handle Groupbuy save error
 						done(groupbuySaveErr);
@@ -125,7 +131,7 @@ describe('Groupbuy CRUD tests', function() {
 			});
 	});
 
-	it('should not be able to save Groupbuy instance if no description is provided', function(done) {
+	it('NU_T_G002_E104: should not be able to save Groupbuy instance if no description is provided', function(done) {
 		// Invalidate name field
 		groupbuy.description = '';
 
@@ -140,12 +146,15 @@ describe('Groupbuy CRUD tests', function() {
 				var userId = user.id;
 
 				// Save a new Groupbuy
-				agent.post('/groupbuys')
+				agent.post('/api/v1/groupbuys')
 					.send(groupbuy)
 					.expect(400)
 					.end(function(groupbuySaveErr, groupbuySaveRes) {
 						// Set message assertion
-						(groupbuySaveRes.body.message).should.match('Please fill Groupbuy description');
+						(groupbuySaveRes.body.name).should.match('ValidationError');
+						(groupbuySaveRes.body.errors.description.path).should.match('description');
+						(groupbuySaveRes.body.errors.description.type).should.match('required');
+						//(groupbuySaveRes.body.message).should.match('Please fill Groupbuy description');
 
 						// Handle Groupbuy save error
 						done(groupbuySaveErr);
@@ -153,7 +162,7 @@ describe('Groupbuy CRUD tests', function() {
 			});
 	});
 
-	it('should be able to update Groupbuy instance if signed in', function(done) {
+	it('NU_T_G002_E105: should be able to update Groupbuy instance if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -165,9 +174,9 @@ describe('Groupbuy CRUD tests', function() {
 				var userId = user.id;
 
 				// Save a new Groupbuy
-				agent.post('/groupbuys')
+				agent.post('/api/v1/groupbuys')
 					.send(groupbuy)
-					.expect(200)
+					.expect(201)
 					.end(function(groupbuySaveErr, groupbuySaveRes) {
 						// Handle Groupbuy save error
 						if (groupbuySaveErr) done(groupbuySaveErr);
@@ -176,7 +185,7 @@ describe('Groupbuy CRUD tests', function() {
 						groupbuy.name = 'WHY YOU GOTTA BE SO MEAN?';
 
 						// Update existing Groupbuy
-						agent.put('/groupbuys/' + groupbuySaveRes.body.slug)
+						agent.put('/api/v1/groupbuys/' + groupbuySaveRes.body._id)
 							.send(groupbuy)
 							.expect(200)
 							.end(function(groupbuyUpdateErr, groupbuyUpdateRes) {
@@ -194,17 +203,19 @@ describe('Groupbuy CRUD tests', function() {
 			});
 	});
 
-	it('should be able to get a list of Groupbuys if not signed in', function(done) {
+	it('NU_T_G002_E106: should be able to get a list of Groupbuys if not signed in', function(done) {
 		// Create new Groupbuy model instance
 		var groupbuyObj = new Groupbuy(groupbuy);
 
 		// Save the Groupbuy
 		groupbuyObj.save(function() {
 			// Request Groupbuys
-			request(app).get('/groupbuys')
+			request(app).get('/api/v1/groupbuys')
+				.expect(401)
 				.end(function(req, res) {
 					// Set assertion
-					res.body.should.be.an.Array.with.lengthOf(1);
+					(res.body.name).should.match('NotLogged');
+					(res.body.message).should.match('User is not logged in');
 
 					// Call the assertion callback
 					done();
@@ -214,16 +225,18 @@ describe('Groupbuy CRUD tests', function() {
 	});
 
 
-	it('should be able to get a single Groupbuy if not signed in', function(done) {
+	it('NU_T_G002_E107: should not be able to get a single Groupbuy if not signed in', function(done) {
 		// Create new Groupbuy model instance
 		var groupbuyObj = new Groupbuy(groupbuy);
 
 		// Save the Groupbuy
 		groupbuyObj.save(function() {
-			request(app).get('/groupbuys/' + groupbuyObj.slug)
+			request(app).get('/api/v1/groupbuys/' + groupbuyObj._id)
+				.expect(401)
 				.end(function(req, res) {
 					// Set assertion
-					res.body.should.be.an.Object.with.property('name', groupbuy.name);
+					(res.body.name).should.match('NotLogged');
+					(res.body.message).should.match('User is not logged in');
 
 					// Call the assertion callback
 					done();
@@ -231,7 +244,7 @@ describe('Groupbuy CRUD tests', function() {
 		});
 	});
 
-	it('should be able to delete Groupbuy instance if signed in', function(done) {
+	it('NU_T_G002_E108: should not be able to delete Groupbuy instance if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -243,15 +256,15 @@ describe('Groupbuy CRUD tests', function() {
 				var userId = user.id;
 
 				// Save a new Groupbuy
-				agent.post('/groupbuys')
+				agent.post('/api/v1/groupbuys')
 					.send(groupbuy)
-					.expect(200)
+					.expect(201)
 					.end(function(groupbuySaveErr, groupbuySaveRes) {
 						// Handle Groupbuy save error
 						if (groupbuySaveErr) done(groupbuySaveErr);
 
 						// Delete existing Groupbuy
-						agent.delete('/groupbuys/' + groupbuySaveRes.body.slug)
+						agent.delete('/api/v1/groupbuys/' + groupbuySaveRes.body._id)
 							.send(groupbuy)
 							.expect(200)
 							.end(function(groupbuyDeleteErr, groupbuyDeleteRes) {
@@ -259,7 +272,8 @@ describe('Groupbuy CRUD tests', function() {
 								if (groupbuyDeleteErr) done(groupbuyDeleteErr);
 
 								// Set assertions
-								(groupbuyDeleteRes.body.slug).should.equal(groupbuySaveRes.body.slug);
+								//(groupbuyDeleteRes.body._id).should.equal(groupbuySaveRes.body._id);
+								(groupbuyDeleteRes.body).should.be.empty;	// mongoose-rest-endpoints no devuelve contenido al borrar
 
 								// Call the assertion callback
 								done();
@@ -268,7 +282,7 @@ describe('Groupbuy CRUD tests', function() {
 			});
 	});
 
-	it('should not be able to delete Groupbuy instance if not signed in', function(done) {
+	it('NU_T_G002_E109: should not be able to delete Groupbuy instance if not signed in', function(done) {
 		// Set Groupbuy user
 		groupbuy.user = user;
 
@@ -278,7 +292,7 @@ describe('Groupbuy CRUD tests', function() {
 		// Save the Groupbuy
 		groupbuyObj.save(function() {
 			// Try deleting Groupbuy
-			request(app).delete('/groupbuys/' + groupbuyObj.slug)
+			request(app).delete('/api/v1/groupbuys/' + groupbuyObj._id)
 			.expect(401)
 			.end(function(groupbuyDeleteErr, groupbuyDeleteRes) {
 				// Set message assertion
@@ -294,6 +308,7 @@ describe('Groupbuy CRUD tests', function() {
 	afterEach(function(done) {
 		User.remove().exec();
 		Groupbuy.remove().exec();
+
 		done();
 	});
 });

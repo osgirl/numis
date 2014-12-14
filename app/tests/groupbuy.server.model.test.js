@@ -11,7 +11,7 @@ var should = require('should'),
 /**
  * Globals
  */
-var user, groupbuy;
+var user, groupbuy, groupbuy2;
 
 /**
  * Unit tests
@@ -34,22 +34,44 @@ describe('Groupbuy Model Unit Tests:', function() {
 				user: user
 			});
 
+			groupbuy2 = new Groupbuy({
+				name: 'Groupbuy-Name',
+				description: 'Groupbuy Description',
+				user: user
+			});
+
 			done();
 		});
 	});
 
 	describe('Method Save', function() {
-		it('should be able to save without problems', function(done) {
+		it('NU_T_G002_E001: should be able to save without problems', function(done) {
 			return groupbuy.save(function(err) {
 				should.not.exist(err);
 				done();
 			});
 		});
 
-		it('should be able to show an error when try to save without name', function(done) {
+		it('NU_T_G002_E002: should be able to show an error when try to save without name', function(done) {
 			groupbuy.name = '';
 
 			return groupbuy.save(function(err) {
+				should.exist(err);
+				done();
+			});
+		});
+
+		it('NU_T_G002_E003: should fail to save an existing groupbuy again', function(done) {
+			groupbuy.save();
+			return groupbuy.save(function(err) {
+				should.not.exist(err);
+				done();
+			});
+		});
+
+		it('NU_T_G002_E004: should be able to save two groupbuys with similar name and same slug beginning', function(done) {
+			groupbuy.save();
+			return groupbuy2.save(function(err) {
 				should.exist(err);
 				done();
 			});
