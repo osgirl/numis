@@ -27,7 +27,8 @@ exports.userByID = function(req, res, next, id) {
 exports.requiresLogin = function(req, res, next) {
 	if (!req.isAuthenticated()) {
 		return res.status(401).send({
-			message: 'User is not logged in'
+			name: 'NotLogged',
+			message: 'User is not logged in',
 		});
 	}
 
@@ -46,6 +47,7 @@ exports.hasAuthorization = function(roles) {
 				return next();
 			} else {
 				return res.status(403).send({
+					name: 'NotAuthorized',
 					message: 'User is not authorized'
 				});
 			}
