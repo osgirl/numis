@@ -6,8 +6,9 @@
 var passport = require('passport'),
 	User = require('mongoose').model('User'),
 	path = require('path'),
-	config = require('./config');
-	
+	config = require('./config'),
+	userProfileHandler = require('../app/controllers/users/users.profile.server.controller.js');
+
 /**
  * Module init function.
  */
@@ -22,7 +23,9 @@ module.exports = function() {
 		User.findOne({
 			_id: id
 		}, '-salt -password', function(err, user) {
-			done(err, user);
+			userProfileHandler.formattingUser({'user': user}, user, function(result) {
+				done(err, result);
+			});
 		});
 	});
 

@@ -12,44 +12,11 @@ var passport = require('passport'),
 module.exports = function(app) {
 	// User Routes
 	/*
-	 *
-	 */
-	var prepareFields = function(data, showProtected) {
-		// Rename _id field
-		data.id = data._id;
-		delete data._id;
-
-		// Add links field.
-		data.links = [
-			{ref: 'self', href: ''},
-			{ref: 'user', href: ''},
-			{ref: 'avatar', href: ''}
-		];
-
-		// Delete private fields fromresponse
-		delete data.__v;
-		delete data.password;
-		delete data.salt;
-		delete data.displayName;
-		delete data.avatar;
-
-		// Delete protected fields from response
-		if (!showProtected) {
-			delete data.lastName;
-			delete data.firstName;
-			delete data.homeAddress;
-			delete data.roles;
-			delete data.email;
-			delete data.provider;
-		}
-	};
-
-	/*
 	*
 	*/
 	var listPreFilter = function(req, query, next) {
 
-//console.log('LUIS req: ', req.query);
+		//console.log('LUIS req: ', req.query);
 
 		next(query);
 	};
@@ -59,44 +26,31 @@ module.exports = function(app) {
 	 *
 	 */
 	var fetchPreResponse = function(req, data, next) {
-		var isAdmin = (req.user && req.user.roles && req.user.roles.indexOf('admin') !== -1),
-			isMe    = (req.user && req.user._id.equals(data._id) );
-
-		prepareFields(data, isAdmin || isMe);
-
-		next(data);
+		users.formattingUser(req, data, next);
 	};
 
 	/*
 	 *
 	 */
 	var listPreResponse = function(req, data, next) {
-		var isAdmin = (req.user && req.user.roles && req.user.roles.indexOf('admin') !== -1);
-
-		for (var i = 0; i < data.length; i++) {
-			prepareFields(data[i], isAdmin);
-		}
-
-		next(data);
+		users.formattingUserList(req, data, next);
 	};
 
 	/*
 	 *
 	 */
 	var preResponseError = function(req, error, next) {
-		if (error && !error.message)
-			error.message = errorHandler.getErrorMessage(error);
+		errorHandler.prepareErrorResponse(error.message);
 
 		next(error);
 	};
 
 // TODO: Comment it!
-	//restEndpoints.log.verbose(true);
+		//restEndpoints.log.verbose(true);
 
 	// Register end point for '/users' and /users/:id'
 	new restEndpoints
 				.endpoint('/api/v1/users', 'User', {
-					limitFields: ['_id', 'username', 'slug', 'roles'],
 					queryParams: ['username', 'slug', 'email', '$in_roles'],
 					pagination: {
 						perPage: 50,
@@ -104,23 +58,24 @@ module.exports = function(app) {
 					}
 				})
 				.addMiddleware('*', users.requiresLogin)
-				.tap('pre_filter', 'list', listPreFilter)
-				.tap('pre_filter', 'fetch', listPreFilter)
-				.tap('post_retrieve', 'list', listPreFilter)
-				.tap('post_retrieve', 'fetch', listPreFilter)
+				//.tap('pre_filter', 'list', listPreFilter)
+				//.tap('pre_filter', 'fetch', listPreFilter)
+				//.tap('post_retrieve', 'list', listPreFilter)
+				//.tap('post_retrieve', 'fetch', listPreFilter)
 				.tap('pre_response', 'list', listPreResponse)
 				.tap('pre_response', 'fetch', fetchPreResponse)
-				.tap('pre_response_error', 'fetch', preResponseError)
-				.tap('pre_response_error', 'list', preResponseError)
-				.tap('pre_response_error', 'post', preResponseError)
-				.tap('pre_response_error', 'put', preResponseError)
-				.tap('pre_response_error', 'delete', preResponseError)
+				.tap('pre_response', 'post', fetchPreResponse)
+				.tap('pre_response_error', '*', preResponseError)
 				.register(app);
 
-
-
 	// Setting up the users profile api
-	app.route('/users/me').get(users.me);
+	//app.route('/users/me').get(users.me);
+	app.route('/users/me').get( function(req, res, next) {
+		res.url = '/api/v1/users/' + req.user._id;
+
+		next();
+	});
+
 	app.route('/users').put( function(req, res, next) {
 		res.url = '/api/v1' + res.url;
 
@@ -130,8 +85,8 @@ module.exports = function(app) {
 
 	// Setting up the users avatar api
 	app.route('/api/v1/users/:userId/avatar')
-		.get(users.requiresLogin, users.getAvatar)
-		.put(users.requiresLogin, users.updateAvatar)
+		.get(users.requiresLogin, users.userByID, users.getAvatar)
+		.put(users.requiresLogin, users.userByID, users.updateAvatar)
 		.delete(users.requiresLogin, users.deleteAvatar);
 
 	// Setting up the users password api
@@ -142,7 +97,7 @@ module.exports = function(app) {
 
 	// Setting up the users authentication api
 	app.route('/auth/signup').post(users.signup);
-	app.route('/auth/signin').post(users.signin);
+	app.route('/auth/signin').post(users.signin, users.formattingUser);
 	app.route('/auth/signout').get(users.signout);
 
 /*

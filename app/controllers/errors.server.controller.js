@@ -1,20 +1,23 @@
 'use strict';
 
+
+var errorTypes = ['ValidationError', 'DuplicateError', 'UnexpectedError'];
+
 /**
  * Get unique error field name
  */
-var getUniqueErrorMessage = function(err) {
-	var output;
+var getUniqueErrorData = function(err) {
+	var output, fieldName = '';
 
 	try {
-		var fieldName = err.err.substring(err.err.lastIndexOf('.$') + 2, err.err.lastIndexOf('_1'));
+		fieldName = err.err.substring(err.err.lastIndexOf('.$') + 2, err.err.lastIndexOf('_1'));
 		output = fieldName.charAt(0).toUpperCase() + fieldName.slice(1) + ' already exists';
 
 	} catch (ex) {
 		output = 'Unique field already exists';
 	}
 
-	return output;
+	return {field: fieldName, message: output};
 };
 
 /**
@@ -27,7 +30,8 @@ exports.getErrorMessage = function(err) {
 		switch (err.code) {
 			case 11000:
 			case 11001:
-				message = getUniqueErrorMessage(err);
+				message = getUniqueErrorData(err).message;
+
 				break;
 			default:
 				message = 'Something went wrong';
@@ -39,4 +43,39 @@ exports.getErrorMessage = function(err) {
 	}
 
 	return message;
+};
+
+
+/**
+* Get the error message from error object
+*/
+exports.prepareErrorResponse = function(err) {
+	if (err.code) {
+		switch (err.code) {
+			case 11000:
+			case 11001:
+				var det = getUniqueErrorData(err);
+
+				err.name = 'DuplicateError';
+				err.message = det.message;
+				err.errors = {};
+				err.errors[det.field] = {
+					message: err.err,
+					name: 'DuplicateError',
+					path: det.field,
+					type: 'unique',
+					code: err.code
+				};
+
+				delete err.err;
+				delete err.code;
+				break;
+
+			default:
+				err.name = 'UnexpectedError';
+		}
+
+	} else if (err.name && errorTypes.indexOf(err.name) === -1) {
+		err.name = 'UnexpectedError';
+	}
 };

@@ -59,9 +59,6 @@ describe('User CRUD tests', function() {
 				// Handle signin error
 				if (signinErr) done(signinErr);
 
-				// Get the userId
-				var userId = user.id;
-
 				// Save a new User
 				agent.post('/api/v1/users')
 					.send(user2)
@@ -82,14 +79,22 @@ describe('User CRUD tests', function() {
 								var users = usersGetRes.body;
 
 								// Set assertions
-								users.should.be.an.Array.with.lengthOf(2);
+								users.should.be.an.Object.not.be.empty;
+
+								users.should.have.propertyByPath('_links', 'self');
+								users.should.have.propertyByPath('_links', 'curies');
+								users._links.curies.should.be.an.Array;
+								users._links.curies[0].should.have.property('href');
+
+								//users['nu:user'].should.be.an.Array.with.lengthOf(2);
 
 								// The second user is the authenticated user.
-								(users[1].id).should.be.equal(userId);
+								(users._links['nu:user'][1].name).should.be.equal(user.slug);
+								(users._links['nu:user'][1].title).should.be.equal(user.username);
 
 								// First user is the new user
-								users[0].should.have.properties('id', 'username', 'slug');
-								(users[0].username).should.be.equal(user2.username);
+								users._links['nu:user'][0].should.have.properties('href', 'name', 'title');
+								(users._links['nu:user'][0].title).should.be.equal(user2.username);
 
 								// Call the assertion callback
 								done();
@@ -103,6 +108,12 @@ describe('User CRUD tests', function() {
 			.send(user2)
 			.expect(401)
 			.end(function(userSaveErr, userSaveRes) {
+				//console.log('userSaveRes: ', userUpdateRes.body);
+
+				// Set assertions
+				(userSaveRes.body.name).should.match('NotLogged');
+				(userSaveRes.body.message).should.match('User is not logged in');
+
 				// Call the assertion callback
 				done(userSaveErr);
 			});
@@ -120,9 +131,6 @@ describe('User CRUD tests', function() {
 			.end(function(signinErr, signinRes) {
 				// Handle signin error
 				if (signinErr) done(signinErr);
-
-				// Get the userId
-				var userId = user.id;
 
 				// Save a new User
 				agent.post('/api/v1/users')
@@ -160,9 +168,6 @@ describe('User CRUD tests', function() {
 				// Handle signin error
 				if (signinErr) done(signinErr);
 
-				// Get the userId
-				var userId = user.id;
-
 				// Save a new User
 				agent.post('/api/v1/users')
 					.send(user2)
@@ -194,9 +199,6 @@ describe('User CRUD tests', function() {
 				// Handle signin error
 				if (signinErr) done(signinErr);
 
-				// Get the userId
-				var userId = user.id;
-
 				// Save a new User
 				agent.post('/api/v1/users')
 					.send(user2)
@@ -206,9 +208,13 @@ describe('User CRUD tests', function() {
 
 						// Set message assertion
 						(userSaveRes.body).should.be.an.Object.not.be.empty;
-						(userSaveRes.body.name).should.match('MongoError');
-						(userSaveRes.body.code).should.match(11000);
-						//(userSaveRes.body.name).should.match('ValidationError');
+						(userSaveRes.body.name).should.match('DuplicateError');
+						//(userSaveRes.body).should.have.property('message');
+
+						(userSaveRes.body).should.have.propertyByPath('errors', 'username', 'message');
+						(userSaveRes.body.errors.username.path).should.match('username');
+						(userSaveRes.body.errors.username.type).should.match('unique');
+						(userSaveRes.body.errors.username.code).should.match(11000);
 
 						// Handle User save error
 						done(userSaveErr);
@@ -226,9 +232,6 @@ describe('User CRUD tests', function() {
 		.end(function(signinErr, signinRes) {
 			// Handle signin error
 			if (signinErr) done(signinErr);
-
-			// Get the userId
-			var userId = user.id;
 
 			// Save a new User
 			agent.post('/api/v1/users')
@@ -250,7 +253,7 @@ describe('User CRUD tests', function() {
 		});
 	});
 
-	it('NU_P_G111_E107: should be able to save User instance but not save role specification', function(done) {
+	it.skip('NU_P_G111_E107: should be able to save User instance but not save role specification', function(done) {
 		// Duplicate username field
 		user2.roles = ['user', 'admin', 'other'];
 
@@ -261,9 +264,6 @@ describe('User CRUD tests', function() {
 				// Handle signin error
 				if (signinErr) done(signinErr);
 
-				// Get the userId
-				var userId = user.id;
-
 				// Save a new User
 				agent.post('/api/v1/users')
 					.send(user2)
@@ -271,10 +271,16 @@ describe('User CRUD tests', function() {
 					.end(function(userSaveErr, userSaveRes) {
 						//console.log('userSaveRes: ', userSaveRes.body);
 
-						// Set message assertion
-						(userSaveRes.body).should.be.an.Object.not.be.empty;
-						(userSaveRes.body.roles).should.be.an.Array.with.lengthOf(1);
-						(userSaveRes.body.roles[0]).should.match('user');
+						// Set assertions
+						(usersGetRes.body).should.be.an.Object.not.be.empty;
+
+						(usersGetRes.body).should.have.propertyByPath('_links', 'self');
+						(usersGetRes.body).should.have.propertyByPath('_links', 'curies');
+						(usersGetRes.body._links.curies).should.be.an.Array;
+						(usersGetRes.body._links.curies[0]).should.have.property('href');
+
+						(usersGetRes.body['nu:user'].name).should.match(user2.username);
+						(usersGetRes.body['nu:user'].title).should.match(user2.username);
 
 						// Handle User save error
 						done(userSaveErr);
@@ -291,7 +297,7 @@ describe('User CRUD tests', function() {
 				if (signinErr) done(signinErr);
 
 				// Get the userId
-				var userId = user.id;
+				var userId 		 = signinRes.body._id;
 				var userPassword = user.password;
 
 				// Update User name and home address
@@ -336,7 +342,7 @@ describe('User CRUD tests', function() {
 				if (signinErr) done(signinErr);
 
 				// Get the userId
-				var userId = user.id;
+				var userId = signinRes.body._id;
 
 				agent.get('/auth/signout')
 					.expect(302)	// Redirect to '/'
@@ -380,7 +386,7 @@ describe('User CRUD tests', function() {
 			if (signinErr) done(signinErr);
 
 			// Get the userId
-			var userId = user.id;
+			var userId = signinRes.body._id;
 
 			// Update User name and home address
 			user.firstName = 'Fred';
@@ -416,9 +422,6 @@ describe('User CRUD tests', function() {
 				// Handle signin error
 				if (signinErr) done(signinErr);
 
-				// Get the userId
-				var userId = user.id;
-
 				// Get a list of Users
 				agent.get('/api/v1/users')
 					.expect(200)
@@ -430,10 +433,18 @@ describe('User CRUD tests', function() {
 						var users = usersGetRes.body;
 
 						// Set assertions
-						users.should.be.an.Array.with.lengthOf(1);
+						users.should.be.an.Object.not.be.empty;
 
-						// First user is the new user
-						users[0].should.have.properties('username', 'slug');
+						users.should.have.propertyByPath('_links', 'self');
+						users.should.have.propertyByPath('_links', 'curies');
+						users._links.curies.should.be.an.Array;
+						users._links.curies[0].should.have.property('href');
+
+						users._links['nu:user'].should.be.an.Array.with.lengthOf(1);
+
+						// The user is the new user
+						users._links['nu:user'][0].should.have.properties('href', 'name', 'title', 'nu:avatar');
+						(users._links['nu:user'][0].title).should.be.equal(user.username);
 
 						// Call the assertion callback
 						done();
@@ -464,7 +475,7 @@ describe('User CRUD tests', function() {
 				if (signinErr) done(signinErr);
 
 				// Get the userId
-				var userId = user.id;
+				var userId = signinRes.body._id;
 
 				// Request Users
 				agent.get('/api/v1/users/' + userId)
@@ -472,7 +483,18 @@ describe('User CRUD tests', function() {
 					.end(function(userFetchErr, userFetchRes) {
 						// Set assertion
 						(userFetchRes.body).should.be.an.Object.not.be.empty;
-						(userFetchRes.body).should.have.properties('id', 'username', 'slug');
+
+						(userFetchRes.body).should.have.propertyByPath('_links', 'self', 'href');
+						(userFetchRes.body).should.have.propertyByPath('_links', 'curies');
+						(userFetchRes.body._links.curies).should.be.an.Array;
+						(userFetchRes.body._links.curies[0]).should.have.property('href');
+
+						// First user is the new user
+						(userFetchRes.body).should.have.properties('email', 'firstName', 'lastName', 'name', 'username');
+						(userFetchRes.body.username).should.be.equal(user.username);
+						(userFetchRes.body.firstName).should.be.equal(user.firstName);
+						(userFetchRes.body.lastName).should.be.equal(user.lastName);
+						(userFetchRes.body.email).should.be.equal(user.email);
 
 						// Call the assertion callback
 						done();
@@ -490,7 +512,7 @@ describe('User CRUD tests', function() {
 				if (signinErr) done(signinErr);
 
 				// Get the userId
-				var userId = user.id;
+				var userId = signinRes.body._id;
 
 				agent.get('/auth/signout')
 					.expect(302)	// Redirect to '/'
@@ -520,9 +542,6 @@ describe('User CRUD tests', function() {
 			.end(function(signinErr, signinRes) {
 				// Handle signin error
 				if (signinErr) done(signinErr);
-
-				// Get the userId
-				var userId = user.id;
 
 				// Save a new User
 				agent.post('/api/v1/users')
@@ -575,8 +594,13 @@ describe('User CRUD tests', function() {
 	});
 
 	afterEach(function(done) {
-		User.remove().exec();
+		agent.get('/auth/signout')
+			.expect(302)
+			.end(function(signoutErr, signoutRes) {
+				User.remove().exec();
 
-		done();
+				done();
+			});
 	});
+
 });

@@ -3,10 +3,16 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose'),
-	slug	 = require('mongoose-url-slugs'),
-	crypto	 = require('crypto'),
-	Schema 	 = mongoose.Schema;
+var mongoose 	  = require('mongoose'),
+	slugPlugin	  = require('mongoose-url-slugs'),
+	filePluginLib = require('mongoose-file'),
+	filePlugin	  = filePluginLib.filePlugin,
+	l2r 		  = require('mongoose-l2r'),
+	//thumbnailPluginLib = require('mongoose-thumbnail'),
+	//thumbnailPlugin	   = thumbnailPluginLib.thumbnailPlugin,
+	crypto	 	  = require('crypto'),
+	path		  = require('path'),
+	Schema 	 	  = mongoose.Schema;
 
 /**
  * A Validation function for local strategy properties
@@ -78,7 +84,7 @@ var UserSchema = new Schema({
 	roles: {
 		type: [{
 			type: String,
-			enum: ['user', 'admin']
+			enum: ['user', 'premium', 'admin']
 		}],
 		default: ['user']
 	},
@@ -102,7 +108,34 @@ var UserSchema = new Schema({
 	}
 });
 
-UserSchema.plugin(slug('username'));
+
+/**
+ * Add plugins to User schema.
+ */
+UserSchema.plugin(slugPlugin('username'));
+//UserSchema.plugin(l2r);
+
+
+var uploads_base = path.join(__dirname, '../../'),
+ 	uploads 	 = path.join(uploads_base, 'uploads');
+
+/*
+UserSchema.plugin(thumbnailPlugin, {
+	name: 'avatar',
+	format: 'png',
+	size: 80,
+	inline: false,
+	save: true,
+	upload_to: thumbnailPluginLib.make_upload_to_model(uploads, 'avatars'),
+	relative_to: uploads_base
+});
+*/
+
+UserSchema.plugin(filePlugin, {
+	name: 'avatar',
+	upload_to: filePluginLib.make_upload_to_model(uploads, 'avatars'),
+	relative_to: uploads_base
+});
 
 
 /**
