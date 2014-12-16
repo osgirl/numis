@@ -8,5 +8,6 @@ public/dist
 public/docs
 public/locales
 app/tests/coverage/
+uploads/
 .bower-*/
 .idea/

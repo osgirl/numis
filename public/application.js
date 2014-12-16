@@ -38,4 +38,7 @@ angular.element(document).ready(function() {
 
 	//Then init the app
 	angular.bootstrap(document, [ApplicationConfiguration.applicationModuleName]);
+
+	// Prevent drop files in body
+	angular.element(document).attr('flow-prevent-drop', '');
 });

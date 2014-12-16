@@ -29,7 +29,9 @@ module.exports = {
 				'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
 				'public/lib/angular-translate/angular-translate.js',
 				'public/lib/angular-translate-loader-static-files/angular-translate-loader-static-files.js',
-				'public/lib/angular-ui-tinymce/src/tinymce.js'
+				'public/lib/angular-ui-tinymce/src/tinymce.js',
+				'public/lib/ng-file-upload/angular-file-upload-all.js',
+				'public/lib/angular-fallback-src/fallback-src.js'
 			]
 		},
 		css: [

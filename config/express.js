@@ -9,6 +9,7 @@ var fs = require('fs'),
 	express = require('express'),
 	morgan = require('morgan'),
 	bodyParser = require('body-parser'),
+	multer = require('multer'),
 	session = require('express-session'),
 	compress = require('compression'),
 	methodOverride = require('method-override'),
@@ -80,6 +81,7 @@ module.exports = function(db) {
 		extended: true
 	}));
 	app.use(bodyParser.json());
+	app.use(multer({dest:'./uploads/tmp'}));
 	app.use(methodOverride());
 
 	// CookieParser should be above session
