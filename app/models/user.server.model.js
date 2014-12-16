@@ -7,7 +7,6 @@ var mongoose 	  = require('mongoose'),
 	slugPlugin	  = require('mongoose-url-slugs'),
 	filePluginLib = require('mongoose-file'),
 	filePlugin	  = filePluginLib.filePlugin,
-	l2r 		  = require('mongoose-l2r'),
 	//thumbnailPluginLib = require('mongoose-thumbnail'),
 	//thumbnailPlugin	   = thumbnailPluginLib.thumbnailPlugin,
 	crypto	 	  = require('crypto'),
@@ -113,7 +112,6 @@ var UserSchema = new Schema({
  * Add plugins to User schema.
  */
 UserSchema.plugin(slugPlugin('username'));
-//UserSchema.plugin(l2r);
 
 
 var uploads_base = path.join(__dirname, '../../'),
