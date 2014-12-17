@@ -272,15 +272,15 @@ describe('User CRUD tests', function() {
 						//console.log('userSaveRes: ', userSaveRes.body);
 
 						// Set assertions
-						(usersGetRes.body).should.be.an.Object.not.be.empty;
+						(userSaveRes.body).should.be.an.Object.not.be.empty;
 
-						(usersGetRes.body).should.have.propertyByPath('_links', 'self');
-						(usersGetRes.body).should.have.propertyByPath('_links', 'curies');
-						(usersGetRes.body._links.curies).should.be.an.Array;
-						(usersGetRes.body._links.curies[0]).should.have.property('href');
+						(userSaveRes.body).should.have.propertyByPath('_links', 'self');
+						(userSaveRes.body).should.have.propertyByPath('_links', 'curies');
+						(userSaveRes.body._links.curies).should.be.an.Array;
+						(userSaveRes.body._links.curies[0]).should.have.property('href');
 
-						(usersGetRes.body['nu:user'].name).should.match(user2.username);
-						(usersGetRes.body['nu:user'].title).should.match(user2.username);
+						(userSaveRes.body['nu:user'].name).should.match(user2.username);
+						(userSaveRes.body['nu:user'].title).should.match(user2.username);
 
 						// Handle User save error
 						done(userSaveErr);

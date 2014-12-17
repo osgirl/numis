@@ -16,7 +16,7 @@ exports.formattingUser = function(req, res, next) {
 	var user 	= req.user,
 		isAdmin = (user && user.roles && user.roles.indexOf('admin') !== -1),
 		isMe    = (user && user._id.equals(res._id) ),
-		result  = {}
+		result  = {};
 
 	if (user && user._id && res && res._id) {
 		// Prepare response in JSON+HAL format.
@@ -95,7 +95,7 @@ exports.formattingUserList = function(req, res, next) {
 			name: res[i].slug,
 			'nu:avatar': {
 				small: {
-					href: '/users/' + res._id + '/avatar?size=sm'
+					href: '/users/' + res[i]._id + '/avatar?size=sm'
 				}
 			}
 		});
