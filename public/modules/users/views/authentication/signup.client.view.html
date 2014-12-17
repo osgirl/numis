@@ -52,8 +52,10 @@
 					<span class="error-message" data-ng-show="userForm.password.$dirty && userForm.password.$error.required" translate="core.FIELD_REQUIRED"></span>
 					<span class="error-message" data-ng-show="userForm.password.$dirty && userForm.password.$error.minlength" translate="core.FIELD_MINLENGTH" translate-values="{min: 8}"></span>
 				</div>
+				<alert type="danger" data-ng-show="userForm.$dirty && error">
+					<strong data-ng-bind="error"></strong>
+				</alert>
 				<div class="text-center form-group">
-					<alert type="danger">Username already exists</alert>
 					<button type="submit" class="btn btn-large btn-primary" ng-disabled="userForm.$invalid">{{'users.Sign_up' | translate}}</button>&nbsp; or&nbsp;
 					<a href="/#!/signin" class="show-signup">{{'users.Sign_in' | translate}}</a>
 				</div>

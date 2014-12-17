@@ -37,14 +37,14 @@
 						<label for="username">{{'users.Home_Address' | translate}}</label>
 						<textarea id="homeAddress" name="homeAddress" class="form-control" data-ng-model="user.homeAddress" rows="3" placeholder="{{'users.Home_Address' | translate}}"></textarea>
 					</div>
+					<alert type="success" data-ng-show="success">
+						<strong>{{'users.Profile_Saved_Successfully' | translate}}</strong>
+					</alert>
+					<alert type="danger" data-ng-show="error">
+						<strong data-ng-bind="error"></strong>
+					</alert>
 					<div class="text-center form-group">
 						<button type="submit" class="btn btn-large btn-primary" ng-disabled="userForm.$invalid">{{'users.Save_Profile' | translate}}</button>
-					</div>
-					<div data-ng-show="success" class="text-center text-success">
-						<strong>{{'users.Profile_Saved_Successfully' | translate}}</strong>
-					</div>
-					<div data-ng-show="error" class="text-center text-danger">
-						<strong data-ng-bind="error"></strong>
 					</div>
 				</fieldset>
 			</form>
