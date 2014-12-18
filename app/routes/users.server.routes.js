@@ -14,41 +14,24 @@ module.exports = function(app) {
 	/*
 	*
 	*/
-	var listPreFilter = function(req, query, next) {
-
-		//console.log('LUIS req: ', req.query);
+/*
+	var userListPreFilter = function(req, query, next) {
+		//console.log('req: ', req.query);
 
 		next(query);
 	};
-
-
+*/
 	/*
 	 *
 	 */
-	var fetchPreResponse = function(req, data, next) {
-		users.formattingUser(req, data, next);
-	};
-
-	/*
-	 *
-	 */
-	var listPreResponse = function(req, data, next) {
-		users.formattingUserList(req, data, next);
-	};
-
-	/*
-	 *
-	 */
-	var preResponseError = function(req, error, next) {
+	var userPreResponseError = function(req, error, next) {
 		errorHandler.prepareErrorResponse(error.message);
 
 		next(error);
 	};
 
-// TODO: Comment it!
-		//restEndpoints.log.verbose(true);
-
 	// Register end point for '/users' and /users/:id'
+	//restEndpoints.log.verbose(true);
 	new restEndpoints
 				.endpoint('/api/v1/users', 'User', {
 					queryParams: ['username', 'slug', 'email', '$in_roles'],
@@ -58,14 +41,17 @@ module.exports = function(app) {
 					}
 				})
 				.addMiddleware('*', users.requiresLogin)
-				//.tap('pre_filter', 'list', listPreFilter)
-				//.tap('pre_filter', 'fetch', listPreFilter)
-				//.tap('post_retrieve', 'list', listPreFilter)
-				//.tap('post_retrieve', 'fetch', listPreFilter)
-				.tap('pre_response', 'list', listPreResponse)
-				.tap('pre_response', 'fetch', fetchPreResponse)
-				.tap('pre_response', 'post', fetchPreResponse)
-				.tap('pre_response_error', '*', preResponseError)
+				//.tap('pre_filter', 'list', userListPreFilter)
+				//.tap('pre_filter', 'fetch', userListPreFilter)
+				//.tap('post_retrieve', 'list', userListPreFilter)
+				//.tap('post_retrieve', 'fetch', userListPreFilter)
+				.tap('pre_save',     	   'put',    users.update)
+				.tap('pre_response', 	   'list',   users.formattingUserList)
+				.tap('pre_response', 	   'fetch',  users.formattingUser)
+				.tap('pre_response', 	   'post',   users.formattingUser)
+				.tap('pre_response', 	   'put',    users.formattingUser)
+				.tap('pre_response', 	   'delete', users.formattingUser)
+				.tap('pre_response_error', '*',      userPreResponseError)
 				.register(app);
 
 	// Setting up the users profile api
@@ -81,6 +67,7 @@ module.exports = function(app) {
 
 		next();
 	});
+
 //	app.route('/users/accounts').delete(users.removeOAuthProvider);
 
 	// Setting up the users avatar api
@@ -90,7 +77,7 @@ module.exports = function(app) {
 		.delete(users.requiresLogin, users.deleteAvatar);
 
 	// Setting up the users password api
-	app.route('/users/password').post(users.changePassword);
+	app.route('/users/password').post(users.requiresLogin, users.changePassword);
 	app.route('/auth/forgot').post(users.forgot);
 	app.route('/auth/reset/:token').get(users.validateResetToken);
 	app.route('/auth/reset/:token').post(users.reset);

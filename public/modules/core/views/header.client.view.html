@@ -46,7 +46,7 @@
 						<a href="/#!/settings/accounts" translate>{{'core.Manage_Social_Accounts' | translate}}</a>
 					</li>
 -->
-					<li data-ng-show="authentication.user.provider === 'local'">
+					<li data-ng-show="authentication.user._links.password">
 						<a href="/#!/settings/password" translate>{{'core.Change_Password' | translate}}</a>
 					</li>
 					<li class="divider"></li>

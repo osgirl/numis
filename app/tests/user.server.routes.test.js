@@ -303,10 +303,8 @@ describe('User CRUD tests', function() {
 				// Update User name and home address
 				user.firstName = 'Fred';
 				user.lastName = 'Flintstones';
-				user.displayName = 'The Flintstones';
 				user.homeAddress = '301 Cobblestone Way, Bedrock 70777';
 				user.username = 'Flintstones';
-				user.password = 'fl1ntst0n3s';
 
 				// Update existing User
 				agent.put('/api/v1/users/' + userId)
@@ -320,10 +318,8 @@ describe('User CRUD tests', function() {
 
 						// Set assertions
 						(userUpdateRes.body._id).should.equal(userId);
-						(userUpdateRes.body.password).should.not.match(userPassword);
 						(userUpdateRes.body.firstName).should.match('Fred');
 						(userUpdateRes.body.lastName).should.match('Flintstones');
-						(userUpdateRes.body.displayName).should.match('The Flintstones');
 						(userUpdateRes.body.homeAddress).should.match('301 Cobblestone Way, Bedrock 70777');
 						(userUpdateRes.body.username).should.match('Flintstones');
 

@@ -38,7 +38,7 @@ exports.formattingUser = function(req, res, next) {
 					medium: {
 						href: '/users/' + res._id + '/avatar?size=md'
 					},
-					big: {
+					large: {
 						href: '/users/' + res._id + '/avatar?size=lg'
 					}
 				},
@@ -49,6 +49,10 @@ exports.formattingUser = function(req, res, next) {
 			name: res.slug,
 			_id: res._id,
 		};
+
+		if (res.provider === 'local') {
+			result._links.password = { href: '/users/password', title: 'Change password'};
+		}
 
 		if (isAdmin || isMe) {
 			result.lastName 	= res.lastName;
@@ -108,47 +112,36 @@ exports.formattingUserList = function(req, res, next) {
 /**
  * Update user details
  */
-exports.update = function(req, res) {
-	// Init Variables
-	var user = req.user;
-	var message = null;
+exports.update = function(req, res, next) {
+	if (req.params.id) {
+		// Init Variables
+		var validFields = ['username', 'lastName', 'firstName', 'homeAddress', 'email'],
+			user;
 
-	// For security measurement we remove the roles from the req.body object
-	delete req.body.roles;
+		user = User.findOne({
+			_id: req.params.id
+		}, '-password -salt').exec(function(err, user) {
+			if (err) return next(err);
 
-	if (user) {
-		// Merge existing user
-		user = _.extend(user, req.body);
-		user.updated = Date.now();
-		user.displayName = user.firstName + ' ' + user.lastName;
+			if (!user) return next(new Error('Failed to load User ' + req.params.id));
 
-		user.save(function(err) {
-			if (err) {
-				return res.status(400).send({
-					message: errorHandler.getErrorMessage(err)
-				});
-			} else {
-				req.login(user, function(err) {
-					if (err) {
-						res.status(400).send(err);
-					} else {
-						res.json(user);
-					}
-				});
+			// Filter request data and removes invalid ones.
+			var reqKeys = Object.keys(req.body);
+			for (var i = 0, len = reqKeys.length; i < len; i++) {
+				if (validFields.indexOf(reqKeys[i]) === -1) {
+					delete req.body[reqKeys[i]];
+				}
 			}
+
+			// Merge existing user data with new data
+			user = _.extend(user, req.body);
+			user.updated = Date.now();
+			user.displayName = user.firstName + ' ' + user.lastName;
+
+			next(user);
 		});
+
 	} else {
-		res.status(400).send({
-			message: 'User is not signed in'
-		});
+		return next(new Error('Failed to load User '));
 	}
 };
-
-/**
- * Send User
- */
-/*
-exports.me = function(req, res) {
-	res.json(req.user || null);
-};
-*/

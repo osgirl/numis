@@ -11,8 +11,8 @@
  * Contolador de la imágen de avatar en el perfil de usuario
  */
 
-angular.module('users').controller('AvatarImageController', ['$scope', '$upload',
-	function($scope, $upload) {
+angular.module('users').controller('AvatarImageController', ['$scope', '$upload', '$timeout',
+	function($scope, $upload, $timeout) {
 
 // TODO: Modificar con angular-hal
 		$scope.imgAvatarSrc = '/api/v1' + $scope.user._links['nu:avatar'].medium.href;
@@ -53,13 +53,16 @@ angular.module('users').controller('AvatarImageController', ['$scope', '$upload'
 					// See https://github.com/danialfarid/angular-file-upload/pull/40#issuecomment-28612000 for sample code
 
 			}).progress(function(evt) {
-				console.log('progress: ' + parseInt(100.0 * evt.loaded / evt.total) + '% file :'+ evt.config.file.name);
-
-				$scope.uploadProgress = Math.floor(event.loaded / event.total);
-				$scope.$apply();
+				//console.log('progress: ' + parseInt(100.0 * evt.loaded / evt.total) + '% file');
+				$timeout(function() {
+					$scope.uploadProgress = Math.floor(evt.loaded / evt.total);
+					$scope.$apply();
+				});
 			}).success(function(data, status, headers, config) {
 				// file is uploaded successfully
-				console.log('file ' + config.file.name + 'is uploaded successfully. Response: ' + data);
+				// Refresh avatar image
+				$scope.imgAvatarSrc = $scope.imgAvatarSrc + '&decache=' + Math.random();
+
 			}).error(function(err) {
 				$scope.uploadInProgress = false;
 			});

@@ -7,8 +7,6 @@ var mongoose 	  = require('mongoose'),
 	slugPlugin	  = require('mongoose-url-slugs'),
 	filePluginLib = require('mongoose-file'),
 	filePlugin	  = filePluginLib.filePlugin,
-	//thumbnailPluginLib = require('mongoose-thumbnail'),
-	//thumbnailPlugin	   = thumbnailPluginLib.thumbnailPlugin,
 	crypto	 	  = require('crypto'),
 	path		  = require('path'),
 	Schema 	 	  = mongoose.Schema;
@@ -66,26 +64,35 @@ var UserSchema = new Schema({
 		required: 'Please fill in a username',
 		trim: true
 	},
+	homeAddress: {
+		type: String,
+		trim: true
+	},
 	password: {
 		type: String,
 		default: '',
-		validate: [validateLocalStrategyPassword, 'Password should be longer']
+		validate: [validateLocalStrategyPassword, 'Password should be longer'],
 	},
 	salt: {
-		type: String
+		type: String,
 	},
 	provider: {
 		type: String,
 		required: 'Provider is required'
 	},
-	providerData: {},
-	additionalProvidersData: {},
+	providerData: {
+		select: false
+	},
+	additionalProvidersData: {
+		select: false
+	},
 	roles: {
 		type: [{
 			type: String,
 			enum: ['user', 'premium', 'admin']
 		}],
-		default: ['user']
+		default: ['user'],
+		select: false
 	},
 	updated: {
 		type: Date
@@ -96,14 +103,12 @@ var UserSchema = new Schema({
 	},
 	/* For reset password */
 	resetPasswordToken: {
-		type: String
+		type: String,
+		select: false
 	},
 	resetPasswordExpires: {
-		type: Date
-	},
-	homeAddress: {
-		type: String,
-		trim: true
+		type: Date,
+		select: false
 	}
 });
 
@@ -117,24 +122,11 @@ UserSchema.plugin(slugPlugin('username'));
 var uploads_base = path.join(__dirname, '../../'),
  	uploads 	 = path.join(uploads_base, 'uploads');
 
-/*
-UserSchema.plugin(thumbnailPlugin, {
-	name: 'avatar',
-	format: 'png',
-	size: 80,
-	inline: false,
-	save: true,
-	upload_to: thumbnailPluginLib.make_upload_to_model(uploads, 'avatars'),
-	relative_to: uploads_base
-});
-*/
-
 UserSchema.plugin(filePlugin, {
 	name: 'avatar',
 	upload_to: filePluginLib.make_upload_to_model(uploads, 'avatars'),
 	relative_to: uploads_base
 });
-
 
 /**
  * Hook a pre save method to hash the password

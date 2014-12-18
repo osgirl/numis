@@ -137,7 +137,7 @@ exports.reset = function(req, res, next) {
 									if (err) {
 										res.status(400).send(err);
 									} else {
-										// Return authenticated user 
+										// Return authenticated user
 										res.json(user);
 
 										done(err, user);
@@ -193,7 +193,7 @@ exports.changePassword = function(req, res) {
 
 	if (req.user) {
 		if (passwordDetails.newPassword) {
-			User.findById(req.user.id, function(err, user) {
+			User.findById(req.user._id, function(err, user) {
 				if (!err && user) {
 					if (user.authenticate(passwordDetails.currentPassword)) {
 						if (passwordDetails.newPassword === passwordDetails.verifyPassword) {

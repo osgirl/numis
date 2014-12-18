@@ -108,13 +108,22 @@ angular.module('users').controller('SettingsController', ['$scope', '$http', '$l
 		$scope.changeUserPassword = function() {
 			$scope.success = $scope.error = null;
 
-			$http.post('/users/password', $scope.passwordDetails).success(function(response) {
-				// If successful show success message and clear form
-				$scope.success = true;
-				$scope.passwordDetails = null;
-			}).error(function(response) {
-				$scope.error = response.message;
-			});
+			var canChangePassword = (Authentication.user._links.password && Authentication.user._links.password.href !== '');
+			if (canChangePassword) {
+				$http.post(Authentication.user._links.password.href, $scope.passwordDetails).success(function(response) {
+					// If successful show success message and clear form
+					$scope.success = true;
+					$scope.passwordDetails = null;
+					$scope.passwordForm.$setPristine();
+
+					// And redirect to the index page
+					$location.path('/');
+				}).error(function(response) {
+					$scope.error = response.message;
+				});
+			} else {
+				$scope.error = 'Change password is not available for this account.';
+			}
 		};
 	}
 ]);
