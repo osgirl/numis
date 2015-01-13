@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/pfg-numis/numis.png?label=ready&title=Ready)](https://waffle.io/pfg-numis/numis)
 [![MEAN.JS Logo](http://meanjs.org/img/logo-small.png)](http://meanjs.org/)
 
 [![Build Status](https://travis-ci.org/PFG-NUMIS/numis.svg?branch=master)](https://travis-ci.org/PFG-NUMIS/numis)
