@@ -2,14 +2,43 @@
 
 var mongoose = require('mongoose'),
 	restEndpoints = require('mongoose-rest-endpoints'),
-	users = require('../../app/controllers/users.server.controller');
+	errorHandler = require('../../app/controllers/errors.server.controller'),
+	users = require('../../app/controllers/users.server.controller'),
+	groupbuys = require('../../app/controllers/groupbuys.server.controller');
 
 module.exports = function(app) {
 
-// TODO: Comment it!
-//	mongooseRestEndpoints.log.verbose(true);
+	/*
+	 *
+	 */
+	var groupbuyListPreFilter = function(req, query, next) {
+		var isAdmin = (req.user && req.user.roles && req.user.roles.indexOf('admin') !== -1);
 
-	// Register end point for '/users' and /users/:id'
+		if (!isAdmin) {
+			if (req.user) {
+				//data.$or = [{_id: '547e3ab9b1a7a0ad7df3fcac'}, {name: 'Japón-500 yenes - Serie prefecturas (Septiembre 2014)'}];
+				query.$or = [{status: { '$in': ['new', 'published', 'payments', 'paid', 'shipments', 'closed']} },
+					 		 {managers: {$elemMatch: {managers: req.user._id} } }];
+			} else {
+				query.status = { '$in': ['new', 'published', 'payments', 'paid', 'shipments', 'closed']};
+			}
+		}
+
+		next(query);
+	};
+
+	/*
+	 *
+	 */
+	var groupbuyPreResponseError = function(req, error, next) {
+		errorHandler.prepareErrorResponse(error.message);
+
+		next(error);
+	};
+
+
+	// Register end point for '/groupbuys' and /groupbuys/:id'
+	//restEndpoints.log.verbose(true);
 	new restEndpoints
 				.endpoint('/api/v1/groupbuys', 'Groupbuy', {
 					limitFields: ['_id', 'name', 'description', 'slug', 'status', 'managers', 'members'],
@@ -22,37 +51,13 @@ module.exports = function(app) {
 					}
 				})
 				.addMiddleware('*', users.requiresLogin)
-				.tap('pre_filter', 'list', function(req, data, next) {
-					var isAdmin = (req.user && req.user.roles && req.user.roles.indexOf('admin') !== -1);
-
-					if (!isAdmin) {
-						if (req.user) {
-	//									data.$or = [{_id: '547e3ab9b1a7a0ad7df3fcac'}, {name: 'Japón-500 yenes - Serie prefecturas (Septiembre 2014)'}];
-							data.$or = [{status: { '$in': ['new', 'published', 'payments', 'paid', 'shipments', 'closed']} },
-										{managers: {$elemMatch: {managers: req.user._id} } }];
-						} else {
-							data.status = { '$in': ['new', 'published', 'payments', 'paid', 'shipments', 'closed']};
-						}
-
-					}
-					return next(data);
-				})
-
-				.tap('pre_response', 'list', function(req, data, next) {
-					var isAdmin = (req.user && req.user.roles && req.user.roles.indexOf('admin') !== -1),
-						isManager = false,
-						isMember = false;
-
-					return next(data);
-				})
-				.tap('pre_response', 'fetch', function(req, data, next) {
-					var isAdmin = (req.user && req.user.roles && req.user.roles.indexOf('admin') !== -1),
-						isManager = false,
-						isMember = false;
-
-					return next(data);
-				})
-
+				.tap('pre_filter', 		   'list',   groupbuyListPreFilter)
+				.tap('pre_response', 	   'list',   groupbuys.formattingGroupbuyList)
+				.tap('pre_response', 	   'fetch',  groupbuys.formattingGroupbuy)
+				.tap('pre_response', 	   'post',   groupbuys.formattingGroupbuy)
+				.tap('pre_response', 	   'put',    groupbuys.formattingGroupbuy)
+				.tap('pre_response', 	   'delete', groupbuys.formattingGroupbuy)
+				.tap('pre_response_error', '*',      groupbuyPreResponseError)
 				.register(app);
 
 };
