@@ -15,7 +15,7 @@ angular.module('users').controller('AvatarImageController', ['$scope', '$upload'
 	function($scope, $upload, $timeout) {
 
 // TODO: Modificar con angular-hal
-		$scope.imgAvatarSrc = '/api/v1' + $scope.user._links['nu:avatar'].medium.href;
+		$scope.imgAvatarSrc = $scope.user._links['ht:avatar'].medium.href;
 		$scope.imgAvatarDefault = ['modules/users/img/no-user-image-square.jpg'];
 
 		/**

@@ -23,7 +23,7 @@ exports.formattingUser = function(req, res, next) {
 		result = {
 			_links: {
 				self: {
-					href: '/users/' + res._id
+					href: '/api/v1/users/' + res._id
 				},
 
 				curies: [{
@@ -31,19 +31,22 @@ exports.formattingUser = function(req, res, next) {
 					href: '/api/v1/{rel}',
 					templated: true
 				}],
-				'nu:avatar': {
+				'ht:avatar': {
 					small: {
-						href: '/users/' + res._id + '/avatar?size=sm'
+						href: '/api/v1/users/' + res._id + '/avatar?size=sm',
+						title: 'Small size avatar image'
 					},
 					medium: {
-						href: '/users/' + res._id + '/avatar?size=md'
+						href: '/api/v1/users/' + res._id + '/avatar?size=md',
+						title: 'Medium size avatar image'
 					},
 					large: {
-						href: '/users/' + res._id + '/avatar?size=lg'
+						href: '/api/v1/users/' + res._id + '/avatar?size=lg',
+						title: 'Large size avatar image'
 					}
 				},
 
-				'nu:groupbuys': []
+				'ht:groupbuys': []
 			},
 			username: res.username,
 			name: res.slug,
@@ -51,7 +54,7 @@ exports.formattingUser = function(req, res, next) {
 		};
 
 		if (res.provider === 'local') {
-			result._links.password = { href: '/users/password', title: 'Change password'};
+			result._links['ht:password'] = { href: '/api/v1/users/password', title: 'Change password'};
 		}
 
 		if (isAdmin || isMe) {
@@ -81,25 +84,26 @@ exports.formattingUserList = function(req, res, next) {
 	var result = {
 		_links: {
 			self: {
-				href: '/users/'
+				href: '/api/v1/users/'
 			},
 			curies: [{
-				name: 'nu',
-				href: '/api/v1/{rel}',
+				name: 'ht',
+				href: '/api/v1/rels/{rel}',
 				templated: true
 			}],
-			'nu:user': []
+			'ht:user': []
 		}
 	};
 
 	for (var i = 0; i < res.length; i++) {
-		result._links['nu:user'].push({
-			href: '/users/' + res[i]._id,
+		result._links['ht:user'].push({
+			href: '/api/v1/users/' + res[i]._id,
 			title: res[i].username,
 			name: res[i].slug,
-			'nu:avatar': {
+			'ht:avatar': {
 				small: {
-					href: '/users/' + res[i]._id + '/avatar?size=sm'
+					href: '/api/v1/users/' + res[i]._id + '/avatar?size=sm',
+					'title': 'Small size avatar image'
 				}
 			}
 		});
