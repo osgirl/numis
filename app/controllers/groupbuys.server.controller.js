@@ -14,8 +14,9 @@ var checkVisibility = function(groupbuy, property, isAdmin, isMember, isManager)
 		return true;
 
 		return (groupbuy.visibility[property] === 'public' || 
-		groupbuy.visibility[property] === 'restricted' && isMember || 
-		groupbuy.visibility[property] === 'private' && isManager);
+				groupbuy.visibility[property] === 'restricted' && isMember || 
+				groupbuy.visibility[property] === 'private' && isManager
+			   );
 	};
 
 /**
@@ -95,25 +96,89 @@ exports.list = function(req, res) {
 };
 
 /**
- * Groupbuy middleware
- */
-exports.groupbuyByID = function(req, res, next, id) {
-	Groupbuy.findById(id).populate('user', 'displayName').exec(function(err, groupbuy) {
-		if (err) return next(err);
-		if (! groupbuy) return next(new Error('Failed to load Groupbuy ' + id));
-		req.groupbuy = groupbuy ;
-		next();
+* Add a member to an existing groupbuy
+*/
+exports.addMember = function(req, res) {
+	var groupbuy = req.groupbuy,
+		userId 	 = (req.body && req.body.userId && mongoose.Types.ObjectId.isValid(req.body.userId)) ? req.body.userId : undefined,
+		err      = null;
+
+	// TODO !! ñapa
+	//
+	// TODO: Esto no queda nada bonito aquí.
+	// Check user is a valid user
+	mongoose.model('User').findById(userId, function(err, user) {
+		if (!err && !user) {
+			err = {message: 'You can not add the user as member. The user ID (' + userId + ') is not a valid.'};
+		} else {
+			// Check if user is a member yet
+			if (groupbuy.members.indexOf(userId) === -1) {
+				groupbuy.members.push(userId);
+
+				groupbuy.save(function(err) {
+					if (err) {
+						return res.status(400).send({
+							message: errorHandler.getErrorMessage(err)
+						});
+					} else {
+						res.set('Content-Type', 'application/vnd.hal+json');
+						res.jsonp(groupbuy);
+					}
+				});
+			} else {
+				err = {message: 'You can not add the user to this Groupbuy. The user is already member.'};
+			}
+		}
+		if (err) {
+			return res.status(400).send({
+				message: errorHandler.getErrorMessage(err)
+			});
+		}
 	});
 };
 
 /**
- * Groupbuy authorization middleware
- */
-exports.hasAuthorization = function(req, res, next) {
-	if (req.groupbuy.user.id !== req.user.id) {
-		return res.status(403).send('User is not authorized');
+* Remove a member from an existing groupbuy
+*/
+exports.deleteMember = function(req, res) {
+	var groupbuy = req.groupbuy,
+		member   = req.profile,
+		err      = null,
+		index;
+
+	// Check if user is a member of selected Groupbuy
+	if ( (index = groupbuy.members.indexOf(member._id)) !== -1) {
+		groupbuy.members.splice(index, 1);
+
+		groupbuy.save(function(err) {
+			if (err) {
+				return res.status(400).send({
+					message: errorHandler.getErrorMessage(err)
+				});
+			} else {
+				res.set('Content-Type', 'application/vnd.hal+json');
+				res.jsonp(groupbuy);
+			}
+		});
+	} else {
+		err = {message: 'You can not remove the user as member in this Groupbuy. The user is not member.'};
+	}
+
+	if (err) {
+		return res.status(400).send({
+			message: errorHandler.getErrorMessage(err)
+		});
 	}
 	next();
+};
+
+/**
+* Get list of members in a groupbuy
+*/
+exports.getMembersList = function(req, res) {
+
+	// TODO
+
 };
 
 
@@ -131,34 +196,49 @@ exports.formattingGroupbuy = function(req, res, next) {
 		showMembers  = checkVisibility(groupbuy, 'members', isAdmin, isMember, isManager),
 		showManagers = checkVisibility(groupbuy, 'managers', isAdmin, isMember, isManager),
 		showItems 	 = checkVisibility(groupbuy, 'items', isAdmin, isMember, isManager),
-		result 	  	 = {};
+		result 	  	 = {},
+		i;
 
-/* visibility TODO
-		shipmentsState: 'restricted',
-		paymentStatus: 'restricted',
-		itemsByMember: 'restricted',
-		itemNumbers: 'public',
-*/
+	/* visibility TODO
+			shipmentsState: 'restricted',
+			paymentStatus: 'restricted',
+			itemsByMember: 'restricted',
+			itemNumbers: 'public',
+	*/
 
 	if (user && user._id && groupbuy && groupbuy._id) {
 		// Prepare response in JSON+HAL format.
 		result = {
 			_links: {
 				self: {
-					href: '/groupbuys/' + groupbuy._id
+					href: '/api/v1/groupbuys/' + groupbuy._id
 				},
 
 				curies: [{
-					name: 'nu',
-					href: '/api/v1/{rel}',
+					name: 'ht',
+					href: '/api/v1/rels/{rel}',
 					templated: true
-				}]
+				}],
+
+				'ht:members': {
+					href: '/api/v1/groupbuys/' + groupbuy._id + '/members',
+					title: 'Manage members'
+
+				},
+				'ht:managers': {
+					href: '/api/v1/groupbuys/' + groupbuy._id + '/managers',
+					title: 'Manage managers'
+				},
 			},
+			_embedded: {
+				'ht:members': [],
+				'ht:managers': []
+			},
+			_id: groupbuy._id,
+			name: groupbuy.slug,
 			title: groupbuy.name,
 			status: groupbuy.status,
-			description: groupbuy.description,
-			name: groupbuy.slug,
-			_id: groupbuy._id
+			description: groupbuy.description
 		};
 
 		if (showUpdates) {
@@ -170,11 +250,21 @@ exports.formattingGroupbuy = function(req, res, next) {
 		}
 
 		if (showMembers) {
-			result._links['nu:members'] = {
-				href: '/groupbuys/' + groupbuy._id + '/members',
-				title: 'Groupbuy members'
-			};
-
+			for (i = 0; i < groupbuy.members.length; i++) {
+				result._embedded['ht:members'].push({
+					_links: {
+						self: {href: '/api/v1/users/' + groupbuy.members[i]._id},
+						'ht:avatar': {
+							href: '/api/v1/users/' + groupbuy.members[i]._id + '/avatar?{size}',
+							title: 'Avatar image',
+							templated: true
+						}
+					},
+					_id: groupbuy.members[i]._id,
+					title: groupbuy.members[i].username,
+					name: groupbuy.members[i].slug,
+				});
+			}
 		}
 
 		if (showManagers) {
@@ -185,12 +275,14 @@ exports.formattingGroupbuy = function(req, res, next) {
 
 		}
 
-		if (showItems) {
-			result._links['nu:items'] = {
-				href: '/groupbuys/' + groupbuy._id + '/items',
-				title: 'Groupbuy items'
-			};
-
+		if (showItems && false) {
+			for (i = 0; i < groupbuy.items.length; i++) {
+				result._links['ht:items'] = {
+					href: '/api/v1/groupbuys/' + groupbuy._id + '/items/' + groupbuy.items[i]._id,
+					title: groupbuy.items[i].title,
+					name: groupbuy.items[i].name
+				};
+			}
 		}
 	}
 
@@ -209,22 +301,27 @@ exports.formattingGroupbuyList = function(req, res, next) {
 	var result = {
 		_links: {
 			self: {
-				href: '/groupbuys/'
+				href: '/api/v1/groupbuys/'
 			},
 			curies: [{
-				name: 'nu',
-				href: '/api/v1/{rel}',
+				name: 'ht',
+				href: '/api/v1/rels/{rel}',
 				templated: true
-			}],
-			'nu:groupbuy': []
+			}]
+		},
+		_embedded: {
+			'ht:groupbuy': []
 		}
 	};
 
 	for (var i = 0; i < res.length; i++) {
-		result._links['nu:groupbuy'].push({
-			href: '/groupbuy/' + res[i]._id,
-			title: res[i].name,
+		result._embedded['ht:groupbuy'].push({
+			_links: {
+				self: { href: '/api/v1/groupbuys/' + res[i]._id }
+			},
+			_id: res[i]._id,
 			name: res[i].slug,
+			title: res[i].name,
 			status: res[i].status,
 			description: res[i].description
 		});
@@ -232,4 +329,27 @@ exports.formattingGroupbuyList = function(req, res, next) {
 
 	// Send response
 	next(result);
+};
+
+
+/**
+ * Groupbuy middleware
+ */
+exports.groupbuyByID = function(req, res, next, id) {
+	Groupbuy.findById(id).populate('user', 'displayName').exec(function(err, groupbuy) {
+		if (err) return next(err);
+		if (! groupbuy) return next(new Error('Failed to load Groupbuy ' + id));
+		req.groupbuy = groupbuy;
+		next();
+	});
+};
+
+/**
+ * Groupbuy authorization middleware
+ */
+exports.hasAuthorization = function(req, res, next) {
+	if (req.groupbuy.user.id !== req.user.id) {
+		return res.status(403).send('User is not authorized');
+	}
+	next();
 };

@@ -60,4 +60,16 @@ module.exports = function(app) {
 				.tap('pre_response_error', '*',      groupbuyPreResponseError)
 				.register(app);
 
+	// Members end-points
+	app.route('/api/v1/groupbuys/:groupbuyId/members')
+		.get(groupbuys.getMembersList)
+		.post(users.requiresLogin, groupbuys.addMember);
+
+	app.route('/api/v1/groupbuys/:groupbuyId/members/:userId')
+		.delete(users.requiresLogin, groupbuys.deleteMember);
+
+	// Finish by binding the Item middleware
+	app.param('userId', users.userByID);
+	app.param('groupbuyId', groupbuys.groupbuyByID);
+
 };
