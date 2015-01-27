@@ -26,19 +26,23 @@ var getUniqueErrorData = function(err) {
 exports.getErrorMessage = function(err) {
 	var message = '';
 
-	if (err.code) {
-		switch (err.code) {
-			case 11000:
-			case 11001:
-				message = getUniqueErrorData(err).message;
-
-				break;
-			default:
-				message = 'Something went wrong';
-		}
+	if (typeof err === 'object' && typeof err.message !== 'undefined') {
+		message = err.message;
 	} else {
-		for (var errName in err.errors) {
-			if (err.errors[errName].message) message = err.errors[errName].message;
+		if (err.code) {
+			switch (err.code) {
+				case 11000:
+				case 11001:
+					message = getUniqueErrorData(err).message;
+
+					break;
+				default:
+					message = 'Something went wrong';
+			}
+		} else {
+			for (var errName in err.errors) {
+				if (err.errors[errName].message) message = err.errors[errName].message;
+			}
 		}
 	}
 
