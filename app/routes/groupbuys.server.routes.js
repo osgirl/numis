@@ -68,6 +68,14 @@ module.exports = function(app) {
 	app.route('/api/v1/groupbuys/:groupbuyId/members/:userId')
 		.delete(users.requiresLogin, groupbuys.deleteMember);
 
+	// Managers end-points
+	app.route('/api/v1/groupbuys/:groupbuyId/managers')
+		.get(groupbuys.getManagersList)
+		.post(users.requiresLogin, groupbuys.addManager);
+
+	app.route('/api/v1/groupbuys/:groupbuyId/managers/:userId')
+		.delete(users.requiresLogin, groupbuys.deleteManager);
+
 	// Finish by binding the Item middleware
 	app.param('userId', users.userByID);
 	app.param('groupbuyId', groupbuys.groupbuyByID);

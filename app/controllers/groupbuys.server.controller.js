@@ -19,6 +19,7 @@ var checkVisibility = function(groupbuy, property, isAdmin, isMember, isManager)
 			   );
 	};
 
+
 /**
  * Create a Groupbuy
  */
@@ -169,7 +170,6 @@ exports.deleteMember = function(req, res) {
 			message: errorHandler.getErrorMessage(err)
 		});
 	}
-	next();
 };
 
 /**
@@ -180,6 +180,104 @@ exports.getMembersList = function(req, res) {
 	// TODO
 
 };
+
+/**
+* Add a manager to an existing groupbuy
+*/
+exports.addManager = function(req, res) {
+	var groupbuy = req.groupbuy,
+		userId 	 = (req.body && req.body.userId && mongoose.Types.ObjectId.isValid(req.body.userId)) ? req.body.userId : undefined,
+		err      = null;
+
+	// TODO !! ñapa
+	//
+	// TODO: Esto no queda nada bonito aquí.
+	// Check user is a valid user
+	mongoose.model('User').findById(userId, function(err, user) {
+		if (!err && !user) {
+			err = {message: 'You can not add the user as manager. The user ID (' + userId + ') is not a valid.'};
+		} else {
+			// Check if user is a manager yet
+			if (groupbuy.managers.indexOf(userId) === -1) {
+				groupbuy.managers.push(userId);
+
+				// Add manager as member of Groupbuy.
+				if (groupbuy.members.indexOf(userId) === -1) {
+					groupbuy.members.push(userId);
+				}
+
+				groupbuy.save(function(err) {
+					if (err) {
+						return res.status(400).send({
+							message: errorHandler.getErrorMessage(err)
+						});
+					} else {
+						res.set('Content-Type', 'application/vnd.hal+json');
+						res.jsonp(groupbuy);
+					}
+				});
+			} else {
+				err = {message: 'You can not add the user as manager in this Groupbuy. The user is already manager.'};
+			}
+		}
+		if (err) {
+			return res.status(400).send({
+				message: errorHandler.getErrorMessage(err)
+			});
+		}
+	});
+
+};
+
+/**
+* Remove a manager from an existing groupbuy
+*/
+exports.deleteManager = function(req, res) {
+	var groupbuy  = req.groupbuy,
+		manager   = req.profile,
+		err       = null,
+		index;
+
+	// Check is are many managers
+	if (groupbuy.managers.length > 1) {
+
+		// Check if user is a manager of selected Groupbuy
+		if ( (index = groupbuy.managers.indexOf(manager._id)) !== -1) {
+			groupbuy.managers.splice(index, 1);
+
+			groupbuy.save(function(err) {
+				if (err) {
+					return res.status(400).send({
+						message: errorHandler.getErrorMessage(err)
+					});
+				} else {
+					res.set('Content-Type', 'application/vnd.hal+json');
+					res.jsonp(groupbuy);
+				}
+			});
+		} else {
+			err = {message: 'You can not remove the user as manager in this Groupbuy. The user is not manager.'};
+		}
+	} else {
+		err = {message: 'You can not remove the user as manager in this Groupbuy. The user is the last manager.'};
+	}
+
+	if (err) {
+		return res.status(400).send({
+			message: errorHandler.getErrorMessage(err)
+		});
+	}
+};
+
+/**
+* Get list of members in a groupbuy
+*/
+exports.getManagersList = function(req, res) {
+
+	// TODO
+
+};
+
 
 
 /**
@@ -268,10 +366,21 @@ exports.formattingGroupbuy = function(req, res, next) {
 		}
 
 		if (showManagers) {
-			result._links['nu:managers'] = {
-				href: '/groupbuys/' + groupbuy._id + '/managers',
-				title: 'Groupbuy managers'
-			};
+			for (i = 0; i < groupbuy.managers.length; i++) {
+				result._embedded['ht:managers'].push({
+					_links: {
+						self: {href: '/api/v1/users/' + groupbuy.managers[i]._id},
+						'ht:avatar': {
+							href: '/api/v1/users/' + groupbuy.managers[i]._id + '/avatar?{size}',
+							title: 'Avatar image',
+							templated: true
+						}
+					},
+					_id: groupbuy.managers[i]._id,
+					title: groupbuy.managers[i].username,
+					name: groupbuy.managers[i].slug,
+				});
+			}
 
 		}
 
@@ -287,6 +396,7 @@ exports.formattingGroupbuy = function(req, res, next) {
 	}
 
 	// Send response
+	//res.set('Content-Type', 'application/vnd.hal+json');
 	next(result);
 };
 
