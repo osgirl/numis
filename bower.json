@@ -17,6 +17,7 @@
     "angular-translate-loader-static-files": "~2.4.2",
     "angular-ui-tinymce": "~0.0.5",
     "ng-file-upload": "~2.0.0",
-    "angular-fallback-src": "~0.1.4"
+    "angular-fallback-src": "~0.1.4",
+    "restangular": "~1.4.0"
   }
 }
