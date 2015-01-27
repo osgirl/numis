@@ -34,13 +34,13 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 
 
 		/**
-		 * @ngdoc method
-		 * @name groupbuys.controller:GroupbuysController.$scope·create
-		 * @methodOf groupbuys.controller:GroupbuysController
-		 *
-		 * @description
-		 * Create new Groupbuy
-		 */
+		* @ngdoc method
+		* @name groupbuys.controller:GroupbuysController.$scope·create
+		* @methodOf groupbuys.controller:GroupbuysController
+		*
+		* @description
+		* Create new Groupbuy
+		*/
 		$scope.create = function(isValid) {
 			if (isValid) {
 				$scope.success = $scope.error = null;
@@ -52,7 +52,7 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 					groupbuy.managers = [];
 					groupbuy.managers.push($scope.authentication.user._id);
 
-// TODO: Make this a list
+					// TODO: Make this a list
 					groupbuy.members = $scope.authentication.user._id;
 				} else {
 					return null;
@@ -75,13 +75,13 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 		};
 
 		/**
-		 * @ngdoc method
-		 * @name groupbuys.controller:GroupbuysController.$scope·remove
-		 * @methodOf groupbuys.controller:GroupbuysController
-		 *
-		 * @description
-		 * Remove existing Groupbuy
-		 */
+		* @ngdoc method
+		* @name groupbuys.controller:GroupbuysController.$scope·remove
+		* @methodOf groupbuys.controller:GroupbuysController
+		*
+		* @description
+		* Remove existing Groupbuy
+		*/
 		$scope.remove = function(groupbuy) {
 			if ( groupbuy ) {
 				groupbuy.$remove();
@@ -99,13 +99,13 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 		};
 
 		/**
-		 * @ngdoc method
-		 * @name groupbuys.controller:GroupbuysController.$scope·create
-		 * @methodOf groupbuys.controller:GroupbuysController
-		 *
-		 * @description
-		 * Update existing Groupbuy
-		 */
+		* @ngdoc method
+		* @name groupbuys.controller:GroupbuysController.$scope·create
+		* @methodOf groupbuys.controller:GroupbuysController
+		*
+		* @description
+		* Update existing Groupbuy
+		*/
 		$scope.update = function() {
 			var groupbuy = $scope.groupbuy;
 
@@ -123,13 +123,13 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 
 
 		/**
-		 * @ngdoc method
-		 * @name groupbuys.controller:GroupbuysController.$scope·findOne
-		 * @methodOf groupbuys.controller:GroupbuysController
-		 *
-		 * @description
-		 * Loads the groupbuy, userRole and tabs in the scope.
-		 */
+		* @ngdoc method
+		* @name groupbuys.controller:GroupbuysController.$scope·findOne
+		* @methodOf groupbuys.controller:GroupbuysController
+		*
+		* @description
+		* Loads the groupbuy, userRole and tabs in the scope.
+		*/
 		$scope.findOne = function() {
 			$scope.groupbuy = Groupbuys.get({
 				groupbuySlug: $stateParams.groupbuySlug
@@ -143,20 +143,20 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 
 
 		/**
-		 * @ngdoc method
-		 * @name groupbuys.controller:GroupbuysController.$scope·userRole
-		 * @methodOf groupbuys.controller:GroupbuysController
-		 *
-		 * @description
-		 * Return the role ('manager', 'member', 'none') of the user in the groupbuy according to the url provided.
-		 */
+		* @ngdoc method
+		* @name groupbuys.controller:GroupbuysController.$scope·userRole
+		* @methodOf groupbuys.controller:GroupbuysController
+		*
+		* @description
+		* Return the role ('manager', 'member', 'none') of the user in the groupbuy according to the url provided.
+		*/
 		$scope.userRole = function() {
 			var role = 'none';
 			var manage = false;
 
 			if ($scope.authentication && $scope.authentication.user) {
 				var userId  = $scope.authentication.user._id,
-					fullUrl = $location.path().split('/');
+				fullUrl = $location.path().split('/');
 
 				if (fullUrl[fullUrl.length - 1] === 'manage') {
 					manage = true;
@@ -178,112 +178,112 @@ angular.module('groupbuys').controller('GroupbuysController', ['$scope', '$state
 
 
 		/**
-		 * @ngdoc method
-		 * @name groupbuys.controller:GroupbuysController.$scope·loadTabs
-		 * @methodOf groupbuys.controller:GroupbuysController
-		 *
-		 * @description
-		 * Loads the proper tabs in the scope based on the role of the user
-		 */
+		* @ngdoc method
+		* @name groupbuys.controller:GroupbuysController.$scope·loadTabs
+		* @methodOf groupbuys.controller:GroupbuysController
+		*
+		* @description
+		* Loads the proper tabs in the scope based on the role of the user
+		*/
 		$scope.loadTabs =  function() {
 			// Create the tabs menu according to the permissions of the user:
-		  	$translate([
-					'groupbuys.Information',
-					'groupbuys.Items',
-					'groupbuys.Buyers',
-					'groupbuys.Requests',
-					'groupbuys.Requests_summary',
-					'groupbuys.Messaging',
-					'groupbuys.Payments',
-					'groupbuys.Deliveries',
-					'groupbuys.Managers',
-					'groupbuys.Configuration'
-			]).then(function (translations) {
-				switch ( $scope.userRole ){
-				    case 'manager':
-				        $scope.tabs = [
-							{
-								title: translations['groupbuys.Information'],
-								template: '/modules/groupbuys/views/tabs/info-groupbuy.client.view.html',
-								active: true
-							},{
-								title: translations['groupbuys.Items'],
-								template:'/modules/groupbuys/views/tabs/items-groupbuy.client.view.html'
-							},{
-								title: translations['groupbuys.Buyers'],
-								template:'/modules/groupbuys/views/tabs/buyers-groupbuy.client.view.html'
-							},{
-								title: translations['groupbuys.Requests'],
-								template:'/modules/groupbuys/views/tabs/requests-groupbuy.client.view.html'
-							},{
-								title: translations['groupbuys.Requests_summary'],
-								template:'/modules/groupbuys/views/tabs/requests-summary-groupbuy.client.view.html'
-							},{
-								title: translations['groupbuys.Messaging'],
-								template:'/modules/groupbuys/views/tabs/messaging-groupbuy.client.view.html'
-							},{
-								title: translations['groupbuys.Payments'],
-								template:'/modules/groupbuys/views/tabs/payments-groupbuy.client.view.html'
-							},{
-								title: translations['groupbuys.Deliveries'],
-								template:'/modules/groupbuys/views/tabs/deliveries-groupbuy.client.view.html'
-							},{
-								title: translations['groupbuys.Managers'],
-								template:'/modules/groupbuys/views/tabs/managers-groupbuy.client.view.html'
-							},{
-								title: translations['groupbuys.Configuration'],
-								template:'/modules/groupbuys/views/tabs/config-groupbuy.client.view.html'
-							}
+			$translate([
+				'groupbuys.Information',
+				'groupbuys.Items',
+				'groupbuys.Buyers',
+				'groupbuys.Requests',
+				'groupbuys.Requests_summary',
+				'groupbuys.Messaging',
+				'groupbuys.Payments',
+				'groupbuys.Deliveries',
+				'groupbuys.Managers',
+				'groupbuys.Configuration'
+				]).then(function (translations) {
+					switch ( $scope.userRole ){
+						case 'manager':
+							$scope.tabs = [
+						{
+							title: translations['groupbuys.Information'],
+							template: '/modules/groupbuys/views/tabs/info-groupbuy.client.view.html',
+							active: true
+						},{
+							title: translations['groupbuys.Items'],
+							template:'/modules/groupbuys/views/tabs/items-groupbuy.client.view.html'
+						},{
+							title: translations['groupbuys.Buyers'],
+							template:'/modules/groupbuys/views/tabs/buyers-groupbuy.client.view.html'
+						},{
+							title: translations['groupbuys.Requests'],
+							template:'/modules/groupbuys/views/tabs/requests-groupbuy.client.view.html'
+						},{
+							title: translations['groupbuys.Requests_summary'],
+							template:'/modules/groupbuys/views/tabs/requests-summary-groupbuy.client.view.html'
+						},{
+							title: translations['groupbuys.Messaging'],
+							template:'/modules/groupbuys/views/tabs/messaging-groupbuy.client.view.html'
+						},{
+							title: translations['groupbuys.Payments'],
+							template:'/modules/groupbuys/views/tabs/payments-groupbuy.client.view.html'
+						},{
+							title: translations['groupbuys.Deliveries'],
+							template:'/modules/groupbuys/views/tabs/deliveries-groupbuy.client.view.html'
+						},{
+							title: translations['groupbuys.Managers'],
+							template:'/modules/groupbuys/views/tabs/managers-groupbuy.client.view.html'
+						},{
+							title: translations['groupbuys.Configuration'],
+							template:'/modules/groupbuys/views/tabs/config-groupbuy.client.view.html'
+						}
 						];
-				        break;
-				    case 'member':
-				        $scope.tabs = [
-							{
-								title: translations['groupbuys.Information'],
-								template: '/modules/groupbuys/views/tabs/info-groupbuy.client.view.html',
-								active: true
-							},{
-								title: translations['groupbuys.Items'],
-								template:'/modules/groupbuys/views/tabs/items-groupbuy.client.view.html'
-							},{
-								title: translations['groupbuys.Buyers'],
-								template:'/modules/groupbuys/views/tabs/buyers-groupbuy.client.view.html'
-							},{
-								title: translations['groupbuys.Messaging'],
-								template:'/modules/groupbuys/views/tabs/messaging-groupbuy.client.view.html'
-							},{
-								title: translations['groupbuys.Payments'],
-								template:'/modules/groupbuys/views/tabs/payments-groupbuy.client.view.html'
-							},{
-								title: translations['groupbuys.Deliveries'],
-								template:'/modules/groupbuys/views/tabs/deliveries-groupbuy.client.view.html'
-							},{
-								title: translations['groupbuys.Managers'],
-								template:'/modules/groupbuys/views/tabs/managers-groupbuy.client.view.html'
-							}
+						break;
+						case 'member':
+							$scope.tabs = [
+						{
+							title: translations['groupbuys.Information'],
+							template: '/modules/groupbuys/views/tabs/info-groupbuy.client.view.html',
+							active: true
+						},{
+							title: translations['groupbuys.Items'],
+							template:'/modules/groupbuys/views/tabs/items-groupbuy.client.view.html'
+						},{
+							title: translations['groupbuys.Buyers'],
+							template:'/modules/groupbuys/views/tabs/buyers-groupbuy.client.view.html'
+						},{
+							title: translations['groupbuys.Messaging'],
+							template:'/modules/groupbuys/views/tabs/messaging-groupbuy.client.view.html'
+						},{
+							title: translations['groupbuys.Payments'],
+							template:'/modules/groupbuys/views/tabs/payments-groupbuy.client.view.html'
+						},{
+							title: translations['groupbuys.Deliveries'],
+							template:'/modules/groupbuys/views/tabs/deliveries-groupbuy.client.view.html'
+						},{
+							title: translations['groupbuys.Managers'],
+							template:'/modules/groupbuys/views/tabs/managers-groupbuy.client.view.html'
+						}
 						];
-				        break;
-				    default:
-						$scope.tabs = [
-							{
-								title: translations['groupbuys.Information'],
-								template: '/modules/groupbuys/views/tabs/info-groupbuy.client.view.html',
-								active: true
-							},{
-								title: translations['groupbuys.Items'],
-								template:'/modules/groupbuys/views/tabs/items-groupbuy.client.view.html'
-							},{
-								title: translations['groupbuys.Managers'],
-								template:'/modules/groupbuys/views/tabs/managers-groupbuy.client.view.html'
-							}
+						break;
+						default:
+							$scope.tabs = [
+						{
+							title: translations['groupbuys.Information'],
+							template: '/modules/groupbuys/views/tabs/info-groupbuy.client.view.html',
+							active: true
+						},{
+							title: translations['groupbuys.Items'],
+							template:'/modules/groupbuys/views/tabs/items-groupbuy.client.view.html'
+						},{
+							title: translations['groupbuys.Managers'],
+							template:'/modules/groupbuys/views/tabs/managers-groupbuy.client.view.html'
+						}
 						];
-				        break;
-				}
-    		});
-		};
+						break;
+					}
+				});
+			};
 
 
-
+			
 // from the top of the file
 	}
 ]);
