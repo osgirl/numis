@@ -32,18 +32,9 @@ exports.formattingUser = function(req, res, next) {
 					templated: true
 				}],
 				'ht:avatar': {
-					small: {
-						href: '/api/v1/users/' + res._id + '/avatar?size=sm',
-						title: 'Small size avatar image'
-					},
-					medium: {
-						href: '/api/v1/users/' + res._id + '/avatar?size=md',
-						title: 'Medium size avatar image'
-					},
-					large: {
-						href: '/api/v1/users/' + res._id + '/avatar?size=lg',
-						title: 'Large size avatar image'
-					}
+					href: '/api/v1/users/' + res._id + '/avatar{?size}',
+					title: 'Avatar image',
+					templated: true
 				},
 
 				'ht:groupbuys': []
@@ -90,22 +81,27 @@ exports.formattingUserList = function(req, res, next) {
 				name: 'ht',
 				href: '/api/v1/rels/{rel}',
 				templated: true
-			}],
+			}]
+		},
+		_embedded: {
 			'ht:user': []
 		}
 	};
 
 	for (var i = 0; i < res.length; i++) {
-		result._links['ht:user'].push({
-			href: '/api/v1/users/' + res[i]._id,
+		result._embedded['ht:user'].push({
+			_links: {
+				self: {href: '/api/v1/users/' + res[i]._id},
+				'ht:avatar': {
+					href: '/api/v1/users/' + res[i]._id + '/avatar{?size}',
+					title: 'Avatar image',
+					templated: true
+				}
+			},
+			_id: res[i]._id,
 			title: res[i].username,
 			name: res[i].slug,
-			'ht:avatar': {
-				small: {
-					href: '/api/v1/users/' + res[i]._id + '/avatar?size=sm',
-					'title': 'Small size avatar image'
-				}
-			}
+
 		});
 	}
 
