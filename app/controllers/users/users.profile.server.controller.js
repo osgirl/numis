@@ -79,7 +79,7 @@ exports.formattingUserList = function(req, res, next) {
 			},
 			curies: [{
 				name: 'ht',
-				href: '/api/v1/rels/{rel}',
+				href: '/api/v1/docs/{doc}',
 				templated: true
 			}]
 		},

@@ -33,7 +33,7 @@ exports.getApiRootPoint = function(req, res) {
 					curies: [
 						{
 							name: 'ht',
-							href: '/api/v1/rels/{rel}',
+							href: '/api/v1/docs/{doc}',
 							templated: true
 						}
 					],
