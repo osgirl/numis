@@ -54,15 +54,13 @@ module.exports = function(app) {
 				.tap('pre_response', 	   'list',   groupbuys.formattingGroupbuyList)
 				.tap('pre_response', 	   'fetch',  groupbuys.formattingGroupbuy)
 				.tap('pre_response', 	   'post',   groupbuys.formattingGroupbuy)
-				.tap('pre_response', 	   'put',    groupbuys.formattingGroupbuy)
-				.tap('pre_response', 	   'delete', groupbuys.formattingGroupbuy)
 				.tap('pre_response_error', '*',      groupbuyPreResponseError)
 				.register(app);
 
 	// Members end-points
 	app.route('/api/v1/groupbuys/:groupbuyId/members')
 		.get(groupbuys.getMembersList)
-		.post(users.requiresLogin, groupbuys.addMember);
+		.put(users.requiresLogin, groupbuys.addMember);
 
 	app.route('/api/v1/groupbuys/:groupbuyId/members/:userId')
 		.delete(users.requiresLogin, groupbuys.deleteMember);
@@ -70,7 +68,7 @@ module.exports = function(app) {
 	// Managers end-points
 	app.route('/api/v1/groupbuys/:groupbuyId/managers')
 		.get(groupbuys.getManagersList)
-		.post(users.requiresLogin, groupbuys.addManager);
+		.put(users.requiresLogin, groupbuys.addManager);
 
 	app.route('/api/v1/groupbuys/:groupbuyId/managers/:userId')
 		.delete(users.requiresLogin, groupbuys.deleteManager);

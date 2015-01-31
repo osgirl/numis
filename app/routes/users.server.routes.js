@@ -49,8 +49,6 @@ module.exports = function(app) {
 				.tap('pre_response', 	   'list',   users.formattingUserList)
 				.tap('pre_response', 	   'fetch',  users.formattingUser)
 				.tap('pre_response', 	   'post',   users.formattingUser)
-				.tap('pre_response', 	   'put',    users.formattingUser)
-				.tap('pre_response', 	   'delete', users.formattingUser)
 				.tap('pre_response_error', '*',      userPreResponseError)
 				.register(app);
 
