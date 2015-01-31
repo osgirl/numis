@@ -29,13 +29,13 @@ describe('Groupbuy Model Unit Tests:', function() {
 
 		user.save(function() {
 			groupbuy = new Groupbuy({
-				name: 'Groupbuy Name',
+				title: 'Groupbuy Title',
 				description: 'Groupbuy Description',
 				user: user
 			});
 
 			groupbuy2 = new Groupbuy({
-				name: 'Groupbuy-Name',
+				title: 'Groupbuy-Title',
 				description: 'Groupbuy Description',
 				user: user
 			});
@@ -52,8 +52,8 @@ describe('Groupbuy Model Unit Tests:', function() {
 			});
 		});
 
-		it('NU_T_G002_E002: should be able to show an error when try to save without name', function(done) {
-			groupbuy.name = '';
+		it('NU_T_G002_E002: should be able to show an error when try to save without title', function(done) {
+			groupbuy.title = '';
 
 			return groupbuy.save(function(err) {
 				should.exist(err);
@@ -69,7 +69,7 @@ describe('Groupbuy Model Unit Tests:', function() {
 			});
 		});
 
-		it('NU_T_G002_E004: should be able to save two groupbuys with similar name and same slug beginning', function(done) {
+		it('NU_T_G002_E004: should be able to save two groupbuys with similar title and same name (slug) beginning', function(done) {
 			groupbuy.save();
 			return groupbuy2.save(function(err) {
 				should.exist(err);

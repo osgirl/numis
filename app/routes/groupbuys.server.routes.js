@@ -36,17 +36,16 @@ module.exports = function(app) {
 		next(error);
 	};
 
-
 	// Register end point for '/groupbuys' and /groupbuys/:id'
 	//restEndpoints.log.verbose(true);
 	new restEndpoints
 				.endpoint('/api/v1/groupbuys', 'Groupbuy', {
-					limitFields: ['_id', 'name', 'description', 'slug', 'status', 'managers', 'members'],
+					limitFields: ['_id', 'title', 'name', 'description', 'status', 'managers', 'members'],
 					populate: ['members', 'managers', 'user'],
-					queryParams: ['$in_status', 'name', '$gte_created'],
+					queryParams: ['$in_status', 'title', '$gte_created'],
 					pagination: {
 						perPage: 20,
-						sortField: 'name'
+						sortField: 'title'
 
 					}
 				})

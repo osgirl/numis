@@ -23,6 +23,7 @@ var checkVisibility = function(groupbuy, property, isAdmin, isMember, isManager)
 /**
  * Create a Groupbuy
  */
+/*
 exports.create = function(req, res) {
 	var groupbuy = new Groupbuy(req.body);
 	groupbuy.user = req.user;
@@ -37,17 +38,21 @@ exports.create = function(req, res) {
 		}
 	});
 };
+*/
 
 /**
  * Show the current Groupbuy
  */
+/*
 exports.read = function(req, res) {
 	res.jsonp(req.groupbuy);
 };
+*/
 
 /**
  * Update a Groupbuy
  */
+/*
 exports.update = function(req, res) {
 	var groupbuy = req.groupbuy ;
 
@@ -63,10 +68,12 @@ exports.update = function(req, res) {
 		}
 	});
 };
+*/
 
 /**
  * Delete an Groupbuy
  */
+/*
 exports.delete = function(req, res) {
 	var groupbuy = req.groupbuy ;
 
@@ -80,10 +87,12 @@ exports.delete = function(req, res) {
 		}
 	});
 };
+*/
 
 /**
  * List of Groupbuys
  */
+/*
 exports.list = function(req, res) {
 	Groupbuy.find().sort('-created').populate('user', 'displayName').exec(function(err, groupbuys) {
 		if (err) {
@@ -95,6 +104,7 @@ exports.list = function(req, res) {
 		}
 	});
 };
+*/
 
 /**
 * Add a member to an existing groupbuy
@@ -333,8 +343,8 @@ exports.formattingGroupbuy = function(req, res, next) {
 				'ht:managers': []
 			},
 			_id: groupbuy._id,
-			name: groupbuy.slug,
-			title: groupbuy.name,
+			name: groupbuy.name,
+			title: groupbuy.title,
 			status: groupbuy.status,
 			description: groupbuy.description
 		};
@@ -359,8 +369,8 @@ exports.formattingGroupbuy = function(req, res, next) {
 						}
 					},
 					_id: groupbuy.members[i]._id,
-					title: groupbuy.members[i].username,
-					name: groupbuy.members[i].slug,
+					username: groupbuy.members[i].username,
+					name: groupbuy.members[i].name,
 				});
 			}
 		}
@@ -377,8 +387,8 @@ exports.formattingGroupbuy = function(req, res, next) {
 						}
 					},
 					_id: groupbuy.managers[i]._id,
-					title: groupbuy.managers[i].username,
-					name: groupbuy.managers[i].slug,
+					username: groupbuy.managers[i].username,
+					name: groupbuy.managers[i].name,
 				});
 			}
 
@@ -430,8 +440,8 @@ exports.formattingGroupbuyList = function(req, res, next) {
 				self: { href: '/api/v1/groupbuys/' + res[i]._id }
 			},
 			_id: res[i]._id,
-			name: res[i].slug,
-			title: res[i].name,
+			name: res[i].name,
+			title: res[i].title,
 			status: res[i].status,
 			description: res[i].description
 		});

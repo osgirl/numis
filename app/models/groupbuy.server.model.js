@@ -3,20 +3,20 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose'),
-	slug	 = require('mongoose-url-slugs'),
-	Schema	 = mongoose.Schema;
+var mongoose   = require('mongoose'),
+	slugPlugin = require('mongoose-url-slugs'),
+	Schema	   = mongoose.Schema;
 
 /**
  * Groupbuy Schema
  */
 var GroupbuySchema = new Schema({
-	name: {
+	title: {
 		type: String,
 		default: '',
-		required: 'Please fill Groupbuy name',
+		required: 'Please fill Groupbuy title',
 		trim: true,
-		match: [/.{10,80}/, 'Name must be between 10 and 80 characters.']
+		match: [/.{10,80}/, 'Title must be between 10 and 80 characters.']
 	},
 	description: {
 		type: String,
@@ -99,7 +99,7 @@ var GroupbuySchema = new Schema({
 	}
 });
 
-GroupbuySchema.plugin(slug('name'));
+GroupbuySchema.plugin(slugPlugin('title', {field: 'name'}));
 
 
 /**
