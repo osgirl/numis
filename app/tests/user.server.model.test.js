@@ -38,7 +38,6 @@ describe('User Model Unit Tests:', function() {
 		user3 = new User({
 			firstName: 'John',
 			lastName: 'Doe',
-			displayName: 'John Doe',
 			email: 'jdoe@example.net',
 			username: 'jdoe',
 			password: 'password',

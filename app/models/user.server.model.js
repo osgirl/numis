@@ -116,7 +116,7 @@ var UserSchema = new Schema({
 /**
  * Add plugins to User schema.
  */
-UserSchema.plugin(slugPlugin('username'));
+UserSchema.plugin(slugPlugin('username', {field: 'name'}));
 
 
 var uploads_base = path.join(__dirname, '../../'),

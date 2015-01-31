@@ -39,9 +39,9 @@ exports.formattingUser = function(req, res, next) {
 
 				'ht:groupbuys': []
 			},
-			username: res.username,
-			name: res.slug,
 			_id: res._id,
+			username: res.username,
+			name: res.name
 		};
 
 		if (res.provider === 'local') {
@@ -99,8 +99,8 @@ exports.formattingUserList = function(req, res, next) {
 				}
 			},
 			_id: res[i]._id,
-			title: res[i].username,
-			name: res[i].slug,
+			username: res[i].username,
+			name: res[i].name
 
 		});
 	}

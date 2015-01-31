@@ -41,17 +41,17 @@ describe('User CRUD tests', function() {
 		user.save(done);
 
 		// Define another users
-		user2 = new User({
+		user2 = {
 			firstName: 'John',
 			lastName: 'Doe',
 			email: 'jdoe@example.net',
 			username: 'jdoe',
-			password: '12345678',
+			password: credentials.password,
 			provider: 'local'
-		});
+		};
 	});
 
-	it('NU_P_G111_E101: should be able to save User instance if logged in', function(done) {
+	it('NU_T_G111_E101: should be able to save User instance if logged in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -86,15 +86,16 @@ describe('User CRUD tests', function() {
 								users._links.curies.should.be.an.Array;
 								users._links.curies[0].should.have.property('href');
 
-								//users['nu:user'].should.be.an.Array.with.lengthOf(2);
-
+								users._embedded['ht:user'].should.be.an.Array.with.lengthOf(2);
 								// The second user is the authenticated user.
-								(users._links['nu:user'][1].name).should.be.equal(user.slug);
-								(users._links['nu:user'][1].title).should.be.equal(user.username);
+								(users._embedded['ht:user'][1].name).should.be.equal(user.name);
+								(users._embedded['ht:user'][1].username).should.be.equal(user.username);
 
 								// First user is the new user
-								users._links['nu:user'][0].should.have.properties('href', 'name', 'title');
-								(users._links['nu:user'][0].title).should.be.equal(user2.username);
+								(users._embedded['ht:user'][0]).should.have.properties('_id', 'name', 'username');
+								(users._embedded['ht:user'][0]).should.have.propertyByPath('_links', 'self', 'href');
+								(users._embedded['ht:user'][0]).should.have.propertyByPath('_links', 'ht:avatar', 'href');
+								(users._embedded['ht:user'][0].username).should.be.equal(user2.username);
 
 								// Call the assertion callback
 								done();
@@ -103,7 +104,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G111_E102: should not be able to save User instance if not logged in', function(done) {
+	it('NU_T_G111_E102: should not be able to save User instance if not logged in', function(done) {
 		agent.post('/api/v1/users')
 			.send(user2)
 			.expect(401)
@@ -119,7 +120,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G111_E103: should not be able to save User instance if no firstName, lastNmae, email, username are provided', function(done) {
+	it('NU_T_G111_E103: should not be able to save User instance if no firstName, lastNmae, email, username are provided', function(done) {
 		user2.firstName = '';
 		user2.lastName = '';
 		user2.email = '';
@@ -157,7 +158,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G111_E104: should not be able to save User instance if email is not valid', function(done) {
+	it('NU_T_G111_E104: should not be able to save User instance if email is not valid', function(done) {
 		// Invalidate email field
 		user2.email = 'fake email@';
 
@@ -188,7 +189,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G111_E105: should not be able to save User instance if username already exists', function(done) {
+	it('NU_T_G111_E105: should not be able to save User instance if username already exists', function(done) {
 		// Duplicate username field
 		user2.username = user.username;
 
@@ -222,7 +223,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G111_E106: should not be able to save User instance if password has less than 8 characters', function(done) {
+	it('NU_T_G111_E106: should not be able to save User instance if password has less than 8 characters', function(done) {
 		// Duplicate username field
 		user2.password = '1234567';
 
@@ -253,7 +254,7 @@ describe('User CRUD tests', function() {
 		});
 	});
 
-	it.skip('NU_P_G111_E107: should be able to save User instance but not save role specification', function(done) {
+	it('NU_T_G111_E107: should be able to save User instance but not save role specification', function(done) {
 		// Duplicate username field
 		user2.roles = ['user', 'admin', 'other'];
 
@@ -269,7 +270,7 @@ describe('User CRUD tests', function() {
 					.send(user2)
 					.expect(201)
 					.end(function(userSaveErr, userSaveRes) {
-						//console.log('userSaveRes: ', userSaveRes.body);
+						// Returns new user info
 
 						// Set assertions
 						(userSaveRes.body).should.be.an.Object.not.be.empty;
@@ -279,8 +280,8 @@ describe('User CRUD tests', function() {
 						(userSaveRes.body._links.curies).should.be.an.Array;
 						(userSaveRes.body._links.curies[0]).should.have.property('href');
 
-						(userSaveRes.body['nu:user'].name).should.match(user2.username);
-						(userSaveRes.body['nu:user'].title).should.match(user2.username);
+						(userSaveRes.body).should.have.property('name');
+						(userSaveRes.body.username).should.match(user2.username);
 
 						// Handle User save error
 						done(userSaveErr);
@@ -288,7 +289,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G111_E108: should be able to update User instance if signed in', function(done) {
+	it('NU_T_G111_E108: should be able to update User instance if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -309,19 +310,13 @@ describe('User CRUD tests', function() {
 				// Update existing User
 				agent.put('/api/v1/users/' + userId)
 					.send(user)
-					.expect(200)
+					.expect(204)
 					.end(function(userUpdateErr, userUpdateRes) {
 						// Handle User update error
 						if (userUpdateErr) done(userUpdateErr);
 
-						//console.log('userSaveRes: ', userUpdateRes.body);
-
 						// Set assertions
-						(userUpdateRes.body._id).should.equal(userId);
-						(userUpdateRes.body.firstName).should.match('Fred');
-						(userUpdateRes.body.lastName).should.match('Flintstones');
-						(userUpdateRes.body.homeAddress).should.match('301 Cobblestone Way, Bedrock 70777');
-						(userUpdateRes.body.username).should.match('Flintstones');
+						(userUpdateRes.body).should.be.empty;
 
 						// Call the assertion callback
 						done();
@@ -329,7 +324,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G111_E109: should not be able to update User instance if not signed in', function(done) {
+	it('NU_T_G111_E109: should not be able to update User instance if not signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -373,44 +368,41 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it.skip('NU_P_G111_E110: should be able to update User roles if have admin role', function(done) {
+	it('NU_T_G111_E110: should be able to update User roles if have admin role', function(done) {
 		agent.post('/auth/signin')
-		.send(credentials)
-		.expect(200)
-		.end(function(signinErr, signinRes) {
-			// Handle signin error
-			if (signinErr) done(signinErr);
-
-			// Get the userId
-			var userId = signinRes.body._id;
-
-			// Update User name and home address
-			user.firstName = 'Fred';
-			user.lastName = 'Flintstones';
-			user.displayName = 'The Flintstones';
-
-			// Update existing User
-			agent.put('/api/v1/users/' + userId)
-			.send(user)
+			.send(credentials)
 			.expect(200)
-			.end(function(userUpdateErr, userUpdateRes) {
-				// Handle User update error
-				if (userUpdateErr) done(userUpdateErr);
+			.end(function(signinErr, signinRes) {
+				// Handle signin error
+				if (signinErr) done(signinErr);
 
-				//console.log('userSaveRes: ', userUpdateRes.body);
+				// Get the userId
+				var userId = signinRes.body._id;
 
-				// Set assertions
-				//(userUpdateRes.body.name).should.match('NotLogged');
-				//(userUpdateRes.body.message).should.match('User is not logged in');
+				// Update User name and home address
+				user.firstName = 'Fred';
+				user.lastName = 'Flintstones';
+				user.displayName = 'The Flintstones';
 
-				// Call the assertion callback
-				done();
+				// Update existing User
+				agent.put('/api/v1/users/' + userId)
+					.send(user)
+					.expect(204)
+					.end(function(userUpdateErr, userUpdateRes) {
+						// Handle User update error
+						if (userUpdateErr) done(userUpdateErr);
+
+						// Set assertions
+						(userUpdateRes.body).should.be.empty;
+
+						// Call the assertion callback
+						done();
+					});
+
 			});
-
-		});
 	});
 
-	it('NU_P_G111_E111: should be able to get a list of Users if signed in', function(done) {
+	it('NU_T_G111_E111: should be able to get a list of Users if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -436,11 +428,13 @@ describe('User CRUD tests', function() {
 						users._links.curies.should.be.an.Array;
 						users._links.curies[0].should.have.property('href');
 
-						users._links['nu:user'].should.be.an.Array.with.lengthOf(1);
+						(users._embedded['ht:user']).should.be.an.Array.with.lengthOf(1);
 
 						// The user is the new user
-						users._links['nu:user'][0].should.have.properties('href', 'name', 'title', 'nu:avatar');
-						(users._links['nu:user'][0].title).should.be.equal(user.username);
+						(users._embedded['ht:user'][0]).should.have.properties('_id', 'name', 'username', '_links');
+						(users._embedded['ht:user'][0]).should.have.propertyByPath('_links', 'self', 'href');
+						(users._embedded['ht:user'][0]).should.have.propertyByPath('_links', 'ht:avatar', 'href');
+						(users._embedded['ht:user'][0].username).should.be.equal(user.username);
 
 						// Call the assertion callback
 						done();
@@ -448,7 +442,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G111_E112: should not be able to get a list of Users if not signed in', function(done) {
+	it('NU_T_G111_E112: should not be able to get a list of Users if not signed in', function(done) {
 		// Request Users
 		agent.get('/api/v1/users')
 			.expect(401)
@@ -462,7 +456,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G111_E113: should be able to get a single User if signed in', function(done) {
+	it('NU_T_G111_E113: should be able to get a single User if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -499,7 +493,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G111_E114: should not be able to get a single User if not signed in', function(done) {
+	it('NU_T_G111_E114: should not be able to get a single User if not signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -531,7 +525,7 @@ describe('User CRUD tests', function() {
 		});
 	});
 
-	it.skip('NU_P_G111_E115: should not be able to delete User instance if signed in', function(done) {
+	it('NU_T_G111_E115: should not be able to delete User instance if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -550,14 +544,13 @@ describe('User CRUD tests', function() {
 						// Delete existing User
 						agent.delete('/api/v1/users/' + userSaveRes.body._id)
 							.send(user)
-							.expect(200)
+							.expect(204)
 							.end(function(userDeleteErr, userDeleteRes) {
 								// Handle User error error
 								if (userDeleteErr) done(userDeleteErr);
 
 								// Set assertions
-								//(userDeleteRes.body._id).should.equal(userSaveRes.body._id);
-								(userDeleteRes.body).should.be.empty;	// mongoose-rest-endpoints no devuelve contenido al borrar
+								(userDeleteRes.body).should.be.empty;
 
 								// Call the assertion callback
 								done();
@@ -566,7 +559,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it.skip('NU_P_G111_E116: should not be able to delete User instance if not signed in', function(done) {
+	it('NU_T_G111_E116: should not be able to delete User instance if not signed in', function(done) {
 		// Set User user
 		user.user = user;
 
@@ -577,14 +570,14 @@ describe('User CRUD tests', function() {
 		userObj.save(function() {
 			// Try deleting User
 			agent.delete('/api/v1/users/' + userObj._id)
-			.expect(401)
-			.end(function(userDeleteErr, userDeleteRes) {
-				// Set message assertion
-				(userDeleteRes.body.message).should.match('User is not logged in');
+				.expect(401)
+				.end(function(userDeleteErr, userDeleteRes) {
+					// Set message assertion
+					(userDeleteRes.body.message).should.match('User is not logged in');
 
-				// Handle User error error
-				done(userDeleteErr);
-			});
+					// Handle User error error
+					done(userDeleteErr);
+				});
 
 		});
 	});
