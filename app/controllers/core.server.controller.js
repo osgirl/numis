@@ -19,6 +19,10 @@ exports.getApiRootPoint = function(req, res) {
 		isAdmin 	= (user && user.roles && user.roles.indexOf('admin') !== -1),
 		response	= {};
 
+	if (user === undefined || user._id === undefined) {
+		apiVersion = 'nologin';
+	}
+
 	// Prepare response in JSON+HAL format.
 	switch(apiVersion) {
 		case '1':
@@ -48,6 +52,29 @@ exports.getApiRootPoint = function(req, res) {
 					}
 				}
 			};
+			break;
+		case 'nologin':
+			response = {
+				_links: {
+					self: {
+						href: '/api/v1/'
+					},
+					lastApiVersion: {
+						href: '/api/v1/'
+					},
+					curies: [
+						{
+							name: 'ht',
+							href: '/api/v1/docs/{doc}',
+							templated: true
+						}
+					],
+					'ht:login': {
+						href: '/api/v1/users/login'
+					}
+				}
+			};
+
 			break;
 		default: {
 			response = {
