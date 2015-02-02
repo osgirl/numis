@@ -80,22 +80,18 @@ describe('User CRUD tests', function() {
 
 								// Set assertions
 								users.should.be.an.Object.not.be.empty;
-
 								users.should.have.propertyByPath('_links', 'self');
-								users.should.have.propertyByPath('_links', 'curies');
-								users._links.curies.should.be.an.Array;
-								users._links.curies[0].should.have.property('href');
 
-								users._embedded['ht:user'].should.be.an.Array.with.lengthOf(2);
+								users._embedded.users.should.be.an.Array.with.lengthOf(2);
 								// The second user is the authenticated user.
-								(users._embedded['ht:user'][1].name).should.be.equal(user.name);
-								(users._embedded['ht:user'][1].username).should.be.equal(user.username);
+								(users._embedded.users[1].name).should.be.equal(user.name);
+								(users._embedded.users[1].username).should.be.equal(user.username);
 
 								// First user is the new user
-								(users._embedded['ht:user'][0]).should.have.properties('_id', 'name', 'username');
-								(users._embedded['ht:user'][0]).should.have.propertyByPath('_links', 'self', 'href');
-								(users._embedded['ht:user'][0]).should.have.propertyByPath('_links', 'ht:avatar', 'href');
-								(users._embedded['ht:user'][0].username).should.be.equal(user2.username);
+								(users._embedded.users[0]).should.have.properties('_id', 'name', 'username');
+								(users._embedded.users[0]).should.have.propertyByPath('_links', 'self', 'href');
+								(users._embedded.users[0]).should.have.propertyByPath('_links', 'avatar', 'href');
+								(users._embedded.users[0].username).should.be.equal(user2.username);
 
 								// Call the assertion callback
 								done();
@@ -274,11 +270,7 @@ describe('User CRUD tests', function() {
 
 						// Set assertions
 						(userSaveRes.body).should.be.an.Object.not.be.empty;
-
 						(userSaveRes.body).should.have.propertyByPath('_links', 'self');
-						(userSaveRes.body).should.have.propertyByPath('_links', 'curies');
-						(userSaveRes.body._links.curies).should.be.an.Array;
-						(userSaveRes.body._links.curies[0]).should.have.property('href');
 
 						(userSaveRes.body).should.have.property('name');
 						(userSaveRes.body.username).should.match(user2.username);
@@ -422,19 +414,15 @@ describe('User CRUD tests', function() {
 
 						// Set assertions
 						users.should.be.an.Object.not.be.empty;
-
 						users.should.have.propertyByPath('_links', 'self');
-						users.should.have.propertyByPath('_links', 'curies');
-						users._links.curies.should.be.an.Array;
-						users._links.curies[0].should.have.property('href');
 
-						(users._embedded['ht:user']).should.be.an.Array.with.lengthOf(1);
+						(users._embedded.users).should.be.an.Array.with.lengthOf(1);
 
 						// The user is the new user
-						(users._embedded['ht:user'][0]).should.have.properties('_id', 'name', 'username', '_links');
-						(users._embedded['ht:user'][0]).should.have.propertyByPath('_links', 'self', 'href');
-						(users._embedded['ht:user'][0]).should.have.propertyByPath('_links', 'ht:avatar', 'href');
-						(users._embedded['ht:user'][0].username).should.be.equal(user.username);
+						(users._embedded.users[0]).should.have.properties('_id', 'name', 'username', '_links');
+						(users._embedded.users[0]).should.have.propertyByPath('_links', 'self', 'href');
+						(users._embedded.users[0]).should.have.propertyByPath('_links', 'avatar', 'href');
+						(users._embedded.users[0].username).should.be.equal(user.username);
 
 						// Call the assertion callback
 						done();
@@ -473,11 +461,7 @@ describe('User CRUD tests', function() {
 					.end(function(userFetchErr, userFetchRes) {
 						// Set assertion
 						(userFetchRes.body).should.be.an.Object.not.be.empty;
-
 						(userFetchRes.body).should.have.propertyByPath('_links', 'self', 'href');
-						(userFetchRes.body).should.have.propertyByPath('_links', 'curies');
-						(userFetchRes.body._links.curies).should.be.an.Array;
-						(userFetchRes.body._links.curies[0]).should.have.property('href');
 
 						// First user is the new user
 						(userFetchRes.body).should.have.properties('email', 'firstName', 'lastName', 'name', 'username');

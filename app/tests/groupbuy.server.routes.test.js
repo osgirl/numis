@@ -80,7 +80,7 @@ describe('Groupbuy CRUD tests', function() {
 								if (groupbuysGetErr) done(groupbuysGetErr);
 
 								// Get Groupbuys list
-								var groupbuys = groupbuysGetRes.body._embedded['ht:groupbuy'];
+								var groupbuys = groupbuysGetRes.body._embedded.groupbuys;
 
 								// Set assertions
 								groupbuys.should.be.an.Array.with.lengthOf(1);

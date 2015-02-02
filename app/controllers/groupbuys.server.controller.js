@@ -321,26 +321,19 @@ exports.formattingGroupbuy = function(req, res, next) {
 				self: {
 					href: '/api/v1/groupbuys/' + groupbuy._id
 				},
-
-				curies: [{
-					name: 'ht',
-					href: '/api/v1/docs/{doc}',
-					templated: true
-				}],
-
-				'ht:members': {
+				members: {
 					href: '/api/v1/groupbuys/' + groupbuy._id + '/members',
 					title: 'Manage members'
 
 				},
-				'ht:managers': {
+				managers: {
 					href: '/api/v1/groupbuys/' + groupbuy._id + '/managers',
 					title: 'Manage managers'
 				},
 			},
 			_embedded: {
-				'ht:members': [],
-				'ht:managers': []
+				members: [],
+				managers: []
 			},
 			_id: groupbuy._id,
 			name: groupbuy.name,
@@ -359,10 +352,10 @@ exports.formattingGroupbuy = function(req, res, next) {
 
 		if (showMembers) {
 			for (i = 0; i < groupbuy.members.length; i++) {
-				result._embedded['ht:members'].push({
+				result._embedded.members.push({
 					_links: {
 						self: {href: '/api/v1/users/' + groupbuy.members[i]._id},
-						'ht:avatar': {
+						avatar: {
 							href: '/api/v1/users/' + groupbuy.members[i]._id + '/avatar?{size}',
 							title: 'Avatar image',
 							templated: true
@@ -377,10 +370,10 @@ exports.formattingGroupbuy = function(req, res, next) {
 
 		if (showManagers) {
 			for (i = 0; i < groupbuy.managers.length; i++) {
-				result._embedded['ht:managers'].push({
+				result._embedded.managers.push({
 					_links: {
 						self: {href: '/api/v1/users/' + groupbuy.managers[i]._id},
-						'ht:avatar': {
+						avatar: {
 							href: '/api/v1/users/' + groupbuy.managers[i]._id + '/avatar?{size}',
 							title: 'Avatar image',
 							templated: true
@@ -396,7 +389,7 @@ exports.formattingGroupbuy = function(req, res, next) {
 
 		if (showItems && false) {
 			for (i = 0; i < groupbuy.items.length; i++) {
-				result._links['ht:items'] = {
+				result._links.items = {
 					href: '/api/v1/groupbuys/' + groupbuy._id + '/items/' + groupbuy.items[i]._id,
 					title: groupbuy.items[i].title,
 					name: groupbuy.items[i].name
@@ -422,26 +415,21 @@ exports.formattingGroupbuyList = function(req, res, next) {
 		_links: {
 			self: {
 				href: '/api/v1/groupbuys/'
-			},
-			curies: [{
-				name: 'ht',
-				href: '/api/v1/dcos/{doc}',
-				templated: true
-			}]
+			}
 		},
 		_embedded: {
-			'ht:groupbuy': []
+			groupbuys: []
 		}
 	};
 
 	for (var i = 0; i < res.length; i++) {
-		result._embedded['ht:groupbuy'].push({
+		result._embedded.groupbuys.push({
 			_links: {
 				self: { href: '/api/v1/groupbuys/' + res[i]._id }
 			},
 			_id: res[i]._id,
-			name: res[i].name,
 			title: res[i].title,
+			name: res[i].name,
 			status: res[i].status,
 			description: res[i].description
 		});

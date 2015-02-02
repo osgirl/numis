@@ -34,20 +34,13 @@ exports.getApiRootPoint = function(req, res) {
 					lastApiVersion: {
 						href: '/api/v1/'
 					},
-					curies: [
-						{
-							name: 'ht',
-							href: '/api/v1/docs/{doc}',
-							templated: true
-						}
-					],
-					'ht:users': {
+					'users': {
 						href: '/api/v1/users'
 					},
-					'ht:me': {
+					'me': {
 						href: '/api/v1/users/' + user._id
 					},
-					'ht:groupbuys': {
+					'groupbuys': {
 						href: '/api/v1/groupbuys'
 					}
 				}
@@ -62,14 +55,7 @@ exports.getApiRootPoint = function(req, res) {
 					lastApiVersion: {
 						href: '/api/v1/'
 					},
-					curies: [
-						{
-							name: 'ht',
-							href: '/api/v1/docs/{doc}',
-							templated: true
-						}
-					],
-					'ht:login': {
+					'login': {
 						href: '/api/v1/users/login'
 					}
 				}

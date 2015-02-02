@@ -25,19 +25,13 @@ exports.formattingUser = function(req, res, next) {
 				self: {
 					href: '/api/v1/users/' + res._id
 				},
-
-				curies: [{
-					name: 'nu',
-					href: '/api/v1/{rel}',
-					templated: true
-				}],
-				'ht:avatar': {
+				avatar: {
 					href: '/api/v1/users/' + res._id + '/avatar{?size}',
 					title: 'Avatar image',
 					templated: true
 				},
 
-				'ht:groupbuys': []
+				groupbuys: []
 			},
 			_id: res._id,
 			username: res.username,
@@ -45,7 +39,7 @@ exports.formattingUser = function(req, res, next) {
 		};
 
 		if (res.provider === 'local') {
-			result._links['ht:password'] = { href: '/api/v1/users/password', title: 'Change password'};
+			result._links.password = { href: '/api/v1/users/password', title: 'Change password'};
 		}
 
 		if (isAdmin || isMe) {
@@ -76,23 +70,18 @@ exports.formattingUserList = function(req, res, next) {
 		_links: {
 			self: {
 				href: '/api/v1/users/'
-			},
-			curies: [{
-				name: 'ht',
-				href: '/api/v1/docs/{doc}',
-				templated: true
-			}]
+			}
 		},
 		_embedded: {
-			'ht:user': []
+			users: []
 		}
 	};
 
 	for (var i = 0; i < res.length; i++) {
-		result._embedded['ht:user'].push({
+		result._embedded.users.push({
 			_links: {
 				self: {href: '/api/v1/users/' + res[i]._id},
-				'ht:avatar': {
+				avatar: {
 					href: '/api/v1/users/' + res[i]._id + '/avatar{?size}',
 					title: 'Avatar image',
 					templated: true
