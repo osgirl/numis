@@ -23,6 +23,7 @@
         "Written_on": "Escrito el día",
         "Add_Manager": "Añadir gestor",
         "Search": "Buscar",
-        "Filter": "Filtrar"
+        "Filter": "Filtrar",
+        "No_available_groupbuys": "No hay compras en grupo disponibles"
     }
 }

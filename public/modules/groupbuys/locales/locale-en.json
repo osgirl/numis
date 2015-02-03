@@ -4,7 +4,7 @@
         "Description": "Description",
         "Groupbuys": "Groupbuys",
         "New_Groupbuy": "New Groupbuy",
-        "List_Groupbuys": "List Groupbuys",
+        "List_Groupbuys": "Groupbuys list",
         "Information": "Information",
         "Items": "Items",
         "Buyers": "Buyers",
@@ -23,6 +23,7 @@
         "Written_on": "Written on",
         "Add_Manager": "Add manager",
         "Search": "Search",
-        "Filter": "Filter"
+        "Filter": "Filter",
+        "No_available_groupbuys": "There aren't any available groupbuys"
     }
 }
