@@ -9,4 +9,4 @@
 */
 
 // Use applicaion configuration module to register a new module
-ApplicationConfiguration.registerModule('groupbuys');
+ApplicationConfiguration.registerModule('groupbuys', ['restangular']);

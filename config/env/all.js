@@ -31,7 +31,10 @@ module.exports = {
 				'public/lib/angular-translate-loader-static-files/angular-translate-loader-static-files.js',
 				'public/lib/angular-ui-tinymce/src/tinymce.js',
 				'public/lib/ng-file-upload/angular-file-upload-all.js',
-				'public/lib/angular-fallback-src/fallback-src.js'
+				'public/lib/angular-fallback-src/fallback-src.js',
+				'public/lib/lodash/dist/lodash.js',
+				'public/lib/restangular/dist/restangular.js'
+
 			]
 		},
 		css: [
