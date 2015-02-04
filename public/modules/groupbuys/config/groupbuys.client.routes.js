@@ -9,13 +9,13 @@ angular.module('groupbuys').config(['$stateProvider',
 				url: '/groupbuys',
 				templateUrl: 'modules/groupbuys/views/list-groupbuys.client.view.html'
 			}).
+			state('viewGroupbuy', {
+				url: '/groupbuys/:groupbuyId',
+				templateUrl: 'modules/groupbuys/views/view-groupbuy.client.view.html'
+			}).
 			state('createGroupbuy', {
 				url: '/groupbuys/create',
 				templateUrl: 'modules/groupbuys/views/create-groupbuy.client.view.html'
-			}).
-			state('viewGroupbuy', {
-				url: '/groupbuys/:groupbuySlug',
-				templateUrl: 'modules/groupbuys/views/view-groupbuy.client.view.html'
 			}).
 			state('manageGroupbuy', {
 				url: '/groupbuys/:groupbuySlug/manage',
