@@ -48,14 +48,19 @@ describe('User Model Unit Tests:', function() {
 		done();
 	});
 
-	describe('Method Save', function() {
+	describe('Method Find', function() {
 		it('NU_T_G001_E001: should begin with no users', function(done) {
 			User.find({}, function(err, users) {
+				should.not.exist(err);
+
 				users.should.have.length(0);
 				done();
 			});
 		});
 
+	});
+
+	describe('Method Save', function() {
 		it('NU_T_G001_E002: should be able to save user without problems', function(done) {
 			user.save(done);
 		});
