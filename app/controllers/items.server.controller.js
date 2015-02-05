@@ -10,8 +10,8 @@ var mongoose = require('mongoose'),
 
 
 /**
-* Formatting groupbuy details to send
-*/
+ * Formatting groupbuy details to send
+ */
 var formattingItem = exports.formattingItem = function(item, req) {
 	var result = {};
 
@@ -51,8 +51,8 @@ var formattingItem = exports.formattingItem = function(item, req) {
 };
 
 /**
-* Formatting groupbuy details to send
-*/
+ * Formatting groupbuy details to send
+ */
 var formattingItemList = exports.formattingItemList = function(items, req) {
 	var item;
 	var result = {
@@ -128,7 +128,7 @@ exports.update = function(req, res) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			return res.status(204);
+			res.status(204).end();
 		}
 	});
 };
@@ -139,16 +139,11 @@ exports.update = function(req, res) {
 exports.delete = function(req, res) {
 	var item = req.item ;
 
-	console.log ('item.delete pre-remove', item);
 	item.remove(function(err, item) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			Item.findById(item._id, function (err, item) {
-				console.log('post-remove:', item); // null
-			});
-
-			return res.status(204);
+			res.status(204).end();
 		}
 	});
 };
