@@ -400,15 +400,13 @@ exports.formattingGroupbuy = function(req, res, next) {
 					title: 'Manage managers'
 				},
 			},
-			_embedded: {
-				members: [],
-				managers: []
-			},
 			_id: groupbuy._id,
 			name: groupbuy.name,
 			title: groupbuy.title,
 			status: groupbuy.status,
-			description: groupbuy.description
+			description: groupbuy.description,
+			members: [],
+			managers: []
 		};
 
 		if (showUpdates) {
@@ -421,39 +419,14 @@ exports.formattingGroupbuy = function(req, res, next) {
 
 		if (showMembers) {
 			for (i = 0; i < groupbuy.members.length; i++) {
-				result._embedded.members.push({
-					_links: {
-						self: {href: '/api/v1/users/' + groupbuy.members[i]._id},
-						avatar: {
-							href: '/api/v1/users/' + groupbuy.members[i]._id + '/avatar?{size}',
-							title: 'Avatar image',
-							templated: true
-						}
-					},
-					_id: groupbuy.members[i]._id,
-					username: groupbuy.members[i].username,
-					name: groupbuy.members[i].name,
-				});
+				result.members.push( groupbuy.members[i]._id );
 			}
 		}
 
 		if (showManagers) {
 			for (i = 0; i < groupbuy.managers.length; i++) {
-				result._embedded.managers.push({
-					_links: {
-						self: {href: '/api/v1/users/' + groupbuy.managers[i]._id},
-						avatar: {
-							href: '/api/v1/users/' + groupbuy.managers[i]._id + '/avatar?{size}',
-							title: 'Avatar image',
-							templated: true
-						}
-					},
-					_id: groupbuy.managers[i]._id,
-					username: groupbuy.managers[i].username,
-					name: groupbuy.managers[i].name,
-				});
+				result.managers.push( groupbuy.managers[i]._id );
 			}
-
 		}
 
 		if (showItems && false) {
