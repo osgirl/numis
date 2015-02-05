@@ -37,6 +37,9 @@ describe('User CRUD tests', function() {
 			provider: 'local'
 		});
 
+		// Remove old previous data
+		User.remove().exec();
+
 		// Save a user to the test db and create new User
 		user.save(done);
 

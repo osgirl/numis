@@ -37,6 +37,10 @@ describe('Groupbuy CRUD tests', function() {
 			provider: 'local'
 		});
 
+		// Remove old previous data
+		Groupbuy.remove().exec();
+		User.remove().exec();
+
 		// Save a user to the test db and create new Groupbuy
 		user.save(function() {
 			groupbuy = {
@@ -108,6 +112,9 @@ describe('Groupbuy CRUD tests', function() {
 					.send(groupbuy)
 					.expect(401)
 					.end(function(groupbuySaveErr, groupbuySaveRes) {
+						// Set message assertion
+						(groupbuySaveRes.body.name).should.match('NotLogged');
+
 						// Call the assertion callback
 						done(groupbuySaveErr);
 					});
@@ -138,7 +145,7 @@ describe('Groupbuy CRUD tests', function() {
 						(groupbuySaveRes.body.name).should.match('ValidationError');
 						(groupbuySaveRes.body.errors.title.path).should.match('title');
 						(groupbuySaveRes.body.errors.title.type).should.match('required');
-						//(groupbuySaveRes.body.message).should.match('Please fill Groupbuy title');
+						//(groupbuySaveRes.body.errors.title.message).should.match('Please fill Groupbuy title');
 
 						// Handle Groupbuy save error
 						done(groupbuySaveErr);
@@ -316,12 +323,5 @@ describe('Groupbuy CRUD tests', function() {
 			});
 
 		});
-	});
-
-	afterEach(function(done) {
-		User.remove().exec();
-		Groupbuy.remove().exec();
-
-		done();
 	});
 });
