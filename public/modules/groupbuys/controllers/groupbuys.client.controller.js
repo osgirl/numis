@@ -94,6 +94,56 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 
 	// ----------------------
+	// ----------------------
+
+	/**
+	* @ngdoc method
+	* @name groupbuys.controller:GroupbuysController.$scope.loadOne
+	* @methodOf groupbuys.controller:GroupbuysController
+	*
+	* @description
+	* Loads the groupbuy, userRole and tabs into the scope.
+	*/
+	$scope.loadOne = function() {
+
+		var groupbuyData = Restangular.one('groupbuys',$stateParams.groupbuyId).get();
+
+		groupbuyData.then(function(data) {
+			$scope.groupbuy = data;
+			/*
+			// Load members
+			console.log('load items');
+			var membersData = Restangular.all('groupbuys',$stateParams.groupbuyId,'members').getList();
+
+			membersData.then(function(data) {
+
+				// Cargar los members
+
+			}
+
+
+			// Load items
+			console.log('load members');
+			var itemsData = Restangular.all('groupbuys',$stateParams.groupbuyId,'items').getList();
+
+			itemsData.then(function(data) {
+
+				// Cargar los items
+
+			}
+			*/
+
+			$scope.userRole = $scope.userRole();
+			$scope.loadTabs();
+
+		}, function errorCallback() {
+			// TODO translate this key and don't use alert
+			alert('Error getting data from server');
+		});
+
+
+	};
+
 // from the top of the file
 }
 ]);
