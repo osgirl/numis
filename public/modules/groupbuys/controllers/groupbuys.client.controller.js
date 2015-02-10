@@ -302,6 +302,30 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 	};
 
 
+	// ----------------------
+
+	/**
+	* @ngdoc method
+	* @name groupbuys.controller:GroupbuysController.$scope.toogleManage
+	* @methodOf groupbuys.controller:GroupbuysController
+	*
+	* @description
+	* Toogles the manage or memeber view
+	*/
+	$scope.toogleManage = function() {
+		var fullUrl = $location.path().split('/');
+		if (fullUrl[fullUrl.length - 1] === 'manage') {
+			// From manager to member
+			$location.path('groupbuys/' + $scope.groupbuy._id );
+		} else {
+			// From member to manager
+			$location.path('groupbuys/' + $scope.groupbuy._id + '/manage');
+
+		}
+	}
+
+	// ----------------------
+
 // from the top of the file
 }
 ]);
