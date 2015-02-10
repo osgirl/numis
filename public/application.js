@@ -54,7 +54,7 @@ angular.module(ApplicationConfiguration.applicationModuleName).config(['Restangu
 		RestangularProvider.setBaseUrl('http://localhost:3000/api/v1/');
 
 		RestangularProvider.setDefaultHeaders(
-			{ "Content-Type": "application/json+hal" }
+			{ "Content-Type": "application/json" }
 		);
 
 		// Add a response intereceptor to extract the JSON from the response Object
