@@ -34,6 +34,15 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 
 	// ----------------------
+
+	/**
+	* @ngdoc method
+	* @name groupbuys.controller:GroupbuysController.$scope.loadList
+	* @methodOf groupbuys.controller:GroupbuysController
+	*
+	* @description
+	* Gets the list of Groupbuys from the server and processes it.
+	*/
 	$scope.loadList = function(){
 		var serverData = Restangular.all('groupbuys').getList();
 
@@ -48,7 +57,7 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 		}, function errorCallback() {
 	// TODO translate this key and don't use alert
-			alert("Error getting data from server");
+			alert('Error getting data from server');
 		});
 	};
 
