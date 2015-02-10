@@ -7,7 +7,7 @@
             <fieldset>
                 <div class="form-group">
                     <label class="control-label" for="name">{{'groupbuys.Name' | translate}}</label>
-                    <input type="text" id="name" name="name" class="form-control" data-ng-model="groupbuy.name" ng-required="true" ng-minlength="10" ng-maxlength="80" placeholder="{{'groupbuys.Name' | translate}}">
+                    <input type="text" id="name" name="name" class="form-control" data-ng-model="groupbuy.title" ng-required="true" ng-minlength="10" ng-maxlength="80" placeholder="{{'groupbuys.Name' | translate}}">
                     <span class="error-message" data-ng-show="groupbuyForm.name.$dirty && groupbuyForm.name.$error.required" translate="core.FIELD_REQUIRED"></span>
                     <span class="error-message" data-ng-show="groupbuyForm.name.$dirty && groupbuyForm.name.$error.minlength" translate="core.FIELD_LENGTHS" translate-values="{min: 10, max: 80}"></span>
                     <span class="error-message" data-ng-show="groupbuyForm.name.$dirty && groupbuyForm.name.$error.maxlength" translate="core.FIELD_LENGTHS" translate-values="{min: 10, max: 80}"></span>
