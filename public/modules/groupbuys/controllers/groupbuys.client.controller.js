@@ -22,6 +22,18 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 	//$locationProvider.html5Mode(true); // Mode HTML5
 
+	// Configuration of tinyMCE
+	$scope.tinymceOptions = {
+		resize: false,
+		menubar: false,
+		statusbar: false,
+		plugins: 'textcolor image table',
+		toolbar1: 'bold italic underline strikethrough | forecolor backcolor fontsizeselect | removeformat',
+		toolbar2: 'alignleft aligncenter alignright | bullist numlist outdent indent | table image'
+	};
+
+
+	// ----------------------
 	$scope.loadList = function(){
 		var serverData = Restangular.all('groupbuys').getList();
 
