@@ -144,6 +144,56 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 	};
 
+	// ----------------------
+
+	/**
+	* @ngdoc method
+	* @name groupbuys.controller:GroupbuysController.$scope.userRole
+	* @methodOf groupbuys.controller:GroupbuysController
+	*
+	* @description
+	* Return the role ('manager', 'member', 'none') of the user in the groupbuy according to the url provided.
+	*/
+	$scope.userRole = function() {
+		var role = 'none';
+		var manage = false;
+
+		if ($scope.authentication && $scope.authentication.user) {
+			var userId  = $scope.authentication.user._id;
+			var fullUrl = $location.path().split('/');
+
+			if (fullUrl[fullUrl.length - 1] === 'manage') {
+				manage = true;
+			}
+
+			if ( $scope.groupbuy.members.length > 0 && $scope.groupbuy.members.indexOf(userId) !== -1 ) {
+				role = 'member';
+			}
+
+			if ($scope.groupbuy.managers.length > 0 && $scope.groupbuy.managers.indexOf(userId) !== -1 ) {
+
+				if (manage) {
+					role = 'manager';
+					$scope.authentication.user.memberCanAdmin = false;
+				} else {
+					// If it's manager but it's in member mode, set $scope.authentication.user.canAdmin to true
+					$scope.authentication.user.memberCanAdmin = true;
+				}
+
+			}
+
+			return role;
+		} else {
+			return null;
+		}
+		var userId  = $scope.authentication.user._id;
+
+	//	return 'none';
+    //	return 'member';
+	//	return 'manager';
+	};
+
+
 // from the top of the file
 }
 ]);
