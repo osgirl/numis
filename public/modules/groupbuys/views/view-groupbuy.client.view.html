@@ -12,6 +12,9 @@
 				<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
 			</button>
 		</span>
+		<button type="button" class="btn btn-default btn-xs" aria-label="" data-ng-click="remove();">
+			<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+		</button>
 	</div>
 	<tabset>
 		<tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disabled="tab.disabled">

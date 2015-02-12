@@ -326,6 +326,23 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 	// ----------------------
 
+	/**
+	* @ngdoc method
+	* @name groupbuys.controller:GroupbuysController.$scope.remove
+	* @methodOf groupbuys.controller:GroupbuysController
+	*
+	* @description
+	* Remove existing Groupbuy
+	*/
+	$scope.remove = function(groupbuy) {
+			$scope.groupbuy.remove().then(function () {
+				$location.path('groupbuys');
+			});
+	};
+
+	// ----------------------
+
+
 // from the top of the file
 }
 ]);
