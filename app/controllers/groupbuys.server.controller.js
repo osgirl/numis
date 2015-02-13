@@ -26,16 +26,18 @@ var checkVisibility = function(groupbuy, property, isAdmin, isMember, isManager)
 /**
  * Formatting groupbuy details to send
  */
-var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req) {
+var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, reduce) {
+	reduce = reduce || false;
+
 	var user 	  	 = req.user,
 		isAdmin   	 = (user && user.roles && user.roles.indexOf('admin') !== -1),
-		isMember  	 = (isAdmin || groupbuy.members.indexOf(user._id) !== -1),
-		isManager 	 = (isAdmin || groupbuy.managers.indexOf(user._id) !== -1),
-		showUpdates  = isMember,
-		showVisibilityInfo = isManager,
-		showMembers  = checkVisibility(groupbuy, 'members', isAdmin, isMember, isManager),
-		showManagers = checkVisibility(groupbuy, 'managers', isAdmin, isMember, isManager),
-		showItems 	 = checkVisibility(groupbuy, 'items', isAdmin, isMember, isManager),
+		isMember  	 = (isAdmin || (groupbuy.members && groupbuy.members.indexOf(user._id) !== -1) ),
+		isManager 	 = (isAdmin || (groupbuy.managers && groupbuy.managers.indexOf(user._id) !== -1) ),
+		showUpdates  = !reduce && isMember,
+		showMembers  = !reduce && checkVisibility(groupbuy, 'members', isAdmin, isMember, isManager),
+		showManagers = !reduce && checkVisibility(groupbuy, 'managers', isAdmin, isMember, isManager),
+		showItems 	 = !reduce && checkVisibility(groupbuy, 'items', isAdmin, isMember, isManager),
+		showVisibilityInfo = !reduce && isManager,
 		result 	  	 = {},
 		i;
 
@@ -47,22 +49,23 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req) {
 	*/
 
 	if (user && user._id && groupbuy && groupbuy._id) {
-		var selfURL = req.method === 'GET' ? req.url : req.url + '/' + groupbuy._id;
+		var selfURL = '/api/v1' + groupbuy.toLink(),
+			parentURL = selfURL.replace(/\/[a-f\d]{24}$/i, '');
 
 		// Prepare response in JSON+HAL format.
 		result = {
 			_links: {
-				self:     { href: selfURL },
-				members:  { href: selfURL + '/members', title: 'Manage members' },
-				managers: { href: selfURL + '/managers', title: 'Manage managers' },
+				self:       { href: selfURL },
+				collection: { href: parentURL,             title: 'Groupbuys list' },
+				members:    { href: selfURL + '/members',  title: 'Manage members' },
+				managers:   { href: selfURL + '/managers', title: 'Manage managers' },
+				items:      { href: selfURL + '/items',    title: 'Items list' }
 			},
-			_id: 	groupbuy._id,
-			name: 	groupbuy.name,
-			title: 	groupbuy.title,
-			status: groupbuy.status,
-			description: groupbuy.description,
-			members:  [],
-			managers: []
+			_id: 		 groupbuy._id,
+			name: 		 groupbuy.name,
+			title: 		 groupbuy.title,
+			status: 	 groupbuy.status,
+			description: groupbuy.description
 		};
 
 		if (showUpdates) {
@@ -74,25 +77,25 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req) {
 		}
 
 		if (showMembers) {
-			for (i = 0; i < groupbuy.members.length; i++) {
-				result.members.push( groupbuy.members[i]._id );
-			}
+			result.members = groupbuy.members;
 		}
 
 		if (showManagers) {
-			for (i = 0; i < groupbuy.managers.length; i++) {
-				result.managers.push( groupbuy.managers[i]._id );
-			}
+			result.managers = groupbuy.managers;
 		}
 
-		if (showItems && false) {
+		if (showItems) {
+			result._embedded = {items: []};
+/*
+TODO
 			for (i = 0; i < groupbuy.items.length; i++) {
-				result._links.items = {
+				result._embedded.items.push({
 					href:  selfURL + '/items/' + groupbuy.items[i]._id,
 					title: groupbuy.items[i].title,
 					name:  groupbuy.items[i].name
-				};
+				});
 			}
+*/
 		}
 	}
 
@@ -103,32 +106,23 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req) {
  * Formatting groupbuy details to send
  */
 var formattingGroupbuyList = exports.formattingGroupbuyList = function(groupbuys, req) {
-	var user 	= req.user,
-		isAdmin = (user && user.roles && user.roles.indexOf('admin') !== -1);
+	var selfURL 	 = (req && req.url) ? req.url : '',
+		groupbuysURL = '';
 
 	// Prepare response in JSON+HAL format.
 	var result = {
 		_links: {
-			self: {
-				href: req.url
-			}
+			self: { href: selfURL }
 		},
 		_embedded: {
 			groupbuys: []
 		}
 	};
 
-	for (var i = 0; i < groupbuys.length; i++) {
-		result._embedded.groupbuys.push({
-			_links: {
-				self: { href: req.url + '/' + groupbuys[i]._id }
-			},
-			_id: 	groupbuys[i]._id,
-			title: 	groupbuys[i].title,
-			name: 	groupbuys[i].name,
-			status: groupbuys[i].status,
-			description: groupbuys[i].description
-		});
+	if (groupbuys || typeof groupbuys !== 'undefined') {
+		for (var i = 0; i < groupbuys.length; i++) {
+			result._embedded.groupbuys.push( formattingGroupbuy(groupbuys[i], req, true) );
+		}
 	}
 
 	return result;
