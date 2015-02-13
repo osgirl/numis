@@ -13,13 +13,13 @@ var _ = require('lodash'),
  * Formatting user details to send
  */
 var formattingUser = exports.formattingUser = function(user, req, callback) {
-	var isAdmin = (req.user && typeof req.user.roles !== 'undefined' && req.user.roles.indexOf('admin') !== -1),
-		isMe    = (user && user._id.equals(req.user._id) ),
+	var isAdmin = (req && req.user && typeof req.user.roles !== 'undefined' && req.user.roles.indexOf('admin') !== -1),
+		isMe    = (req && user && user._id.equals(req.user._id) ),
 		result  = {};
 
-	//if (user && user._id && me && me._id) {
 	if (user && user._id) {
-		var selfURL = req.method === 'GET' ? req.url : req.url + '/' + user._id;
+		var selfURL = '/api/v1' + user.toLink(),
+			parentURL = selfURL.replace(/\/[a-f\d]{24}$/i, '');
 
 		// Prepare response in JSON+HAL format.
 		result = {
@@ -39,7 +39,7 @@ var formattingUser = exports.formattingUser = function(user, req, callback) {
 		};
 
 		if (user.provider === 'local') {
-			result._links.password = { href: '/api/v1/users/password', title: 'Change own password'};
+			result._links.password = { href: parentURL + '/password', title: 'Change own password'};
 		}
 
 		if (isAdmin || isMe) {
@@ -65,35 +65,44 @@ var formattingUser = exports.formattingUser = function(user, req, callback) {
 * Formatting user details to send
 */
 var formattingUserList = exports.formattingUserList = function(users, req, callback) {
-	var isAdmin = (req.user && typeof req.user.roles !== 'undefined' && req.user.roles.indexOf('admin') !== -1),
-		result  = {};
+	var selfURL  = (req && req.url) ? req.url : '',
+		usersURL = '';
 
 	// Prepare response in JSON+HAL format.
-	result = {
+	var result = {
 		_links: {
-			self: { href: req.url }
+			self: { href: selfURL }
 		},
 		_embedded: {
 			users: []
 		}
 	};
 
-	for (var i = 0; i < users.length; i++) {
-		result._embedded.users.push({
-			_links: {
-				self: {href: req.url + '/' + users[i]._id},
-				avatar: {
-					href: req.url + '/' + users[i]._id + '/avatar{?size}',
-					title: 'Avatar image',
-					templated: true
-				}
-			},
-			_id:      users[i]._id,
-			username: users[i].username,
-			name: 	  users[i].name
-		});
+	if (users || typeof users !== 'undefined') {
+		var isAdmin = (req && req.user && typeof req.user.roles !== 'undefined' && req.user.roles.indexOf('admin') !== -1);
+
+		if (users.length) {
+			usersURL = ('/api/v1' + users[0].toLink() ).replace(/\/[a-f\d]{24}$/i, '');
+		}
+
+		for (var i = 0; i < users.length; i++) {
+			result._embedded.users.push({
+				_links: {
+					self: {href: usersURL + '/' + users[i]._id},
+					avatar: {
+						href: usersURL + '/' + users[i]._id + '/avatar{?size}',
+						title: 'Avatar image',
+						templated: true
+					}
+				},
+				_id:      users[i]._id,
+				username: users[i].username,
+				name: 	  users[i].name
+			});
+		}
 	}
 
+	// Do callback or return result
 	if (typeof callback !== 'undefined') {
 		callback(result);
 	} else {

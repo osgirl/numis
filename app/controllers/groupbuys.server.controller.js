@@ -3,11 +3,12 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose'),
+var mongoose 	 = require('mongoose'),
 	errorHandler = require('./errors.server.controller'),
-	User = mongoose.model('User'),
-	Groupbuy = mongoose.model('Groupbuy'),
-	_ = require('lodash');
+	users 		 = require('./users.server.controller'),
+	User 		 = mongoose.model('User'),
+	Groupbuy 	 = mongoose.model('Groupbuy'),
+	_ 			 = require('lodash');
 
 
 var checkVisibility = function(groupbuy, property, isAdmin, isMember, isManager) {
@@ -284,51 +285,21 @@ exports.deleteMember = function(req, res) {
 };
 
 /**
-* Get list of members in a groupbuy
-*/
-// TODO: Refactorizar
+ * Get list of members in a groupbuy
+ */
 exports.getMembersList = function(req, res) {
 	Groupbuy.findById(req.groupbuy._id).populate('members').exec(function(err, groupbuy) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			// FIXME: Use formattingUser
-			var result = {
-				_links: {
-					self: {
-						href: '/api/v1/groupbuys/' + req.groupbuy._id + '/members'
-					}
-				},
-				_embedded: {
-					users: []
-				}
-			};
-
-			for (var i = 0; i < groupbuy.members.length; i++) {
-				result._embedded.users.push({
-					_links: {
-						self: {href: '/api/v1/users/' + groupbuy.members[i]._id},
-						avatar: {
-							href: '/api/v1/users/' + groupbuy.members[i]._id + '/avatar{?size}',
-							title: 'Avatar image',
-							templated: true
-						}
-					},
-					_id: groupbuy.members[i]._id,
-					username: groupbuy.members[i].username,
-					name: groupbuy.members[i].name
-
-				});
-			}
-
-			res.jsonp( result );
+			res.jsonp( users.formattingUserList(groupbuy.members, req) );
 		}
 	});
 };
 
 /**
-* Add a manager to an existing groupbuy
-*/
+ * Add a manager to an existing groupbuy
+ */
 exports.addManager = function(req, res) {
 	var groupbuy = req.groupbuy,
 		userId 	 = (req.body && req.body.userId && mongoose.Types.ObjectId.isValid(req.body.userId)) ? req.body.userId : undefined,
@@ -375,8 +346,8 @@ exports.addManager = function(req, res) {
 };
 
 /**
-* Remove a manager from an existing groupbuy
-*/
+ * Remove a manager from an existing groupbuy
+ */
 exports.deleteManager = function(req, res) {
 	var groupbuy  = req.groupbuy,
 		manager   = req.profile,
@@ -415,44 +386,14 @@ exports.deleteManager = function(req, res) {
 };
 
 /**
-* Get list of members in a groupbuy
-*/
-// TODO: Refactorizar
+ * Get list of members in a groupbuy
+ */
 exports.getManagersList = function(req, res) {
 	Groupbuy.findById(req.groupbuy._id).populate('managers').exec(function(err, groupbuy) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			// FIXME: Use formattingUser
-			var result = {
-				_links: {
-					self: {
-						href: '/api/v1/groupbuys/' + req.groupbuy._id + '/managers'
-					}
-				},
-				_embedded: {
-					users: []
-				}
-			};
-
-			for (var i = 0; i < groupbuy.managers.length; i++) {
-				result._embedded.users.push({
-					_links: {
-						self: {href: '/api/v1/users/' + groupbuy.managers[i]._id},
-						avatar: {
-							href: '/api/v1/users/' + groupbuy.managers[i]._id + '/avatar{?size}',
-							title: 'Avatar image',
-							templated: true
-						}
-					},
-					_id: groupbuy.managers[i]._id,
-					username: groupbuy.managers[i].username,
-					name: groupbuy.managers[i].name
-
-				});
-			}
-
-			res.jsonp( result );
+			res.jsonp( users.formattingUserList(groupbuy.managers, req) );
 		}
 	});
 };
