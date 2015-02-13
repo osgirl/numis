@@ -21,91 +21,191 @@ var checkVisibility = function(groupbuy, property, isAdmin, isMember, isManager)
 	};
 
 
+
+/**
+ * Formatting groupbuy details to send
+ */
+var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req) {
+	var user 	  	 = req.user,
+		isAdmin   	 = (user && user.roles && user.roles.indexOf('admin') !== -1),
+		isMember  	 = (isAdmin || groupbuy.members.indexOf(user._id) !== -1),
+		isManager 	 = (isAdmin || groupbuy.managers.indexOf(user._id) !== -1),
+		showUpdates  = isMember,
+		showVisibilityInfo = isManager,
+		showMembers  = checkVisibility(groupbuy, 'members', isAdmin, isMember, isManager),
+		showManagers = checkVisibility(groupbuy, 'managers', isAdmin, isMember, isManager),
+		showItems 	 = checkVisibility(groupbuy, 'items', isAdmin, isMember, isManager),
+		result 	  	 = {},
+		i;
+
+	/* visibility TODO
+			shipmentsState: 'restricted',
+			paymentStatus: 'restricted',
+			itemsByMember: 'restricted',
+			itemNumbers: 'public',
+	*/
+
+	if (user && user._id && groupbuy && groupbuy._id) {
+		var selfURL = req.method === 'GET' ? req.url : req.url + '/' + groupbuy._id;
+
+		// Prepare response in JSON+HAL format.
+		result = {
+			_links: {
+				self:     { href: selfURL },
+				members:  { href: selfURL + '/members', title: 'Manage members' },
+				managers: { href: selfURL + '/managers', title: 'Manage managers' },
+			},
+			_id: 	groupbuy._id,
+			name: 	groupbuy.name,
+			title: 	groupbuy.title,
+			status: groupbuy.status,
+			description: groupbuy.description,
+			members:  [],
+			managers: []
+		};
+
+		if (showUpdates) {
+			result.updates = groupbuy.updates;
+		}
+
+		if (showVisibilityInfo) {
+			result.visibility = groupbuy.visibility;
+		}
+
+		if (showMembers) {
+			for (i = 0; i < groupbuy.members.length; i++) {
+				result.members.push( groupbuy.members[i]._id );
+			}
+		}
+
+		if (showManagers) {
+			for (i = 0; i < groupbuy.managers.length; i++) {
+				result.managers.push( groupbuy.managers[i]._id );
+			}
+		}
+
+		if (showItems && false) {
+			for (i = 0; i < groupbuy.items.length; i++) {
+				result._links.items = {
+					href:  selfURL + '/items/' + groupbuy.items[i]._id,
+					title: groupbuy.items[i].title,
+					name:  groupbuy.items[i].name
+				};
+			}
+		}
+	}
+
+	return result;
+};
+
+/**
+ * Formatting groupbuy details to send
+ */
+var formattingGroupbuyList = exports.formattingGroupbuyList = function(groupbuys, req) {
+	var user 	= req.user,
+		isAdmin = (user && user.roles && user.roles.indexOf('admin') !== -1);
+
+	// Prepare response in JSON+HAL format.
+	var result = {
+		_links: {
+			self: {
+				href: req.url
+			}
+		},
+		_embedded: {
+			groupbuys: []
+		}
+	};
+
+	for (var i = 0; i < groupbuys.length; i++) {
+		result._embedded.groupbuys.push({
+			_links: {
+				self: { href: req.url + '/' + groupbuys[i]._id }
+			},
+			_id: 	groupbuys[i]._id,
+			title: 	groupbuys[i].title,
+			name: 	groupbuys[i].name,
+			status: groupbuys[i].status,
+			description: groupbuys[i].description
+		});
+	}
+
+	return result;
+};
+
+
 /**
  * Create a Groupbuy
  */
-/*
 exports.create = function(req, res) {
 	var groupbuy = new Groupbuy(req.body);
+	// Set user creator
 	groupbuy.user = req.user;
+	// Add user creator as manager and member
+	groupbuy.members  = [ groupbuy.user ];
+	groupbuy.managers = [ groupbuy.user ];
 
 	groupbuy.save(function(err) {
 		if (err) {
-			return res.status(400).send({
-				message: errorHandler.getErrorMessage(err)
-			});
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.jsonp(groupbuy);
+			res.status(201).jsonp( formattingGroupbuy(groupbuy, req) );
 		}
 	});
 };
-*/
 
 /**
  * Show the current Groupbuy
  */
-/*
 exports.read = function(req, res) {
-	res.jsonp(req.groupbuy);
+	res.jsonp( formattingGroupbuy(req.groupbuy, req) );
 };
-*/
 
 /**
  * Update a Groupbuy
  */
-/*
 exports.update = function(req, res) {
 	var groupbuy = req.groupbuy ;
 
+	delete req.body.user;
 	groupbuy = _.extend(groupbuy , req.body);
 
 	groupbuy.save(function(err) {
 		if (err) {
-			return res.status(400).send({
-				message: errorHandler.getErrorMessage(err)
-			});
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.jsonp(groupbuy);
+			res.status(204).end();
 		}
 	});
 };
-*/
 
 /**
- * Delete an Groupbuy
+ * Delete a Groupbuy
  */
-/*
 exports.delete = function(req, res) {
-	var groupbuy = req.groupbuy ;
+	var groupbuy = req.groupbuy;
 
 	groupbuy.remove(function(err) {
 		if (err) {
-			return res.status(400).send({
-				message: errorHandler.getErrorMessage(err)
-			});
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.jsonp(groupbuy);
+			res.status(204).end();
 		}
 	});
 };
-*/
 
 /**
  * List of Groupbuys
  */
-/*
 exports.list = function(req, res) {
-	Groupbuy.find().sort('-created').populate('user', 'displayName').exec(function(err, groupbuys) {
+	Groupbuy.find().select('_id title name description status members manager user').sort('title').populate('user', 'username roles').exec(function(err, groupbuys) {
 		if (err) {
-			return res.status(400).send({
-				message: errorHandler.getErrorMessage(err)
-			});
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.jsonp(groupbuys);
+			res.jsonp( formattingGroupbuyList(groupbuys, req) );
 		}
 	});
 };
-*/
 
 /**
 * Add a member to an existing groupbuy
@@ -355,130 +455,6 @@ exports.getManagersList = function(req, res) {
 			res.jsonp( result );
 		}
 	});
-};
-
-
-
-/**
-* Formatting groupbuy details to send
-*/
-exports.formattingGroupbuy = function(req, res, next) {
-	var user 	  	 = req.user,
-		groupbuy	 = res,
-		isAdmin   	 = (user && user.roles && user.roles.indexOf('admin') !== -1),
-		isMember  	 = (isAdmin || groupbuy.members.indexOf(user._id) !== -1),
-		isManager 	 = (isAdmin || groupbuy.managers.indexOf(user._id) !== -1),
-		showUpdates  = isMember,
-		showVisibilityInfo = isManager,
-		showMembers  = checkVisibility(groupbuy, 'members', isAdmin, isMember, isManager),
-		showManagers = checkVisibility(groupbuy, 'managers', isAdmin, isMember, isManager),
-		showItems 	 = checkVisibility(groupbuy, 'items', isAdmin, isMember, isManager),
-		result 	  	 = {},
-		i;
-
-	/* visibility TODO
-			shipmentsState: 'restricted',
-			paymentStatus: 'restricted',
-			itemsByMember: 'restricted',
-			itemNumbers: 'public',
-	*/
-
-	if (user && user._id && groupbuy && groupbuy._id) {
-		// Prepare response in JSON+HAL format.
-		result = {
-			_links: {
-				self: {
-					href: '/api/v1/groupbuys/' + groupbuy._id
-				},
-				members: {
-					href: '/api/v1/groupbuys/' + groupbuy._id + '/members',
-					title: 'Manage members'
-
-				},
-				managers: {
-					href: '/api/v1/groupbuys/' + groupbuy._id + '/managers',
-					title: 'Manage managers'
-				},
-			},
-			_id: groupbuy._id,
-			name: groupbuy.name,
-			title: groupbuy.title,
-			status: groupbuy.status,
-			description: groupbuy.description,
-			members: [],
-			managers: []
-		};
-
-		if (showUpdates) {
-			result.updates = groupbuy.updates;
-		}
-
-		if (showVisibilityInfo) {
-			result.visibility = groupbuy.visibility;
-		}
-
-		if (showMembers) {
-			for (i = 0; i < groupbuy.members.length; i++) {
-				result.members.push( groupbuy.members[i]._id );
-			}
-		}
-
-		if (showManagers) {
-			for (i = 0; i < groupbuy.managers.length; i++) {
-				result.managers.push( groupbuy.managers[i]._id );
-			}
-		}
-
-		if (showItems && false) {
-			for (i = 0; i < groupbuy.items.length; i++) {
-				result._links.items = {
-					href: '/api/v1/groupbuys/' + groupbuy._id + '/items/' + groupbuy.items[i]._id,
-					title: groupbuy.items[i].title,
-					name: groupbuy.items[i].name
-				};
-			}
-		}
-	}
-
-	// Send response
-	//res.set('Content-Type', 'application/vnd.hal+json');
-	next(result);
-};
-
-/**
-* Formatting groupbuy details to send
-*/
-exports.formattingGroupbuyList = function(req, res, next) {
-	var user 	= req.user,
-		isAdmin = (user && user.roles && user.roles.indexOf('admin') !== -1);
-
-	// Prepare response in JSON+HAL format.
-	var result = {
-		_links: {
-			self: {
-				href: '/api/v1/groupbuys/'
-			}
-		},
-		_embedded: {
-			groupbuys: []
-		}
-	};
-
-	for (var i = 0; i < res.length; i++) {
-		result._embedded.groupbuys.push({
-			_links: {
-				self: { href: '/api/v1/groupbuys/' + res[i]._id }
-			},
-			_id: res[i]._id,
-			title: res[i].title,
-			name: res[i].name,
-			status: res[i].status,
-			description: res[i].description
-		});
-	}
-
-	// Send response
-	next(result);
 };
 
 

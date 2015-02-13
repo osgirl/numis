@@ -103,16 +103,11 @@ GroupbuySchema.plugin(slugPlugin('title', {field: 'name'}));
 
 
 /**
-* Hook a pre save method to add to members an managers the creator user
-*/
+ * Hook a pre save method to modify udpated date.
+ */
 GroupbuySchema.pre('save', function(next) {
-	if (this.user) {
-		if (this.members.indexOf(this.user) === -1) {
-			this.members.push(this.user);
-		}
-		if (this.managers.indexOf(this.user) === -1) {
-			this.managers.push(this.user);
-		}
+	if (this._id) {
+		this.updated = new Date();
 	}
 
 	next();
