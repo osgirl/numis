@@ -23,9 +23,7 @@ module.exports = function() {
 		User.findOne({
 			_id: id
 		}, '-salt -password', function(err, user) {
-			userProfileHandler.formattingUser({'user': user}, user, function(result) {
-				done(err, result);
-			});
+			done(err, user);
 		});
 	});
 

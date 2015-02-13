@@ -12,125 +12,195 @@ var _ = require('lodash'),
 /**
  * Formatting user details to send
  */
-exports.formattingUser = function(req, res, next) {
-	var user 	= req.user,
-		isAdmin = (user && user.roles && user.roles.indexOf('admin') !== -1),
-		isMe    = (user && user._id.equals(res._id) ),
+var formattingUser = exports.formattingUser = function(user, req, callback) {
+	var isAdmin = (req.user && typeof req.user.roles !== 'undefined' && req.user.roles.indexOf('admin') !== -1),
+		isMe    = (user && user._id.equals(req.user._id) ),
 		result  = {};
 
-	if (user && user._id && res && res._id) {
+	//if (user && user._id && me && me._id) {
+	if (user && user._id) {
+		var selfURL = req.method === 'GET' ? req.url : req.url + '/' + user._id;
+
 		// Prepare response in JSON+HAL format.
 		result = {
 			_links: {
-				self: {
-					href: '/api/v1/users/' + res._id
-				},
+				self: { href: selfURL },
 				avatar: {
-					href: '/api/v1/users/' + res._id + '/avatar{?size}',
+					href: selfURL + '/avatar{?size}',
 					title: 'Avatar image',
 					templated: true
 				},
 
 				groupbuys: []
 			},
-			_id: res._id,
-			username: res.username,
-			name: res.name
+			_id: 	  user._id,
+			username: user.username,
+			name: 	  user.name
 		};
 
-		if (res.provider === 'local') {
-			result._links.password = { href: '/api/v1/users/password', title: 'Change password'};
+		if (user.provider === 'local') {
+			result._links.password = { href: '/api/v1/users/password', title: 'Change own password'};
 		}
 
 		if (isAdmin || isMe) {
-			result.lastName 	= res.lastName;
-			result.firstName 	= res.firstName;
-			result.homeAddress	= res.homeAddress;
-			result.email 		= res.email;
+			result.lastName 	= user.lastName;
+			result.firstName 	= user.firstName;
+			result.homeAddress	= user.homeAddress;
+			result.email 		= user.email;
 		}
 		if (isAdmin) {
-			result.provider = res.provider;
-			result.roles 	= res.roles;
+			result.provider = user.provider;
+			result.roles 	= user.roles;
 		}
 	}
 
-	// Send response
-	next(result);
+	if (typeof callback !== 'undefined') {
+		callback(result);
+	} else {
+		return result;
+	}
 };
 
 /**
 * Formatting user details to send
 */
-exports.formattingUserList = function(req, res, next) {
-	var user 	= req.user,
-		isAdmin = (user && user.roles && user.roles.indexOf('admin') !== -1);
+var formattingUserList = exports.formattingUserList = function(users, req, callback) {
+	var isAdmin = (req.user && typeof req.user.roles !== 'undefined' && req.user.roles.indexOf('admin') !== -1),
+		result  = {};
 
 	// Prepare response in JSON+HAL format.
-	var result = {
+	result = {
 		_links: {
-			self: {
-				href: '/api/v1/users/'
-			}
+			self: { href: req.url }
 		},
 		_embedded: {
 			users: []
 		}
 	};
 
-	for (var i = 0; i < res.length; i++) {
+	for (var i = 0; i < users.length; i++) {
 		result._embedded.users.push({
 			_links: {
-				self: {href: '/api/v1/users/' + res[i]._id},
+				self: {href: req.url + '/' + users[i]._id},
 				avatar: {
-					href: '/api/v1/users/' + res[i]._id + '/avatar{?size}',
+					href: req.url + '/' + users[i]._id + '/avatar{?size}',
 					title: 'Avatar image',
 					templated: true
 				}
 			},
-			_id: res[i]._id,
-			username: res[i].username,
-			name: res[i].name
-
+			_id:      users[i]._id,
+			username: users[i].username,
+			name: 	  users[i].name
 		});
 	}
 
-	// Send response
-	next(result);
+	if (typeof callback !== 'undefined') {
+		callback(result);
+	} else {
+		return result;
+	}
+};
+
+
+/**
+ * Create a User
+ */
+exports.create = function(req, res) {
+	var user = new User(req.body);
+
+	user.save(function(err) {
+		if (err) {
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+		} else {
+			res.status(201).jsonp( formattingUser(user, req) );
+		}
+	});
+};
+
+/**
+ * Show the current User
+ */
+exports.read = function(req, res) {
+	res.jsonp( formattingUser(req.user, req) );
 };
 
 /**
  * Update user details
  */
-exports.update = function(req, res, next) {
-	if (req.params.id) {
-		// Init Variables
-		var validFields = ['username', 'lastName', 'firstName', 'homeAddress', 'email'],
-			user;
+exports.update = function(req, res) {
+	// Init Variables
+	var user = req.user;
 
-		user = User.findOne({
-			_id: req.params.id
-		}, '-password -salt').exec(function(err, user) {
-			if (err) return next(err);
+	// For security measurement we remove the roles from the req.body object
+	delete req.body.roles;
 
-			if (!user) return next(new Error('Failed to load User ' + req.params.id));
+	if (user) {
+    	// Merge existing user
+        user = _.extend(user, req.body);
+        user.updated = Date.now();
+        user.displayName = user.firstName + ' ' + user.lastName;
 
-			// Filter request data and removes invalid ones.
-			var reqKeys = Object.keys(req.body);
-			for (var i = 0, len = reqKeys.length; i < len; i++) {
-				if (validFields.indexOf(reqKeys[i]) === -1) {
-					delete req.body[reqKeys[i]];
-				}
+        user.save(function(err) {
+        	if (err) {
+				// Bad Request
+        		return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+        	} else {
+        		req.login(user, function(err) {
+        			if (err) {
+						// Bad Request
+						res.status(400).send( errorHandler.prepareErrorResponse (err) );
+        			} else {
+						// OK. No Content
+						res.status(204).end();
+        			}
+        		});
 			}
-
-			// Merge existing user data with new data
-			user = _.extend(user, req.body);
-			user.updated = Date.now();
-			user.displayName = user.firstName + ' ' + user.lastName;
-
-			next(user);
 		});
-
 	} else {
-		return next(new Error('Failed to load User '));
+		res.status(401).send({
+			name: 'NotLogged',
+			message: 'User is not logged in',
+		});
 	}
+};
+
+/**
+ * Delete an User
+ */
+exports.delete = function(req, res) {
+	var user = req.user;
+
+	user.remove(function(err) {
+		if (err) {
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+		} else {
+			res.status(204).end();
+		}
+	});
+};
+
+/**
+ * List of Users
+ */
+exports.list = function(req, res) {
+	User.find().select('_id username name provider roles').sort('username').exec(function(err, users) {
+		if (err) {
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+		} else {
+			res.jsonp( formattingUserList(users, req) );
+		}
+	});
+};
+
+
+/*
+ * Send User
+ */
+exports.me = function(req, res) {
+	var fakeReq = {
+		url: req.url.replace(/me$/, req.user.id),
+		method: 'GET'
+	};
+
+	res.jsonp( formattingUser(req.user, fakeReq) );
 };

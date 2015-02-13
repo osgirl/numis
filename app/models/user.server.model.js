@@ -92,7 +92,7 @@ var UserSchema = new Schema({
 			enum: ['user', 'premium', 'admin']
 		}],
 		default: ['user'],
-		select: false
+		select: true
 	},
 	updated: {
 		type: Date
