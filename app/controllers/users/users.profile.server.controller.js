@@ -12,7 +12,7 @@ var _ = require('lodash'),
 /**
  * Formatting user details to send
  */
-var formattingUser = exports.formattingUser = function(user, req, callback) {
+var formattingUser = exports.formattingUser = function(user, req, reduce) {
 	var isAdmin = (req && req.user && typeof req.user.roles !== 'undefined' && req.user.roles.indexOf('admin') !== -1),
 		isMe    = (req && user && user._id.equals(req.user._id) ),
 		result  = {};
@@ -25,6 +25,7 @@ var formattingUser = exports.formattingUser = function(user, req, callback) {
 		result = {
 			_links: {
 				self: { href: selfURL },
+				collection: { href: parentURL, title: 'Users list' },
 				avatar: {
 					href: selfURL + '/avatar{?size}',
 					title: 'Avatar image',
@@ -38,33 +39,31 @@ var formattingUser = exports.formattingUser = function(user, req, callback) {
 			name: 	  user.name
 		};
 
-		if (user.provider === 'local') {
-			result._links.password = { href: parentURL + '/password', title: 'Change own password'};
-		}
+		if (!reduce) {
+			if (user.provider === 'local') {
+				result._links.password = { href: parentURL + '/password', title: 'Change own password'};
+			}
 
-		if (isAdmin || isMe) {
-			result.lastName 	= user.lastName;
-			result.firstName 	= user.firstName;
-			result.homeAddress	= user.homeAddress;
-			result.email 		= user.email;
-		}
-		if (isAdmin) {
-			result.provider = user.provider;
-			result.roles 	= user.roles;
+			if (isAdmin || isMe) {
+				result.lastName 	= user.lastName;
+				result.firstName 	= user.firstName;
+				result.homeAddress	= user.homeAddress;
+				result.email 		= user.email;
+			}
+			if (isAdmin) {
+				result.provider = user.provider;
+				result.roles 	= user.roles;
+			}
 		}
 	}
 
-	if (typeof callback !== 'undefined') {
-		callback(result);
-	} else {
-		return result;
-	}
+	return result;
 };
 
 /**
-* Formatting user details to send
-*/
-var formattingUserList = exports.formattingUserList = function(users, req, callback) {
+ * Formatting user details to send
+ */
+var formattingUserList = exports.formattingUserList = function(users, req, reduce) {
 	var selfURL  = (req && req.url) ? req.url : '',
 		usersURL = '';
 
@@ -86,28 +85,11 @@ var formattingUserList = exports.formattingUserList = function(users, req, callb
 		}
 
 		for (var i = 0; i < users.length; i++) {
-			result._embedded.users.push({
-				_links: {
-					self: {href: usersURL + '/' + users[i]._id},
-					avatar: {
-						href: usersURL + '/' + users[i]._id + '/avatar{?size}',
-						title: 'Avatar image',
-						templated: true
-					}
-				},
-				_id:      users[i]._id,
-				username: users[i].username,
-				name: 	  users[i].name
-			});
+			result._embedded.users.push( formattingUser(users[i], req, true) );
 		}
 	}
 
-	// Do callback or return result
-	if (typeof callback !== 'undefined') {
-		callback(result);
-	} else {
-		return result;
-	}
+	return result;
 };
 
 
@@ -206,10 +188,5 @@ exports.list = function(req, res) {
  * Send User
  */
 exports.me = function(req, res) {
-	var fakeReq = {
-		url: req.url.replace(/me$/, req.user.id),
-		method: 'GET'
-	};
-
-	res.jsonp( formattingUser(req.user, fakeReq) );
+	res.jsonp( formattingUser(req.user, req) );
 };
