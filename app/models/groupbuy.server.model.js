@@ -5,6 +5,7 @@
  */
 var mongoose   = require('mongoose'),
 	slugPlugin = require('mongoose-url-slugs'),
+	l2rPlugin  = require('mongoose-l2r'),
 	Schema	   = mongoose.Schema;
 
 /**
@@ -99,7 +100,15 @@ var GroupbuySchema = new Schema({
 	}
 });
 
+
+/**
+ * Add plugins to Groupbuy schema.
+ */
+// Slug plugin
 GroupbuySchema.plugin(slugPlugin('title', {field: 'name'}));
+
+// L2r plugin
+GroupbuySchema.plugin(l2rPlugin);
 
 
 /**
