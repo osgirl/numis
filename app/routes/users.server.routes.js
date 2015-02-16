@@ -3,86 +3,40 @@
 /**
  * Module dependencies.
  */
-var passport = require('passport'),
-	mongoose = require('mongoose'),
-	restEndpoints = require('mongoose-rest-endpoints'),
-	errorHandler = require('../../app/controllers/errors.server.controller'),
-	users = require('../../app/controllers/users.server.controller');
+var passport = require('passport');
 
 module.exports = function(app) {
 	// User Routes
-	/*
-	*
-	*/
-/*
-	var userListPreFilter = function(req, query, next) {
-		//console.log('req: ', req.query);
+	var users = require('../../app/controllers/users.server.controller');
 
-		next(query);
-	};
-*/
-	/*
-	 *
-	 */
-	var userPreResponseError = function(req, error, next) {
-		errorHandler.prepareErrorResponse(error.message);
+	// Users Routes
+	app.route('/api/v1/users')
+		.get(users.requiresLogin, users.list)
+		.post(users.requiresLogin, users.hasAuthorization(['admin']), users.create);
 
-		next(error);
-	};
+	app.route('/api/v1/users/me').get(users.requiresLogin, users.me);
 
-	// Register end point for '/users' and /users/:id'
-	//restEndpoints.log.verbose(true);
-	new restEndpoints
-				.endpoint('/api/v1/users', 'User', {
-					queryParams: ['username', 'name', 'email', '$in_roles'],
-					pagination: {
-						perPage: 50,
-						sortField: 'username'
-					}
-				})
-				.addMiddleware('*', users.requiresLogin)
-				//.tap('pre_filter', 'list', userListPreFilter)
-				//.tap('pre_filter', 'fetch', userListPreFilter)
-				//.tap('post_retrieve', 'list', userListPreFilter)
-				//.tap('post_retrieve', 'fetch', userListPreFilter)
-				.tap('pre_save',     	   'put',    users.update)
-				.tap('pre_response', 	   'list',   users.formattingUserList)
-				.tap('pre_response', 	   'fetch',  users.formattingUser)
-				.tap('pre_response', 	   'post',   users.formattingUser)
-				.tap('pre_response_error', '*',      userPreResponseError)
-				.register(app);
+	app.route('/api/v1/users/:userId')
+		.get(users.requiresLogin, users.read)
+		.put(users.requiresLogin, users.hasAuthorization(['admin']), users.update)
+		.delete(users.requiresLogin, users.hasAuthorization(['admin']), users.delete);
 
-	// Setting up the users profile api
-	//app.route('/users/me').get(users.me);
-	app.route('/users/me').get( function(req, res, next) {
-		res.url = '/api/v1/users/' + req.user._id;
-
-		next();
-	});
-
-	app.route('/users').put( function(req, res, next) {
-		res.url = '/api/v1' + res.url;
-
-		next();
-	});
-
-//	app.route('/users/accounts').delete(users.removeOAuthProvider);
-
-	// Setting up the users avatar api
+	// Users avatar Routes
 	app.route('/api/v1/users/:userId/avatar')
-		.get(users.requiresLogin, users.userByID, users.getAvatar)
-		.put(users.requiresLogin, users.userByID, users.updateAvatar)
-		.delete(users.requiresLogin, users.deleteAvatar);
+		.get(users.requiresLogin, users.getAvatar)
+		.put(users.requiresLogin, users.hasAuthorization(['admin']), users.updateAvatar)
+		.delete(users.requiresLogin, users.hasAuthorization(['admin']), users.deleteAvatar);
 
+//	app.route('/api/v1/users/accounts').delete(users.removeOAuthProvider);
 	// Setting up the users password api
-	app.route('/users/password').post(users.requiresLogin, users.changePassword);
+	app.route('/api/v1/users/password').post(users.requiresLogin, users.changePassword);
 	app.route('/auth/forgot').post(users.forgot);
 	app.route('/auth/reset/:token').get(users.validateResetToken);
 	app.route('/auth/reset/:token').post(users.reset);
 
 	// Setting up the users authentication api
 	app.route('/auth/signup').post(users.signup);
-	app.route('/auth/signin').post(users.signin, users.formattingUser);
+	app.route('/auth/signin').post(users.signin);
 	app.route('/auth/signout').get(users.signout);
 
 /*

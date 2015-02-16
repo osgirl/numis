@@ -12,32 +12,52 @@ var mongoose = require('mongoose'),
 /**
  * Formatting groupbuy details to send
  */
-var formattingItem = exports.formattingItem = function(item, req) {
-	var result = {};
+var formattingItem = exports.formattingItem = function(item, req, reduce) {
+	reduce = reduce || false;
+
+	var selfURL = '',
+		parentURL = '',
+		creatorURL = '',
+		groupbuyURL = '',
+		result = {};
 
 	if (item && item._id) {
+		try {
+			var rels = item.relationsToLink(['user', 'groupbuy']);
+
+			creatorURL  = '/api/v1' + rels.user;
+			groupbuyURL = '/api/v1' + rels.groupbuy;
+		} catch (ex) {}
+
+		try {
+			selfURL     = groupbuyURL + item.toLink();
+			parentURL   = selfURL.replace(/\/[a-f\d]{24}$/i, '');
+		} catch (ex) {}
+
 		// Duplicate object item
 		result = item.toJSON();
 
 		// Add links to response
-		if (req && req.url) {
-			var selfURL = req.method === 'GET' ? req.url : req.url + '/' + result._id;
-			result._links = {
-				self: { href: selfURL },
-				image: {
-					href: req.selfURL + '/image{?size}',
-					title: 'Item picture',
-					templated: true
-				},
-				creator: {
-					href: '/api/v1/users/' + item.user._id,
+		result._links = {
+			self: { href: selfURL },
+			image: {
+				href: selfURL + '/image{?size}',
+				title: 'Item picture',
+				templated: true
+			}
+		};
+
+		if (!reduce) {
+			try {
+				result._links.creator = {
+					href: creatorURL,
 					title: 'User creator'
-				},
-				groupbuy: {
-					href: '/api/v1/groupbuys/' + item.groupbuy,
+				};
+				result._links.groupbuy = {
+					href: groupbuyURL,
 					title: 'Groupbuy to which belongs to'
-				}
-			};
+				};
+			} catch (ex) {}
 		}
 
 		// Remove fields
@@ -65,25 +85,7 @@ var formattingItemList = exports.formattingItemList = function(items, req) {
 	};
 
 	for (var i = 0; i < items.length; i++) {
-		// Duplicate object item
-		item = items[i].toJSON();
-
-		// Add relational links
-		item._links = {
-			self: { href: req.url + '/' + item._id },
-			image: {
-				href: req.selfURL + '/image{?size}',
-				title: 'Item picture',
-				templated: true
-			}
-		};
-
-		// Remove internal fields
-		delete item.user;
-		delete item.groupbuy;
-
-		// Add item to array
-		result._embedded.items.push(item);
+		result._embedded.items.push( formattingItem(items[i], req, true) );
 	}
 
 	// Send response
@@ -152,7 +154,7 @@ exports.delete = function(req, res) {
  * List of Items
  */
 exports.list = function(req, res) {
-	Item.find().select('_id title name description price currency').sort('title').exec(function(err, items) {
+	Item.find().sort('title').exec(function(err, items) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
@@ -166,7 +168,7 @@ exports.list = function(req, res) {
  * Item middleware
  */
 exports.itemByID = function(req, res, next, id) {
-	Item.findById(id).populate('user', 'displayName').exec(function(err, item) {
+	Item.findById(id).exec(function(err, item) {
 		if (err) return next(err);
 		if (! item) return next(new Error('Failed to load Item ' + id));
 		req.item = item ;

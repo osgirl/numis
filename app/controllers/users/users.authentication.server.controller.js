@@ -40,9 +40,7 @@ exports.signup = function(req, res) {
 				if (err) {
 					res.status(400).send(err);
 				} else {
-					userProfileHandler.formattingUser({'user': user}, user, function(result) {
-						res.json(result);
-					});
+					res.json( userProfileHandler.formattingUser(user, req) );
 				}
 			});
 		}
@@ -65,9 +63,7 @@ exports.signin = function(req, res, next) {
 				if (err) {
 					res.status(400).send(err);
 				} else {
-					userProfileHandler.formattingUser({'user': user}, user, function(result) {
-						res.json(result);
-					});
+					res.json( userProfileHandler.formattingUser(user, req) );
 				}
 			});
 		}

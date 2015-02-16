@@ -7,6 +7,7 @@ var mongoose 	  = require('mongoose'),
 	slugPlugin	  = require('mongoose-url-slugs'),
 	filePluginLib = require('mongoose-file'),
 	filePlugin	  = filePluginLib.filePlugin,
+	l2rPlugin	  = require('mongoose-l2r'),
 	path		  = require('path'),
 	Schema = mongoose.Schema;
 
@@ -91,9 +92,15 @@ ItemSchema.path('currency.code').validate( function (value) {
 
 
 /**
-* Add plugins to Item schema.
-*/
+ * Add plugins to Item schema.
+ */
+// Slug plugin
 ItemSchema.plugin(slugPlugin('title', {field: 'name'}));
+
+// L2r plugin
+ItemSchema.plugin(l2rPlugin);
+
+
 
 
 var uploads_base = path.join(__dirname, '../../'),
