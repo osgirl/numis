@@ -14,16 +14,12 @@ angular.module('groupbuys').config(['$stateProvider',
 				templateUrl: 'modules/groupbuys/views/create-groupbuy.client.view.html'
 			}).
 			state('viewGroupbuy', {
-				url: '/groupbuys/:groupbuySlug',
+				url: '/groupbuys/:groupbuyId',
 				templateUrl: 'modules/groupbuys/views/view-groupbuy.client.view.html'
 			}).
 			state('manageGroupbuy', {
-				url: '/groupbuys/:groupbuySlug/manage',
+				url: '/groupbuys/:groupbuyId/manage',
 				templateUrl: 'modules/groupbuys/views/view-groupbuy.client.view.html'
-			}).
-			state('editGroupbuy', {
-				url: '/groupbuys/:groupbuySlug/edit',
-				templateUrl: 'modules/groupbuys/views/edit-groupbuy.client.view.html'
 			});
 	}
 ]);

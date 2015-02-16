@@ -7,6 +7,7 @@ var mongoose 	  = require('mongoose'),
 	slugPlugin	  = require('mongoose-url-slugs'),
 	filePluginLib = require('mongoose-file'),
 	filePlugin	  = filePluginLib.filePlugin,
+	l2rPlugin	  = require('mongoose-l2r'),
 	crypto	 	  = require('crypto'),
 	path		  = require('path'),
 	Schema 	 	  = mongoose.Schema;
@@ -92,7 +93,7 @@ var UserSchema = new Schema({
 			enum: ['user', 'premium', 'admin']
 		}],
 		default: ['user'],
-		select: false
+		select: true
 	},
 	updated: {
 		type: Date
@@ -116,9 +117,13 @@ var UserSchema = new Schema({
 /**
  * Add plugins to User schema.
  */
+// Slug plugin
 UserSchema.plugin(slugPlugin('username', {field: 'name'}));
 
+// L2r plugin
+UserSchema.plugin(l2rPlugin);
 
+// file plugin
 var uploads_base = path.join(__dirname, '../../'),
  	uploads 	 = path.join(uploads_base, 'uploads');
 
@@ -127,6 +132,7 @@ UserSchema.plugin(filePlugin, {
 	upload_to: filePluginLib.make_upload_to_model(uploads, 'avatars'),
 	relative_to: uploads_base
 });
+
 
 /**
  * Hook a pre save method to hash the password

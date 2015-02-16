@@ -12,125 +12,181 @@ var _ = require('lodash'),
 /**
  * Formatting user details to send
  */
-exports.formattingUser = function(req, res, next) {
-	var user 	= req.user,
-		isAdmin = (user && user.roles && user.roles.indexOf('admin') !== -1),
-		isMe    = (user && user._id.equals(res._id) ),
+var formattingUser = exports.formattingUser = function(user, req, reduce) {
+	var isAdmin = (req && req.user && typeof req.user.roles !== 'undefined' && req.user.roles.indexOf('admin') !== -1),
+		isMe    = (req && user && user._id.equals(req.user._id) ),
 		result  = {};
 
-	if (user && user._id && res && res._id) {
+	if (user && user._id) {
+		var selfURL = '/api/v1' + user.toLink(),
+			parentURL = selfURL.replace(/\/[a-f\d]{24}$/i, '');
+
 		// Prepare response in JSON+HAL format.
 		result = {
 			_links: {
-				self: {
-					href: '/api/v1/users/' + res._id
-				},
+				self: { href: selfURL },
+				collection: { href: parentURL, title: 'Users list' },
 				avatar: {
-					href: '/api/v1/users/' + res._id + '/avatar{?size}',
+					href: selfURL + '/avatar{?size}',
 					title: 'Avatar image',
 					templated: true
 				},
 
 				groupbuys: []
 			},
-			_id: res._id,
-			username: res.username,
-			name: res.name
+			_id: 	  user._id,
+			username: user.username,
+			name: 	  user.name
 		};
 
-		if (res.provider === 'local') {
-			result._links.password = { href: '/api/v1/users/password', title: 'Change password'};
-		}
+		if (!reduce) {
+			if (user.provider === 'local') {
+				result._links.password = { href: parentURL + '/password', title: 'Change own password'};
+			}
 
-		if (isAdmin || isMe) {
-			result.lastName 	= res.lastName;
-			result.firstName 	= res.firstName;
-			result.homeAddress	= res.homeAddress;
-			result.email 		= res.email;
-		}
-		if (isAdmin) {
-			result.provider = res.provider;
-			result.roles 	= res.roles;
+			if (isAdmin || isMe) {
+				result.lastName 	= user.lastName;
+				result.firstName 	= user.firstName;
+				result.homeAddress	= user.homeAddress;
+				result.email 		= user.email;
+			}
+			if (isAdmin) {
+				result.provider = user.provider;
+				result.roles 	= user.roles;
+			}
 		}
 	}
 
-	// Send response
-	next(result);
+	return result;
 };
 
 /**
-* Formatting user details to send
-*/
-exports.formattingUserList = function(req, res, next) {
-	var user 	= req.user,
-		isAdmin = (user && user.roles && user.roles.indexOf('admin') !== -1);
+ * Formatting user details to send
+ */
+var formattingUserList = exports.formattingUserList = function(users, req, reduce) {
+	var selfURL  = (req && req.url) ? req.url : '',
+		usersURL = '';
 
 	// Prepare response in JSON+HAL format.
 	var result = {
 		_links: {
-			self: {
-				href: '/api/v1/users/'
-			}
+			self: { href: selfURL }
 		},
 		_embedded: {
 			users: []
 		}
 	};
 
-	for (var i = 0; i < res.length; i++) {
-		result._embedded.users.push({
-			_links: {
-				self: {href: '/api/v1/users/' + res[i]._id},
-				avatar: {
-					href: '/api/v1/users/' + res[i]._id + '/avatar{?size}',
-					title: 'Avatar image',
-					templated: true
-				}
-			},
-			_id: res[i]._id,
-			username: res[i].username,
-			name: res[i].name
+	if (users || typeof users !== 'undefined') {
+		var isAdmin = (req && req.user && typeof req.user.roles !== 'undefined' && req.user.roles.indexOf('admin') !== -1);
 
-		});
+		if (users.length) {
+			usersURL = ('/api/v1' + users[0].toLink() ).replace(/\/[a-f\d]{24}$/i, '');
+		}
+
+		for (var i = 0; i < users.length; i++) {
+			result._embedded.users.push( formattingUser(users[i], req, true) );
+		}
 	}
 
-	// Send response
-	next(result);
+	return result;
+};
+
+
+/**
+ * Create a User
+ */
+exports.create = function(req, res) {
+	var user = new User(req.body);
+
+	user.save(function(err) {
+		if (err) {
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+		} else {
+			res.status(201).jsonp( formattingUser(user, req) );
+		}
+	});
+};
+
+/**
+ * Show the current User
+ */
+exports.read = function(req, res) {
+	res.jsonp( formattingUser(req.user, req) );
 };
 
 /**
  * Update user details
  */
-exports.update = function(req, res, next) {
-	if (req.params.id) {
-		// Init Variables
-		var validFields = ['username', 'lastName', 'firstName', 'homeAddress', 'email'],
-			user;
+exports.update = function(req, res) {
+	// Init Variables
+	var user = req.user;
 
-		user = User.findOne({
-			_id: req.params.id
-		}, '-password -salt').exec(function(err, user) {
-			if (err) return next(err);
+	// For security measurement we remove the roles from the req.body object
+	delete req.body.roles;
 
-			if (!user) return next(new Error('Failed to load User ' + req.params.id));
+	if (user) {
+    	// Merge existing user
+        user = _.extend(user, req.body);
+        user.updated = Date.now();
+        user.displayName = user.firstName + ' ' + user.lastName;
 
-			// Filter request data and removes invalid ones.
-			var reqKeys = Object.keys(req.body);
-			for (var i = 0, len = reqKeys.length; i < len; i++) {
-				if (validFields.indexOf(reqKeys[i]) === -1) {
-					delete req.body[reqKeys[i]];
-				}
+        user.save(function(err) {
+        	if (err) {
+				// Bad Request
+        		return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+        	} else {
+        		req.login(user, function(err) {
+        			if (err) {
+						// Bad Request
+						res.status(400).send( errorHandler.prepareErrorResponse (err) );
+        			} else {
+						// OK. No Content
+						res.status(204).end();
+        			}
+        		});
 			}
-
-			// Merge existing user data with new data
-			user = _.extend(user, req.body);
-			user.updated = Date.now();
-			user.displayName = user.firstName + ' ' + user.lastName;
-
-			next(user);
 		});
-
 	} else {
-		return next(new Error('Failed to load User '));
+		res.status(401).send({
+			name: 'NotLogged',
+			message: 'User is not logged in',
+		});
 	}
+};
+
+/**
+ * Delete an User
+ */
+exports.delete = function(req, res) {
+	var user = req.user;
+
+	user.remove(function(err) {
+		if (err) {
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+		} else {
+			res.status(204).end();
+		}
+	});
+};
+
+/**
+ * List of Users
+ */
+exports.list = function(req, res) {
+	User.find().select('_id username name provider roles').sort('username').exec(function(err, users) {
+		if (err) {
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+		} else {
+			res.jsonp( formattingUserList(users, req) );
+		}
+	});
+};
+
+
+/*
+ * Send User
+ */
+exports.me = function(req, res) {
+	res.jsonp( formattingUser(req.user, req) );
 };
