@@ -87,7 +87,7 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 			}, function(serverResponse) {
 				// TODO parse and show errors
-				console.log("Error sending data to server");
+				console.log('Error sending data to server');
 			});
 		}
 	};
@@ -186,7 +186,6 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 		} else {
 			return null;
 		}
-		var userId  = $scope.authentication.user._id;
 
 	//	return 'none';
     //	return 'member';
@@ -322,7 +321,7 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 			$location.path('groupbuys/' + $scope.groupbuy._id + '/manage');
 
 		}
-	}
+	};
 
 	// ----------------------
 
