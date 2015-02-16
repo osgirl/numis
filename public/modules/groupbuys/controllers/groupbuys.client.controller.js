@@ -94,6 +94,19 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 
 	// ----------------------
+
+	/**
+	* @ngdoc method
+	* @name groupbuys.controller:GroupbuysController.$scope.update
+	* @methodOf groupbuys.controller:GroupbuysController
+	*
+	* @description
+	* Update existing Groupbuy
+	*/
+	$scope.update = function() {
+		$scope.groupbuy.save();
+	};
+
 	// ----------------------
 
 	/**
