@@ -1,8 +1,8 @@
 'use strict';
 
 // Information tab controller
-angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys',
-  function($scope, $stateParams, $location, $translate, Authentication, Groupbuys) {
+angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope','Restangular', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys',
+  function($scope, Restangular, $stateParams, $location, $translate, Authentication, Groupbuys) {
     $scope.authentication = Authentication;
 
     $scope.newUpdate = '';
@@ -10,7 +10,7 @@ angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope', 
 
     /*
     @ngdoc method
-    * @name groupbuys.controller:GroupbuysTabInfoController.$addUpdate
+    * @name groupbuys.controller:GroupbuysTabInfoController.$scope.addUpdate
     * @methodOf groupbuys.controller:GroupbuysTabInfoController
 
     @description
@@ -19,14 +19,22 @@ angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope', 
     $scope.addUpdate = function() {
 
         if ($scope.newUpdate !== '' ) {
+
             var elementToAdd = {};
             elementToAdd.publishDate = Date.now();
             elementToAdd.textInfo = $scope.newUpdate;
 
+            // If it doesn't exist create it
+            if (typeof $scope.groupbuy.updates === 'undefined') {
+                $scope.groupbuy.updates = [];
+            }
+
             $scope.groupbuy.updates.push(elementToAdd);
 
             $scope.update();
-            $location.path('groupbuys/' + $scope.groupbuy.slug + '/manage');
+
+            $scope.newUpdate = ''; 
+            //$location.path('groupbuys/' + $scope.groupbuy.slug + '/manage');
         }
     };
 
