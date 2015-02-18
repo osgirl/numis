@@ -83,7 +83,7 @@ var GroupbuySchema = new Schema({
 		},
 		shipmentsState: {
 			type: String,
-			enum: ['private', 'restricted', 'public'],
+			enum: ['private', 'restricted'],
 			default: 'restricted'
 		}
 	},
