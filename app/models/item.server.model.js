@@ -9,7 +9,7 @@ var mongoose 	  = require('mongoose'),
 	filePlugin	  = filePluginLib.filePlugin,
 	l2rPlugin	  = require('mongoose-l2r'),
 	path		  = require('path'),
-	Schema = mongoose.Schema;
+	Schema        = mongoose.Schema;
 
 
 var getPrice = function (num) {
@@ -112,9 +112,7 @@ ItemSchema.plugin(slugPlugin('title', {field: 'name'}));
 // L2r plugin
 ItemSchema.plugin(l2rPlugin);
 
-
-
-
+// file plugin
 var uploads_base = path.join(__dirname, '../../'),
 	uploads 	 = path.join(uploads_base, 'uploads');
 
@@ -124,7 +122,17 @@ ItemSchema.plugin(filePlugin, {
 	relative_to: uploads_base
 });
 
+
+
 ItemSchema.set('toJSON', { getters: true, virtuals: false });
 ItemSchema.set('toObject', { getters: true, virtuals: false });
 
+
+// Compile a 'Item' model using the ItemSchema as the structure.
+// Mongoose also creates a MongoDB collection called 'items' for these documents.
+//
+// Notice that the 'Item' model is capitalized, this is because when a model is compiled,
+// the result is a constructor function that is used to create instances of the model.
+// The instances created from the model constructor are documents which will be persisted
+// by Mongo.
 mongoose.model('Item', ItemSchema);
