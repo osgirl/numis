@@ -18,16 +18,23 @@ var user, groupbuy, groupbuy2;
  */
 describe('Groupbuy Model Unit Tests:', function() {
 	beforeEach(function(done) {
+		// Remove old previous data
+		Groupbuy.remove().exec();
+		User.remove().exec();
+
 		user = new User({
 			firstName: 'Full',
 			lastName: 'Name',
 			displayName: 'Full Name',
 			email: 'test@test.com',
 			username: 'username',
-			password: 'password'
+			password: 'password',
+			provider: 'local'
 		});
 
-		user.save(function() {
+		user.save(function(err) {
+			if (err) console.error(err);
+
 			groupbuy = new Groupbuy({
 				title: 'Groupbuy Title',
 				description: 'Groupbuy Description',
@@ -62,26 +69,26 @@ describe('Groupbuy Model Unit Tests:', function() {
 		});
 
 		it('NU_T_G002_E003: should fail to save an existing groupbuy again', function(done) {
-			groupbuy.save();
-			return groupbuy.save(function(err) {
-				should.not.exist(err);
-				done();
+			groupbuy.save(function(err) {
+				if (err) console.error(err);
+
+				return groupbuy.save(function(err) {
+					should.not.exist(err);
+					done();
+				});
 			});
 		});
 
 		it('NU_T_G002_E004: should be able to save two groupbuys with similar title and same name (slug) beginning', function(done) {
-			groupbuy.save();
-			return groupbuy2.save(function(err) {
-				should.exist(err);
-				done();
+			groupbuy.save(function(err) {
+				if (err) console.error(err);
+
+				return groupbuy2.save(function(err) {
+					should.not.exist(err);
+					done();
+				});
 			});
 		});
 	});
 
-	afterEach(function(done) {
-		Groupbuy.remove().exec();
-		User.remove().exec();
-
-		done();
-	});
 });
