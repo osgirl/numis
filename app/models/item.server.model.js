@@ -92,6 +92,18 @@ ItemSchema.path('currency.code').validate( function (value) {
 
 
 /**
+ * Hook a pre save method to modify udpated date.
+ */
+ItemSchema.pre('save', function(next) {
+	if (this._id) {
+		this.updated = new Date();
+	}
+
+	next();
+});
+
+
+/**
  * Add plugins to Item schema.
  */
 // Slug plugin

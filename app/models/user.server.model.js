@@ -147,6 +147,17 @@ UserSchema.pre('save', function(next) {
 });
 
 /**
+* Hook a pre save method to modify udpated date.
+*/
+UserSchema.pre('save', function(next) {
+	if (this._id) {
+		this.updated = new Date();
+	}
+
+	next();
+});
+
+/**
  * Create instance method for hashing a password
  */
 UserSchema.methods.hashPassword = function(password) {
