@@ -3,9 +3,11 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose'),
-	crypto	 = require('crypto'),
-	Schema   = mongoose.Schema;
+var mongoose  = require('mongoose'),
+	crypto	  = require('crypto'),
+	l2rPlugin = require('mongoose-l2r'),
+	_         = require('lodash'),
+	Schema    = mongoose.Schema;
 
 
 
@@ -15,6 +17,51 @@ var getPrice = function (num) {
 
 var setPrice = function (num) {
 	return Math.round(num * 100);
+};
+
+/**
+ * Function to calculate subtotal and total prices of an order
+ */
+var calculatePrices = function(order) {
+	var subtotals = {},
+		summaryGrp;
+
+	if (order.summary && order.summary.length > 0) {
+		// Populate summary items
+		order.populate({path: 'summary.item', select: 'price currency', model: 'Item'}, function (err) {
+			if (err) {
+				if (callback && typeof(callback) === 'function') {
+					callback(err);
+				}
+			} else {
+				// Group item by currencies
+				summaryGrp = _.groupBy(order.summary, function (entry) {
+					return entry.item.currency.code;
+				});
+
+				// Calculate subtotal price in each currencies.
+				_.forEach(summaryGrp, function(elems, key) {
+					subtotals[key] = _.reduce(elems, function(sum, elem) {
+						return sum + elem.item.price * elem.quantity;
+					}, 0);
+				});
+
+				//console.log('Subtotals:', subtotals);
+
+// TODO: Change to support multiple currencies
+				order.subtotal = _.reduce(subtotals, function(sum, n) { return sum + n; });
+				order.total = order.subtotal + order.shippingCost + order.otherCosts;
+
+				//console.log('Subtotal:', order.subtotal, ' - total:', order.total);
+			}
+		});
+
+	} else {
+		order.subtotal = 0;
+		order.total = order.subtotal + order.shippingCost + order.otherCosts;
+
+		//console.log('Subtotal:', order.subtotal, ' - total:', order.total);
+	}
 };
 
 /**
@@ -38,8 +85,9 @@ var OrderSchema = new Schema({
 			required: 'You must select a groupbuy.'
 		},
 		items: [{
+			_id: false,
 			item: {
-				type: Schema.ObjectId,
+				type: Schema.Types.ObjectId,
 				ref: 'Item',
 				required: 'You must select a item.'
 			},
@@ -69,24 +117,28 @@ var OrderSchema = new Schema({
 	subtotal: {
 		type: Number,
 		min: [0, 'The subtotal price can not be negative.'],
+		default: 0,
         get: getPrice,
         set: setPrice
 	},
 	shippingCost: {
 		type: Number,
 		min: [0, 'The shipping cost can not be negative.'],
+		default: 0,
         get: getPrice,
         set: setPrice
 	},
 	otherCosts: {
 		type: Number,
 		min: [0, 'The other costs can not be negative.'],
+		default: 0,
         get: getPrice,
         set: setPrice
 	},
 	total: {
 		type: Number,
 		min: [0, 'The total price can not be negative.'],
+		default: 0,
         get: getPrice,
         set: setPrice
 	},
@@ -100,39 +152,25 @@ var OrderSchema = new Schema({
 });
 
 
-// TODO: Add validation to requests
-/*
-var many = [
-	{ validator: validator, msg: 'uh oh' }
-, { validator: anotherValidator, msg: 'failed' }
-]
-new Schema({ name: { type: String, validate: many }});
+/**
+ * Hook a pre save method to re-calculate summary and subtotal.
+ */
+OrderSchema.pre('save', function(next) {
+	if (this.summary && this.summary.length > 0) {
+		calculatePrices(this);
+	}
 
-----
-
-schema.path('name').validate(function (value, respond) {
-
-----
-
-toySchema.pre('validate', function (next) {
-	if (this.name != 'Woody') this.name = 'Woody';
 	next();
-})
-
-*/
-
+});
 
 /**
- * Hook a pre save method to update timestamp
+ * Hook a pre save method to modify udpated date.
  */
-OrderSchema.pre('save', function (next) {
-	var now = new Date();
-
-	if (!this.created) {
-		this.created = now;
-	} else {
-		this.updated = now;
+OrderSchema.pre('save', function(next) {
+	if (this._id) {
+		this.updated = new Date();
 	}
+
 	next();
 });
 
@@ -141,6 +179,8 @@ OrderSchema.pre('save', function (next) {
  * Create instance method for adding new request
  */
 OrderSchema.methods.addRequest = function(request, user, callback) {
+	var _this = this;
+
 	// Set the request date
 	request.requestDate = new Date();
 
@@ -154,38 +194,32 @@ OrderSchema.methods.addRequest = function(request, user, callback) {
 		this.requests = request;
 	}
 
-	// Re-calculate summary and subtotal
 	if (this.summary && this.summary.length > 0) {
-		this.calculateSummary();
-	}
-
-	// Do callback
-	if (typeof callback !== 'undefined') {
-		callback();
+		this.calculateSummary(callback);
+	} else {
+		this.save(callback);
 	}
 };
 
 /**
-* Create instance method for removing a request
-*/
+ * Create instance method for removing a request
+ */
 OrderSchema.methods.removeRequest = function(id, callback) {
+	var _this = this;
+
 	// Remove the request from requests list
 	this.requests.pull(id);
 
-	// Re-calculate summary and subtotal
 	if (this.summary && this.summary.length > 0) {
-		this.calculateSummary();
-	}
-
-	// Do callback
-	if (typeof callback !== 'undefined') {
-		callback();
+		this.calculateSummary(callback);
+	} else {
+		this.save(callback);
 	}
 };
 
 /**
-* Create instance method for calculate summary from requests
-*/
+ * Create instance method for calculate summary from requests
+ */
 OrderSchema.methods.calculateSummary = function(callback) {
 	var aItems = [],
 		_this = this,
@@ -210,20 +244,30 @@ OrderSchema.methods.calculateSummary = function(callback) {
 
 	// Fill calculated data in summary field
 	Object.keys(aItems).forEach( function(key) {
+		// Avoid negative quantities in summary.
+		if (this[key] < 0) {
+			this[key] = 0;
+		}
 		_this.summary.push( {item: key, quantity: this[key]} );
 	}, aItems);
 
-
-	// TODO: Calculate subtotal
-
-	// Do callback
-	if (typeof callback !== 'undefined') {
-		callback();
-	}
+	this.save(callback);
 };
 
+
+/**
+ * Add plugins to Item schema.
+ */
+// L2r plugin
+OrderSchema.plugin(l2rPlugin);
+
+
+OrderSchema.set('toJSON', { getters: true, virtuals: false });
+OrderSchema.set('toObject', { getters: true, virtuals: false });
+
+
 // Compile a 'Order' model using the OrderSchema as the structure.
-// Mongoose also creates a MongoDB collection called 'users' for these documents.
+// Mongoose also creates a MongoDB collection called 'orders' for these documents.
 //
 // Notice that the 'Order' model is capitalized, this is because when a model is compiled,
 // the result is a constructor function that is used to create instances of the model.

@@ -10,43 +10,69 @@ var mongoose = require('mongoose'),
 
 
 /**
-* Formatting order details to send
-*/
-var formattingOrder = function(order, req) {
-	var result = {};
+ * Formatting order details to send
+ */
+var formattingOrder = function(order, req, reduce) {
+	reduce = reduce || false;
+
+	var selfURL = '',
+		parentURL = '',
+		creatorURL = '',
+		groupbuyURL = '',
+		result = {};
 
 	if (order && order._id) {
-		// Duplicate object order
-		result = order.toJSON();
+		try {
+			selfURL     = order.toLink();
+			parentURL   = selfURL.replace(/\/[a-f\d]{24}$/i, '');
+		} catch (ex) {
+			console.trace(ex);
+		}
 
-console.log (result);
+		if(!reduce) {
+			try {
+				var rels = order.relationsToLink(['user', 'groupbuy']);
+
+				if (order.populated('user') !== undefined) {
+					creatorURL  = '/api/v1' + order.idToLink(order.user.id, 'User', [], {});
+				} else {
+					creatorURL  = '/api/v1' + rels.user;
+				}
+
+				if (order.populated('groupbuy') !== undefined) {
+					groupbuyURL  = '/api/v1' + order.idToLink(order.groupbuy.id, 'User', [], {});
+				} else {
+					groupbuyURL  = '/api/v1' + rels.groupbuy;
+				}
+			} catch (ex) {
+				console.trace(ex);
+			}
+		}
+
+		// Duplicate object order
+		result = order.toObject( {depopulate:true, getters: true} );
 
 		// Add links to response
-		if (req && req.url) {
-			var selfURL = req.method === 'GET' ? req.url : req.url + '/' + result._id;
-			result._links = {
-				self: { href: selfURL },
-				user: {
-					href: '/api/v1/users/' + order.user._id,
-					title: 'User creator'
-				},
-				groupbuy: {
-					href: '/api/v1/groupbuys/' + order.groupbuy,
-					title: 'Groupbuy to which belongs to'
-				}
-			};
+		result._links = {
+			self: { href: selfURL }
+		};
+		if(!reduce) {
+			result._links.user     = { href: creatorURL, title: 'User creator' };
+			result._links.groupbuy = { href: groupbuyURL, title: 'Groupbuy to which belongs to' };
 		}
 
 		// Remove fields
 		delete result.__v;
+		delete result.groupbuy;
+		delete result.user;
 	}
 
 	return result;
 };
 
 /**
-* Formatting orders list to send
-*/
+ * Formatting orders list to send
+ */
 var formattingOrderList = function(orders, req) {
 	var order;
 	var result = {
@@ -59,20 +85,7 @@ var formattingOrderList = function(orders, req) {
 	};
 
 	for (var i = 0; i < orders.length; i++) {
-		// Duplicate object order
-		order = orders[i].toJSON();
-
-		// Add relational links
-		order._links = {
-			self: { href: req.url + '/' + order._id },
-		};
-
-		// Remove internal fields
-		//delete order.user;
-		//delete order.groupbuy;
-
-		// Add order to array
-		result._embedded.orders.push(order);
+		result._embedded.orders.push( formattingOrder(orders[i], req, true) );
 	}
 
 	// Send response
@@ -81,7 +94,7 @@ var formattingOrderList = function(orders, req) {
 
 
 /**
- * Create a Order
+ * Create an Order
  */
 exports.create = function(req, res) {
 	var order = new Order(req.body);
@@ -104,20 +117,34 @@ exports.read = function(req, res) {
 };
 
 /**
- * Update a Order
+ * Update an Order
  */
 exports.update = function(req, res) {
-	var order = req.order ;
+	var order = req.order,
+		dirty = false;
 
-	order = _.extend(order , req.body);
+	// TODO: Only groupbuy managers can update a request costs
 
-	order.save(function(err) {
-		if (err) {
-			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
-		} else {
-			res.status(204).end();
-		}
-	});
+	if (req.body !== undefined && req.body.shippingCost !== undefined) {
+		order.shippingCost = req.body.shippingCost;
+		dirty = true;
+	}
+	if (req.body !== undefined && req.body.otherCosts !== undefined) {
+		order.otherCosts = req.body.otherCosts;
+		dirty = true;
+	}
+
+	if (dirty) {
+		order.save(function(err) {
+			if (err) {
+				return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+			} else {
+				res.status(204).end();
+			}
+		});
+	} else {
+		res.status(400).send({message: 'There is not valid fields to update'});
+	}
 };
 
 /**
@@ -152,6 +179,61 @@ exports.list = function(req, res) {
 		}
 	});
 };
+
+/**
+ * Adding a request to an Order
+ */
+exports.addRequest = function(req, res) {
+	var order   = req.order,
+		request = req.body,
+		user    = req.user;
+
+	// TODO: Only groupbuy managers or Order user can add requests
+
+	order.addRequest(request, user, function(err) {
+		if (err) {
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+		} else {
+			res.jsonp( formattingOrder(order, req) );
+		}
+	});
+};
+
+/**
+ * Removing a request from an Order
+ */
+exports.removeRequest = function(req, res) {
+	var order = req.order,
+		id    = req.body.id;
+
+	// TODO: Only platform admins can remove requests
+
+	order.removeRequest(id, function(err) {
+		if (err) {
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+		} else {
+			res.jsonp( formattingOrder(order, req) );
+		}
+	});
+};
+
+/**
+ * Removing a request from an Order
+ */
+exports.calculateSummary = function(req, res) {
+	var order = req.order;
+
+	// TODO: Only managers can invoke calculate Summary method
+
+	order.calculateSummary(function(err) {
+		if (err) {
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+		} else {
+			res.jsonp( formattingOrder(order, req) );
+		}
+	});
+};
+
 
 /**
  * Order middleware

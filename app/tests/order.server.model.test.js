@@ -20,13 +20,20 @@ var user, manager, groupbuy, order, item1, item2, item3;
  */
 describe('Order Model Unit Tests:', function() {
 	beforeEach(function(done) {
+		// Remove old previous data
+		Order.remove().exec();
+		Item.remove().exec();
+		Groupbuy.remove().exec();
+		User.remove().exec();
+
 		user = new User({
 			firstName: 'Full',
 			lastName: 'Name',
 			displayName: 'Full Name',
 			email: 'test@test.com',
 			username: 'username',
-			password: 'password'
+			password: 'password',
+			provider: 'local'
 		});
 
 		manager = new User({
@@ -34,7 +41,8 @@ describe('Order Model Unit Tests:', function() {
 			lastName: 'Doe',
 			email: 'jdoe@test.com',
 			username: 'jdoe',
-			password: 'password'
+			password: 'password',
+			provider: 'local'
 		});
 
 		groupbuy = new Groupbuy({
@@ -45,6 +53,7 @@ describe('Order Model Unit Tests:', function() {
 
 		item1 = new Item({
 			title: 'Item 1',
+			description: 'Description 1',
 			price: 22.34,
 			currency: {
 				code: 'EUR',
@@ -65,16 +74,27 @@ describe('Order Model Unit Tests:', function() {
 		// Create one Item to Groupbuy 2
 		item3 = new Item({
 			title: 'Item 3',
+			description: 'Description 3',
 			price: 650,
 			user: user,
 			groupbuy: groupbuy
 		});
 
-		user.save(function() {
-			groupbuy.save(function() {
-				item1.save(function() {
-					item2.save(function() {
-						item3.save(function() {
+		user.save(function(err) {
+			if (err) console.error(err);
+
+			groupbuy.save(function(err) {
+				if (err) console.error(err);
+
+				item1.save(function(err) {
+					if (err) console.error(err);
+
+					item2.save(function(err) {
+						if (err) console.error(err);
+
+						item3.save(function(err) {
+							if (err) console.error(err);
+
 							order = new Order({
 								groupbuy: groupbuy,
 								user: user
@@ -120,9 +140,7 @@ describe('Order Model Unit Tests:', function() {
 				items: [ {item: item1, quantity: 1} ]
 			};
 
-			order.addRequest (request);
-
-			return order.save(function(err) {
+			order.addRequest (request, null, function(err) {
 				should.not.exist(err);
 
 				(order.requests).should.be.an.Array.with.lengthOf(1);
@@ -143,9 +161,7 @@ describe('Order Model Unit Tests:', function() {
 				items: [ {item: item1, quantity: -1} ]
 			};
 
-			order.addRequest (request);
-
-			return order.save(function(err) {
+			order.addRequest (request, null, function(err) {
 				should.not.exist(err);
 
 				(order.requests).should.be.an.Array.with.lengthOf(1);
@@ -167,9 +183,7 @@ describe('Order Model Unit Tests:', function() {
 				]
 			};
 
-			order.addRequest (request);
-
-			return order.save(function(err) {
+			order.addRequest (request, null, function(err) {
 				should.not.exist(err);
 
 				(order.requests).should.be.an.Array.with.lengthOf(1);
@@ -214,14 +228,10 @@ describe('Order Model Unit Tests:', function() {
 			};
 
 			// Add request 1 and 2 to the order before save it.
-			order.addRequest (request1);
-			order.addRequest (request2);
-
-			// Register manager user.
-			return order.save(function(err) {
+			order.addRequest (request1, null, function(err) {
 				should.not.exist(err);
 
-				(order.requests).should.be.an.Array.with.lengthOf(2);
+				(order.requests).should.be.an.Array.with.lengthOf(1);
 
 				// Request 1
 				(order.requests[0]).should.have.properties('_id', 'user', 'requestDate', 'items');
@@ -232,33 +242,10 @@ describe('Order Model Unit Tests:', function() {
 				(order.requests[0].items[1].item).should.match(item2._id);
 				(order.requests[0].items[1].quantity).should.match(request1.items[1].quantity);
 
-				// Request 2
-				(order.requests[1]).should.have.properties('_id', 'user', 'requestDate', 'items');
-				(order.requests[1].user).should.match(user._id);
-				(order.requests[1].items).should.be.an.Array.with.lengthOf(3);
-				(order.requests[1].items[0].item).should.match(item1._id);
-				(order.requests[1].items[0].quantity).should.match(request2.items[0].quantity);
-				(order.requests[1].items[1].item).should.match(item2._id);
-				(order.requests[1].items[1].quantity).should.match(request2.items[1].quantity);
-				(order.requests[1].items[2].item).should.match(item3._id);
-				(order.requests[1].items[2].quantity).should.match(request2.items[2].quantity);
-
-				// Add request 3 after save the order
-				order.addRequest (request3);
-
-				order.save(function(err) {
+				order.addRequest (request2, null, function(err) {
 					should.not.exist(err);
 
-					(order.requests).should.be.an.Array.with.lengthOf(3);
-
-					// Request 1
-					(order.requests[0]).should.have.properties('_id', 'user', 'requestDate', 'items');
-					(order.requests[0].user).should.match(user._id);
-					(order.requests[0].items).should.be.an.Array.with.lengthOf(2);
-					(order.requests[0].items[0].item).should.match(item1._id);
-					(order.requests[0].items[0].quantity).should.match(request1.items[0].quantity);
-					(order.requests[0].items[1].item).should.match(item2._id);
-					(order.requests[0].items[1].quantity).should.match(request1.items[1].quantity);
+					(order.requests).should.be.an.Array.with.lengthOf(2);
 
 					// Request 2
 					(order.requests[1]).should.have.properties('_id', 'user', 'requestDate', 'items');
@@ -271,27 +258,51 @@ describe('Order Model Unit Tests:', function() {
 					(order.requests[1].items[2].item).should.match(item3._id);
 					(order.requests[1].items[2].quantity).should.match(request2.items[2].quantity);
 
-					// Request 3
-					(order.requests[2]).should.have.properties('_id', 'user', 'requestDate', 'items');
-					(order.requests[2].user).should.match(user._id);
-					(order.requests[2].items).should.be.an.Array.with.lengthOf(3);
-					(order.requests[2].items[0].item).should.match(item1._id);
-					(order.requests[2].items[0].quantity).should.match(request3.items[0].quantity);
-					(order.requests[2].items[1].item).should.match(item2._id);
-					(order.requests[2].items[1].quantity).should.match(request3.items[1].quantity);
-					(order.requests[2].items[2].item).should.match(item3._id);
-					(order.requests[2].items[2].quantity).should.match(request3.items[2].quantity);
+					// Add request 3 after save the order
+					order.addRequest (request3, null, function(err) {
+						should.not.exist(err);
 
-					done();
+						(order.requests).should.be.an.Array.with.lengthOf(3);
+
+						// Request 1
+						(order.requests[0]).should.have.properties('_id', 'user', 'requestDate', 'items');
+						(order.requests[0].user).should.match(user._id);
+						(order.requests[0].items).should.be.an.Array.with.lengthOf(2);
+						(order.requests[0].items[0].item).should.match(item1._id);
+						(order.requests[0].items[0].quantity).should.match(request1.items[0].quantity);
+						(order.requests[0].items[1].item).should.match(item2._id);
+						(order.requests[0].items[1].quantity).should.match(request1.items[1].quantity);
+
+						// Request 2
+						(order.requests[1]).should.have.properties('_id', 'user', 'requestDate', 'items');
+						(order.requests[1].user).should.match(user._id);
+						(order.requests[1].items).should.be.an.Array.with.lengthOf(3);
+						(order.requests[1].items[0].item).should.match(item1._id);
+						(order.requests[1].items[0].quantity).should.match(request2.items[0].quantity);
+						(order.requests[1].items[1].item).should.match(item2._id);
+						(order.requests[1].items[1].quantity).should.match(request2.items[1].quantity);
+						(order.requests[1].items[2].item).should.match(item3._id);
+						(order.requests[1].items[2].quantity).should.match(request2.items[2].quantity);
+
+						// Request 3
+						(order.requests[2]).should.have.properties('_id', 'user', 'requestDate', 'items');
+						(order.requests[2].user).should.match(user._id);
+						(order.requests[2].items).should.be.an.Array.with.lengthOf(3);
+						(order.requests[2].items[0].item).should.match(item1._id);
+						(order.requests[2].items[0].quantity).should.match(request3.items[0].quantity);
+						(order.requests[2].items[1].item).should.match(item2._id);
+						(order.requests[2].items[1].quantity).should.match(request3.items[1].quantity);
+						(order.requests[2].items[2].item).should.match(item3._id);
+						(order.requests[2].items[2].quantity).should.match(request3.items[2].quantity);
+
+						done();
+					});
 				});
 			});
 		});
 
 		it('8 - should be able to calculate summary with 0 requests without problems', function(done) {
-			order.calculateSummary();
-
-			// Register manager user.
-			return order.save(function(err) {
+			order.calculateSummary(function(err) {
 				should.not.exist(err);
 
 				(order).should.have.properties('_id', 'user', 'requests', 'summary');
@@ -311,18 +322,18 @@ describe('Order Model Unit Tests:', function() {
 			};
 
 			// Add request to the order and calculate summary.
-			order.addRequest (request);
-			order.calculateSummary();
-
-			// Register manager user.
-			return order.save(function(err) {
+			order.addRequest (request, null, function(err) {
 				should.not.exist(err);
 
-				(order).should.have.properties('_id', 'user', 'requests', 'summary');
-				(order.requests).should.be.an.Array.with.lengthOf(1);
-				(order.summary).should.be.an.Array.with.lengthOf(2);
+				order.calculateSummary(function(err) {
+					should.not.exist(err);
 
-				done();
+					(order).should.have.properties('_id', 'user', 'requests', 'summary');
+					(order.requests).should.be.an.Array.with.lengthOf(1);
+					(order.summary).should.be.an.Array.with.lengthOf(2);
+
+					done();
+				});
 			});
 		});
 
@@ -354,27 +365,31 @@ describe('Order Model Unit Tests:', function() {
 			};
 
 			// Add requests 1 and 2 and calculate summary
-			order.addRequest (request1);
-			order.addRequest (request2);
-			order.calculateSummary();
-
-			// Add request 3. The summary should be update automatically.
-			order.addRequest (request3);
-			//order.calculateSummary();
-
-			// Register manager user.
-			return order.save(function(err) {
+			order.addRequest (request1, null, function(err) {
 				should.not.exist(err);
 
-				(order).should.have.properties('_id', 'user', 'requests', 'summary');
-				(order.requests).should.be.an.Array.with.lengthOf(3);
-				(order.summary).should.be.an.Array.with.lengthOf(3);
+				order.addRequest (request2, null, function(err) {
+					should.not.exist(err);
 
-				(order.summary[0].quantity).should.match(2);
-				(order.summary[1].quantity).should.match(2);
-				(order.summary[2].quantity).should.match(2);
+					order.calculateSummary(function(err) {
+						should.not.exist(err);
 
-				done();
+						// Add request 3. The summary should be update automatically.
+						order.addRequest (request3, null, function(err) {
+							should.not.exist(err);
+
+							(order).should.have.properties('_id', 'user', 'requests', 'summary');
+							(order.requests).should.be.an.Array.with.lengthOf(3);
+							(order.summary).should.be.an.Array.with.lengthOf(3);
+
+							(order.summary[0].quantity).should.match(2);
+							(order.summary[1].quantity).should.match(2);
+							(order.summary[2].quantity).should.match(2);
+
+							done();
+						});
+					});
+				});
 			});
 		});
 
@@ -406,47 +421,58 @@ describe('Order Model Unit Tests:', function() {
 			};
 
 			// Add requests and calculate summary
-			order.addRequest (request1);
-			order.addRequest (request2);
-			order.addRequest (request3);
-			order.calculateSummary();
-
-			// Register manager user.
-			return order.save(function(err) {
+			order.addRequest (request1, null, function(err) {
 				should.not.exist(err);
 
-				(order).should.have.properties('_id', 'user', 'requests', 'summary');
-				(order.requests).should.be.an.Array.with.lengthOf(3);
-				(order.summary).should.be.an.Array.with.lengthOf(3);
+				order.addRequest (request2, null, function(err) {
+					should.not.exist(err);
 
-				(order.summary[0].quantity).should.match(2);
-				(order.summary[1].quantity).should.match(2);
-				(order.summary[2].quantity).should.match(2);
+					order.addRequest (request3, null, function(err) {
+						should.not.exist(err);
 
-				// Remove request 2
-				order.removeRequest (order.requests[1]._id);
-				// Remove request 3
-				order.removeRequest (order.requests[1]._id);
+						// Calculate summary
+						order.calculateSummary(function(err) {
+							should.not.exist(err);
 
-				order.save(function(err) {
-					(order.requests).should.be.an.Array.with.lengthOf(1);
-					(order.summary).should.be.an.Array.with.lengthOf(2);
+							(order).should.have.properties('_id', 'user', 'requests', 'summary');
+							(order.requests).should.be.an.Array.with.lengthOf(3);
+							(order.summary).should.be.an.Array.with.lengthOf(3);
 
-					(order.summary[0].quantity).should.match(1);
-					(order.summary[1].quantity).should.match(1);
+							(order.summary[0].quantity).should.match(2);
+							(order.summary[1].quantity).should.match(2);
+							(order.summary[2].quantity).should.match(2);
+							(order.subtotal).should.match( 2 * (item1.price + item2.price + item3.price) );
+							(order.total).should.match(order.subtotal);
 
-					done();
+							// Remove request 2
+							order.removeRequest (order.requests[1]._id, function(err) {
+								should.not.exist(err);
+
+								// Summary doesn't allow negative quantities.
+								(order.summary[0].quantity).should.match(0);
+								(order.summary[1].quantity).should.match(0);
+								(order.summary[2].quantity).should.match(0);
+								(order.subtotal).should.match(0);
+								(order.total).should.match(0);
+
+								// Remove request 3
+								order.removeRequest (order.requests[1]._id, function(err) {
+									(order.requests).should.be.an.Array.with.lengthOf(1);
+									(order.summary).should.be.an.Array.with.lengthOf(2);
+
+									(order.summary[0].quantity).should.match(1);
+									(order.summary[1].quantity).should.match(1);
+									(order.subtotal).should.match( item1.price + item2.price );
+									(order.total).should.match(order.subtotal);
+
+									done();
+								});
+							});
+						});
+					});
 				});
 			});
 		});
 	});
 
-	afterEach(function(done) {
-		Order.remove().exec();
-		Item.remove().exec();
-		Groupbuy.remove().exec();
-		User.remove().exec();
-
-		done();
-	});
 });
