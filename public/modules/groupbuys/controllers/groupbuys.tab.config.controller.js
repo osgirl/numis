@@ -17,12 +17,6 @@ angular.module('groupbuys').controller('GroupbuysTabConfigController', ['$scope'
     */
     $scope.loadConfig = function() {
 
-        // members: "public"
-        // itemsByMember: "restricted"
-
-        //
-        $scope.visibility = [];
-
         // members
         $scope.visibility.members_public = false;
         $scope.visibility.members_restricted = false;
