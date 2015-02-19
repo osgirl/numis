@@ -176,6 +176,11 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 		var role = 'none';
 		var manage = false;
 
+		// Not member users didn't receive other members list.
+		if ( typeof $scope.groupbuy.members === 'undefined' ) {
+			return 'none';
+		}
+
 		if ($scope.authentication && $scope.authentication.user) {
 			var userId  = $scope.authentication.user._id;
 			var fullUrl = $location.path().split('/');
