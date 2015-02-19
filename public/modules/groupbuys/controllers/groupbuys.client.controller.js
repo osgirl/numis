@@ -151,6 +151,9 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 			$scope.userRole = $scope.userRole();
 			$scope.loadTabs();
 
+			// Create the visibility options list
+			$scope.visibility = [];
+
 		}, function errorCallback() {
 			// TODO translate this key and don't use alert
 			alert('Error getting data from server');
