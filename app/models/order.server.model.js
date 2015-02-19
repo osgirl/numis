@@ -30,9 +30,8 @@ var calculatePrices = function(order) {
 		// Populate summary items
 		order.populate({path: 'summary.item', select: 'price currency', model: 'Item'}, function (err) {
 			if (err) {
-				if (callback && typeof(callback) === 'function') {
-					callback(err);
-				}
+				throw err;
+
 			} else {
 				// Group item by currencies
 				summaryGrp = _.groupBy(order.summary, function (entry) {
@@ -157,7 +156,11 @@ var OrderSchema = new Schema({
  */
 OrderSchema.pre('save', function(next) {
 	if (this.summary && this.summary.length > 0) {
-		calculatePrices(this);
+		try {
+			calculatePrices(this);
+		} catch (ex) {
+			return next(ex);
+		}
 	}
 
 	next();
