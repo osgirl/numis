@@ -33,12 +33,24 @@ angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope','
 
             $scope.update();
 
-            $scope.newUpdate = ''; 
+            $scope.newUpdate = '';
             //$location.path('groupbuys/' + $scope.groupbuy.slug + '/manage');
         }
     };
 
 
+    /*
+    @ngdoc method
+    * @name groupbuys.controller:GroupbuysTabInfoController.$scope.joinGroupbuy
+    * @methodOf groupbuys.controller:GroupbuysTabInfoController
+
+    @description
+    * Adds an member to the groupbuy.
+    */
+    $scope.joinGroupbuy = function() {
+        console.log ('UNIRSE A LA COMPRA');
+        //$location.path('groupbuys/' + $scope.groupbuy.slug + '/manage');
+    };
 
   }
 ]);
