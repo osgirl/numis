@@ -21,6 +21,7 @@
         "Add_Updates": "Añadir actualizaciones",
         "New_Update": "Nueva actualización",
         "Written_on": "Escrito el día",
+        "Join_this_groupbuy": "Unirse a esta compra",
         "Add_Manager": "Añadir gestor",
         "Search": "Buscar",
         "Filter": "Filtrar",
@@ -47,6 +48,7 @@
         "Do_Not_Show": "No mostrar",
         "Items_Requested_By_Members": "Items solicitados por los participantes",
         "Payments_Status": "Estado de los pagos",
-        "Shipments_Status": "Estado de los envios"
+        "Shipments_Status": "Estado de los envios",
+        "Information_Not_Available": "Información no disponible"
     }
 }

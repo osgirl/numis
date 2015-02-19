@@ -21,6 +21,7 @@
         "Add_Updates": "Add updates",
         "New_Update": "New update",
         "Written_on": "Written on",
+        "Join_this_groupbuy": "Join this groupbuy",
         "Add_Manager": "Add manager",
         "Search": "Search",
         "Filter": "Filter",
@@ -47,6 +48,7 @@
         "Do_Not_Show": "Do not show",
         "Items_Requested_By_Members": "Items requested by members",
         "Payments_Status": "Payments status",
-        "Shipments_Status": "Shipments status"
+        "Shipments_Status": "Shipments status",
+        "Information_Not_Available": "Information not available"
     }
 }
