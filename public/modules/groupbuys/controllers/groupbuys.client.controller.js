@@ -78,11 +78,13 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 			var newGroupbuy = {};
 			newGroupbuy.title = $scope.groupbuy.title;
 			newGroupbuy.description = $scope.groupbuy.description;
+			newGroupbuy.user = $scope.authentication.user._id;
 
 			Restangular.all('groupbuys').post(newGroupbuy).then(function(serverResponse) {
 
 			// Redirect after save
 			// TODO parse and get Id
+			$location.path('groupbuys');
 			//	$location.path('groupbuys/' + response._id + '/manage');
 
 			}, function(serverResponse) {
