@@ -166,12 +166,34 @@ exports.delete = function(req, res) {
  * List of Orders
  */
 exports.list = function(req, res) {
-	// TODO: sort by:
-	//			a) General: updated
-	//			b) User orders: updated
-	//			c) Groupbuy orders: User name
+	var query = {},
+		sort,
+		limit = req.param.limit || 25,
+		offset = req.param.offset || 0;
 
-	Order.find().sort('-created').populate('user', 'username').populate('groupbuy', 'title').exec(function(err, orders) {
+	if (!req.profile && !req.groupbuy && typeof req.profile === 'undefined' && typeof req.groupbuy === 'undefined') {
+		//  /orders -- Show all orders
+		// TODO: Admin profile required
+		sort = req.param.sort || '-updated';
+
+	} else if (req.profile && typeof req.profile !== 'undefined') {
+		//  /users/:userId/orders -- Show orders filtered by user
+		// TODO: Admin or itself
+		query = {user: req.profile};
+		sort  = req.param.sort || '-updated';
+
+	} else if (req.groupbuy && typeof req.groupbuy !== 'undefined') {
+		//  /groupbuys/:groupbuyId/orders -- Show orders filtered by groupbuy
+		// TODO: Admin or groupbuy manager
+		query = {groupbuy: req.groupbuy};
+		sort  = req.param.sort || 'user.username';
+
+	} else {
+		// Invalid
+		return res.status(400).send( {message: 'Unsupported request!'} );
+	}
+
+	Order.find(query).populate('user', 'username').populate('groupbuy', 'title').sort(sort).exec(function(err, orders) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {

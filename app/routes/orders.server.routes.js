@@ -5,6 +5,7 @@ module.exports = function(app) {
 		groupbuys = require('../../app/controllers/groupbuys.server.controller'),
 		orders    = require('../../app/controllers/orders.server.controller');
 
+
 	// Orders Routes
 	app.route('/api/v1/orders')
 		.get(users.requiresLogin, orders.list)
@@ -24,13 +25,13 @@ module.exports = function(app) {
 	app.route('/api/v1/orders/:orderId/calculate')
 		.post(users.requiresLogin, orders.hasAuthorization, orders.calculateSummary);
 
-/*
-	app.route('/api/v1/users/:userId/orders/')
-		.get(users.requiresLogin, orders.hasAuthorization, orders.list);
+	app.route('/api/v1/users/:userId/orders')
+		.get(users.requiresLogin, orders.list);
 
-	app.route('/api/v1/groupbuys/:groupbuyId/orders/')
-		.get(users.requiresLogin, orders.hasAuthorization, orders.list);
-*/
+	app.route('/api/v1/groupbuys/:groupbuyId/orders')
+		.get(users.requiresLogin, orders.list);
+
+
 	// Finish by binding the middlewares
 	app.param('orderId', orders.orderByID);
 	app.param('userId', users.userByID);

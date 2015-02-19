@@ -13,8 +13,8 @@ var should   = require('should'),
 /**
  * Globals
  */
-var credentialsA, credentials1, credentials2, credentials3, credentials4;
-var admin, manager1, manager2, member3, member4;
+var credentialsA, credentials1, credentials2, credentials3;
+var admin, manager1, manager2, member3;
 var groupbuy, order, item1, item2, item3;
 var request1, request2, request3;
 
@@ -49,11 +49,6 @@ describe('Order CRUD tests', function() {
 		credentials3 = {
 			username: 'member3',
 			password: 'password3'
-		};
-
-		credentials4 = {
-			username: 'member4',
-			password: 'password4'
 		};
 
 		// Create new users
@@ -94,15 +89,6 @@ describe('Order CRUD tests', function() {
 			email: 'member3@example.net',
 			username: credentials3.username,
 			password: credentials3.password,
-			provider: 'local'
-		});
-
-		member4 = new User({
-			firstName: 'Member',
-			lastName: '4',
-			email: 'member4@example.net',
-			username: credentials4.username,
-			password: credentials4.password,
 			provider: 'local'
 		});
 
@@ -177,28 +163,24 @@ describe('Order CRUD tests', function() {
 					member3.save(function(err) {
 						if (err) console.error(err);
 
-						member4.save(function(err) {
+						groupbuy.save(function(err) {
 							if (err) console.error(err);
 
-							groupbuy.save(function(err) {
+							item1.save(function(err) {
 								if (err) console.error(err);
 
-								item1.save(function(err) {
+								item2.save(function(err) {
 									if (err) console.error(err);
 
-									item2.save(function(err) {
+									item3.save(function(err) {
 										if (err) console.error(err);
 
-										item3.save(function(err) {
-											if (err) console.error(err);
-
-											order = new Order({
-												groupbuy: groupbuy,
-												user: manager1.id
-											});
-
-											done();
+										order = new Order({
+											groupbuy: groupbuy,
+											user: manager1.id
 										});
+
+										done();
 									});
 								});
 							});
@@ -355,7 +337,7 @@ describe('Order CRUD tests', function() {
 						(orderSaveRes.body._links.user.href).should.containEql(member3.id);
 
 						// Update Order user
-						order.user = member4.id;
+						order.user = member3.id;
 
 						// Update Order groupbuy
 						var groupbuy2 = new Groupbuy({
@@ -407,11 +389,8 @@ describe('Order CRUD tests', function() {
 	});
 
 	it('6 - should not be able to get a list of Orders if not signed in', function(done) {
-		// Create new Order model instance
-		var orderObj = new Order(order);
-
 		// Save the Order
-		orderObj.save(function() {
+		order.save(function() {
 			// Request Orders
 			request(app).get('/api/v1/orders')
 				.expect(401)
@@ -427,12 +406,9 @@ describe('Order CRUD tests', function() {
 	});
 
 	it('7 - should not be able to get a single Order if not signed in', function(done) {
-		// Create new Order model instance
-		var orderObj = new Order(order);
-
 		// Save the Order
-		orderObj.save(function() {
-			request(app).get('/api/v1/orders/' + orderObj._id)
+		order.save(function() {
+			request(app).get('/api/v1/orders/' + order._id)
 				.expect(401)
 				.end(function(req, res) {
 					// Set assertion
@@ -543,13 +519,10 @@ describe('Order CRUD tests', function() {
 		// Set Order user
 		order.user = member3;
 
-		// Create new Order model instance
-		var orderObj = new Order(order);
-
 		// Save the Order
-		orderObj.save(function() {
+		order.save(function() {
 			// Try deleting Order
-			request(app).delete('/api/v1/orders/' + orderObj._id)
+			request(app).delete('/api/v1/orders/' + order._id)
 				.expect(401)
 				.end(function(orderDeleteErr, orderDeleteRes) {
 					// Set message assertion
@@ -563,10 +536,8 @@ describe('Order CRUD tests', function() {
 	});
 
 	it('11 - should be able to add a request to an Order instance', function(done) {
-		var orderObj = new Order(order);
-
 		// Save the Order
-		orderObj.save(function() {
+		order.save(function() {
 			agent.post('/auth/signin')
 				.send(credentials1)
 				.expect(200)
@@ -575,7 +546,7 @@ describe('Order CRUD tests', function() {
 					if (signinErr) done(signinErr);
 
 					// Add a request
-					agent.post('/api/v1/orders/' + orderObj.id + '/add-request')
+					agent.post('/api/v1/orders/' + order.id + '/add-request')
 						.send(request1)
 						.expect(200)
 						.end(function(addRequestErr, addRequestRes) {
@@ -612,10 +583,8 @@ describe('Order CRUD tests', function() {
 	});
 
 	it('12 - should be able to add some requests to an Order instance and calculate summary and subtotal', function(done) {
-		var orderObj = new Order(order);
-
 		// Save the Order
-		orderObj.save(function(err) {
+		order.save(function(err) {
 			agent.post('/auth/signin')
 				.send(credentials1)
 				.expect(200)
@@ -624,7 +593,7 @@ describe('Order CRUD tests', function() {
 					if (signinErr) done(signinErr);
 
 					// Add the first request
-					agent.post('/api/v1/orders/' + orderObj.id + '/add-request')
+					agent.post('/api/v1/orders/' + order.id + '/add-request')
 						.send(request1)
 						.expect(200)
 						.end(function(addRequestErr, addRequestRes) {
@@ -632,7 +601,7 @@ describe('Order CRUD tests', function() {
 							if (addRequestErr) done(addRequestErr);
 
 							// Save a new Order
-							agent.post('/api/v1/orders/' + orderObj.id + '/add-request')
+							agent.post('/api/v1/orders/' + order.id + '/add-request')
 								.send(request2)
 								.expect(200)
 								.end(function(addRequestErr, addRequestRes) {
@@ -672,7 +641,7 @@ describe('Order CRUD tests', function() {
 									(order.requests[1].items[2].item).should.containEql(item3._id);
 									(order.requests[1].items[2].quantity).should.match(request2.items[2].quantity);
 
-									agent.post('/api/v1/orders/' + orderObj.id + '/calculate')
+									agent.post('/api/v1/orders/' + order.id + '/calculate')
 										.send(request2)
 										.expect(200)
 										.end(function(calculateSummaryErr, calculateSummaryRes) {
@@ -725,5 +694,296 @@ describe('Order CRUD tests', function() {
 				});
 		});
 	});
+
+	it('13 - should be able to list orders filtering by myself', function(done) {
+		var groupbuy2 = new Groupbuy({
+			title: 'Groupbuy #2',
+			description: '...',
+			user: manager2
+		});
+
+		var item4 = new Item({
+			title: 'Item 4',
+			description: 'Description 4',
+			price: 3.88,
+			currency: {
+				code: 'EUR',
+				symbol: '€'
+			},
+			user: manager2,
+			groupbuy: groupbuy2
+		});
+
+		var order2 = new Order({
+			groupbuy: groupbuy,
+			user: manager2.id
+		});
+
+		var order3 = new Order({
+			groupbuy: groupbuy2,
+			user: manager1.id
+		});
+
+		var order4 = new Order({
+			groupbuy: groupbuy,
+			user: member3.id
+		});
+
+		var request4 = {
+			items: [
+				{item: item2.id, quantity: 1}
+			]
+		};
+
+		var request5 = {
+			items: [
+				{item: item4.id, quantity: 1}
+			]
+		};
+
+		// Groupbuy1 have Items: 1, 2 & 3
+		// Order (1) is made by manager1 to groupbuy (1)
+
+		groupbuy2.save(function(err) {
+			if (err) console.error(err);
+
+			item4.save(function(err) {
+				if (err) console.error(err);
+
+				order.save(function(err) {
+					if (err) console.error(err);
+
+					order2.save(function(err) {
+						if (err) console.error(err);
+
+						order3.save(function(err) {
+							if (err) console.error(err);
+
+							order4.save(function(err) {
+								if (err) console.error(err);
+
+								order.addRequest (request1, null, function(err) {
+									if (err) console.error(err);
+
+									order2.addRequest (request2, null, function(err) {
+										if (err) console.error(err);
+
+										order3.addRequest (request5, null, function(err) {
+											if (err) console.error(err);
+
+											order4.addRequest (request4, null, function(err) {
+												if (err) console.error(err);
+
+												agent.post('/auth/signin')
+													.send(credentials1)
+													.expect(200)
+													.end(function(signinErr, signinRes) {
+														// Handle signin error
+														if (signinErr) done(signinErr);
+
+														agent.get('/api/v1/users/' + manager1.id + '/orders')
+															.expect(200)
+															.end(function(ordersGetErr, ordersGetRes) {
+																// Handle Order save error
+																if (ordersGetErr) done(ordersGetErr);
+
+																// Get Orders list
+																var orders = ordersGetRes.body._embedded.orders;
+
+																// Set assertions
+																orders.should.be.an.Array.with.lengthOf(2);
+
+																done();
+															});
+													});
+											});
+										});
+									});
+								});
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it('14 - should be able to list orders filtering by groupbuy that I manage', function(done) {
+		var groupbuy2 = new Groupbuy({
+			title: 'Groupbuy #2',
+			description: '...',
+			user: manager2
+		});
+
+		var item4 = new Item({
+			title: 'Item 4',
+			description: 'Description 4',
+			price: 3.88,
+			currency: {
+				code: 'EUR',
+				symbol: '€'
+			},
+			user: manager2,
+			groupbuy: groupbuy2
+		});
+
+		var order2 = new Order({
+			groupbuy: groupbuy,
+			user: manager2.id
+		});
+
+		var order3 = new Order({
+			groupbuy: groupbuy2,
+			user: manager1.id
+		});
+
+		var order4 = new Order({
+			groupbuy: groupbuy,
+			user: member3.id
+		});
+
+		var request4 = {
+			items: [
+				{item: item2.id, quantity: 1}
+			]
+		};
+
+		var request5 = {
+			items: [
+				{item: item4.id, quantity: 1}
+			]
+		};
+
+		// Groupbuy1 have Items: 1, 2 & 3
+		// Order (1) is made by manager1 to groupbuy (1)
+
+		groupbuy2.save(function(err) {
+			if (err) console.error(err);
+
+			item4.save(function(err) {
+				if (err) console.error(err);
+
+				order.save(function(err) {
+					if (err) console.error(err);
+
+					order2.save(function(err) {
+						if (err) console.error(err);
+
+						order3.save(function(err) {
+							if (err) console.error(err);
+
+							order4.save(function(err) {
+								if (err) console.error(err);
+
+								order.addRequest (request1, null, function(err) {
+									if (err) console.error(err);
+
+									order2.addRequest (request2, null, function(err) {
+										if (err) console.error(err);
+
+										order3.addRequest (request5, null, function(err) {
+											if (err) console.error(err);
+
+											order4.addRequest (request4, null, function(err) {
+												if (err) console.error(err);
+
+												agent.post('/auth/signin')
+													.send(credentials1)
+													.expect(200)
+													.end(function(signinErr, signinRes) {
+														// Handle signin error
+														if (signinErr) done(signinErr);
+
+														agent.get('/api/v1/groupbuys/' + groupbuy.id + '/orders')
+															.expect(200)
+															.end(function(ordersGetErr, ordersGetRes) {
+																// Handle Order save error
+																if (ordersGetErr) done(ordersGetErr);
+
+																// Get Orders list
+																var orders = ordersGetRes.body._embedded.orders;
+
+																// Set assertions
+																orders.should.be.an.Array.with.lengthOf(3);
+
+																done();
+															});
+													});
+											});
+										});
+									});
+								});
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
+	it.skip('15 - should not be able to list orders made by another user', function(done) {
+		// Groupbuy1 have Items: 1, 2 & 3
+		// Order (1) is made by manager1 to groupbuy (1)
+		order.save(function(err) {
+			if (err) console.error(err);
+
+			order.addRequest (request1, null, function(err) {
+				if (err) console.error(err);
+
+				agent.post('/auth/signin')
+					.send(credentials3)
+					.expect(200)
+					.end(function(signinErr, signinRes) {
+						// Handle signin error
+						if (signinErr) done(signinErr);
+
+						agent.get('/api/v1/users/' + manager1.id + '/orders')
+							.expect(403)
+							.end(function(ordersGetErr, ordersGetRes) {
+								console.log(ordersGetRes.body);
+								//(ordersGetRes.body.name).should.match('');
+
+								done(ordersGetErr);
+							});
+					});
+			});
+		});
+	});
+
+	it('16 - should be able to list orders made by another user if I am an admin', function(done) {
+		// Groupbuy1 have Items: 1, 2 & 3
+		// Order (1) is made by manager1 to groupbuy (1)
+		order.save(function(err) {
+			if (err) console.error(err);
+
+			order.addRequest (request1, null, function(err) {
+				if (err) console.error(err);
+
+				agent.post('/auth/signin')
+					.send(credentialsA)
+					.expect(200)
+					.end(function(signinErr, signinRes) {
+						// Handle signin error
+						if (signinErr) done(signinErr);
+
+						agent.get('/api/v1/users/' + manager1.id + '/orders')
+							.expect(200)
+							.end(function(ordersGetErr, ordersGetRes) {
+								// Handle Order save error
+								if (ordersGetErr) done(ordersGetErr);
+
+								// Get Orders list
+								var orders = ordersGetRes.body._embedded.orders;
+
+								// Set assertions
+								orders.should.be.an.Array.with.lengthOf(1);
+
+								done();
+							});
+					});
+			});
+		});
+	});
+
 
 });
