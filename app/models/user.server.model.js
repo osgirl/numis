@@ -115,32 +115,23 @@ var UserSchema = new Schema({
 
 
 /**
- * Add plugins to User schema.
- */
-// Slug plugin
-UserSchema.plugin(slugPlugin('username', {field: 'name'}));
-
-// L2r plugin
-UserSchema.plugin(l2rPlugin);
-
-// file plugin
-var uploads_base = path.join(__dirname, '../../'),
- 	uploads 	 = path.join(uploads_base, 'uploads');
-
-UserSchema.plugin(filePlugin, {
-	name: 'avatar',
-	upload_to: filePluginLib.make_upload_to_model(uploads, 'avatars'),
-	relative_to: uploads_base
-});
-
-
-/**
  * Hook a pre save method to hash the password
  */
 UserSchema.pre('save', function(next) {
 	if (this.password && this.password.length > 6) {
 		this.salt = new Buffer(crypto.randomBytes(16).toString('base64'), 'base64');
 		this.password = this.hashPassword(this.password);
+	}
+
+	next();
+});
+
+/**
+* Hook a pre save method to modify udpated date.
+*/
+UserSchema.pre('save', function(next) {
+	if (this._id) {
+		this.updated = new Date();
 	}
 
 	next();
@@ -185,6 +176,28 @@ UserSchema.statics.findUniqueUsername = function(username, suffix, callback) {
 		}
 	});
 };
+
+
+/**
+* Add plugins to User schema.
+*/
+// Slug plugin
+UserSchema.plugin(slugPlugin('username', {field: 'name'}));
+
+// L2r plugin
+UserSchema.plugin(l2rPlugin);
+
+// file plugin
+var uploads_base = path.join(__dirname, '../../'),
+	uploads 	 = path.join(uploads_base, 'uploads');
+
+UserSchema.plugin(filePlugin, {
+	name: 'avatar',
+	upload_to: filePluginLib.make_upload_to_model(uploads, 'avatars'),
+	relative_to: uploads_base
+});
+
+
 
 // Compile a 'User' model using the UserSchema as the structure.
 // Mongoose also creates a MongoDB collection called 'users' for these documents.

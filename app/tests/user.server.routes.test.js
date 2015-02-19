@@ -20,6 +20,9 @@ var credentials, user, user2;
  */
 describe('User CRUD tests', function() {
 	beforeEach(function(done) {
+		// Remove old previous data
+		User.remove().exec();
+
 		// Create user credentials
 		credentials = {
 			username: 'username',
@@ -38,21 +41,22 @@ describe('User CRUD tests', function() {
 			roles: ['admin']
 		});
 
-		// Remove old previous data
-		User.remove().exec();
-
 		// Save a user to the test db and create new User
-		user.save(done);
+		user.save(function(err) {
+			if (err) console.error(err);
+			
+			// Define another users
+			user2 = {
+				firstName: 'John',
+				lastName: 'Doe',
+				email: 'jdoe@example.net',
+				username: 'jdoe',
+				password: credentials.password,
+				provider: 'local'
+			};
 
-		// Define another users
-		user2 = {
-			firstName: 'John',
-			lastName: 'Doe',
-			email: 'jdoe@example.net',
-			username: 'jdoe',
-			password: credentials.password,
-			provider: 'local'
-		};
+			done();
+		});
 	});
 
 	it('NU_T_G111_E101: should be able to save User instance if logged in', function(done) {

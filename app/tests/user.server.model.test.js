@@ -17,6 +17,9 @@ var user, user2, user3;
  */
 describe('User Model Unit Tests:', function() {
 	before(function(done) {
+		// Remove old previous data
+		User.remove().exec();
+
 		user = new User({
 			firstName: 'Full',
 			lastName: 'Name',
@@ -26,6 +29,7 @@ describe('User Model Unit Tests:', function() {
 			password: 'password',
 			provider: 'local'
 		});
+
 		user2 = new User({
 			firstName: 'Full',
 			lastName: 'Name',
@@ -35,6 +39,7 @@ describe('User Model Unit Tests:', function() {
 			password: 'password',
 			provider: 'local'
 		});
+
 		user3 = new User({
 			firstName: 'John',
 			lastName: 'Doe',
@@ -44,9 +49,6 @@ describe('User Model Unit Tests:', function() {
 			provider: 'local',
 			homeAddress: 'Fake Street 123, 22150 Springfiled, Virginia USA'
 		});
-
-		// Remove old previous data
-		User.remove().exec();
 
 		done();
 	});
@@ -73,10 +75,11 @@ describe('User Model Unit Tests:', function() {
 		});
 
 		it('NU_T_G001_E004: should fail to save an existing user again', function(done) {
-			user.save();
-			return user2.save(function(err) {
-				should.exist(err);
-				done();
+			user.save(function(err) {
+				return user2.save(function(err) {
+					should.exist(err);
+					done();
+				});
 			});
 		});
 
@@ -89,8 +92,4 @@ describe('User Model Unit Tests:', function() {
 		});
 	});
 
-	after(function(done) {
-		User.remove().exec();
-		done();
-	});
 });

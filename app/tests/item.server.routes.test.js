@@ -19,6 +19,11 @@ var credentials, user1, groupbuy1, groupbuy2, item1, item2, item3;
  */
 describe('Item CRUD tests', function() {
 	beforeEach(function(done) {
+		// Remove old previous data
+		Item.remove().exec();
+		Groupbuy.remove().exec();
+		User.remove().exec();
+
 		// Create user credentials
 		credentials = {
 			username: 'username1',
@@ -46,11 +51,6 @@ describe('Item CRUD tests', function() {
 			description: 'Buscar información en <a href="https://www.google.es/">Google</a>',
 			user: user1
 		});
-
-		// Remove old previous data
-		Item.remove().exec();
-		Groupbuy.remove().exec();
-		User.remove().exec();
 
 		// Save a user and 2 groupbuys to the test db
 		user1.save(function() {

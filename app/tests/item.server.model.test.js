@@ -19,13 +19,19 @@ var user1, groupbuy1, groupbuy2, item1;
  */
 describe('Item Model Unit Tests:', function(done) {
 	beforeEach(function(done) {
+		// Remove old previous data
+		Item.remove().exec();
+		Groupbuy.remove().exec();
+		User.remove().exec();
+
 		user1 = new User({
 			firstName: 'Full',
 			lastName: 'Name',
 			displayName: 'Full Name',
 			email: 'test@test.com',
 			username: 'username',
-			password: 'password'
+			password: 'password',
+			provider: 'local'
 		});
 
 		groupbuy1 = new Groupbuy({
@@ -40,10 +46,15 @@ describe('Item Model Unit Tests:', function(done) {
 			user: user1
 		});
 
-		user1.save(function() {
-			groupbuy1.save(function() {
-				groupbuy2.save(function() {
-					
+		user1.save(function(err) {
+			if (err) console.error(err);
+
+			groupbuy1.save(function(err) {
+				if (err) console.error(err);
+
+				groupbuy2.save(function(err) {
+					if (err) console.error(err);
+
 					item1 = new Item({
 						title: 'Item Title',
 						description: 'Description',
@@ -64,14 +75,14 @@ describe('Item Model Unit Tests:', function(done) {
 	});
 
 	describe('Method Save', function() {
-		it('NU_P_G311_E001: should be able to save without problems', function(done) {
+		it('NU_P_G311_E001: should be able to save an Item without problems', function(done) {
 			return item1.save(function(err) {
 				should.not.exist(err);
 				done();
 			});
 		});
 
-		it('NU_P_G311_E002: should be able to show an error when try to save without name', function(done) {
+		it('NU_P_G311_E002: should be able to show an error when try to save an Item without name', function(done) {
 			item1.title = '';
 
 			return item1.save(function(err) {
@@ -80,7 +91,7 @@ describe('Item Model Unit Tests:', function(done) {
 			});
 		});
 
-        it('NU_P_G311_E003: should be able to show an error when try to save without user creator', function(done) {
+        it('NU_P_G311_E003: should be able to show an error when try to save an Item without user creator', function(done) {
             item1.user = undefined;
 
             return item1.save(function(err) {
@@ -89,7 +100,7 @@ describe('Item Model Unit Tests:', function(done) {
             });
         });
 
-        it('NU_P_G311_E004: should be able to show an error when try to save without Groupbuy', function(done) {
+        it('NU_P_G311_E004: should be able to show an error when try to save an Item without Groupbuy', function(done) {
             item1.groupbuy = undefined;
 
             return item1.save(function(err) {
@@ -98,7 +109,7 @@ describe('Item Model Unit Tests:', function(done) {
             });
         });
 
-        it('NU_P_G311_E005: should be able to show an error when try to save item with negative price', function(done) {
+        it('NU_P_G311_E005: should be able to show an error when try to save an Item item with negative price', function(done) {
             item1.price = -1;
 
             return item1.save(function(err) {
@@ -107,7 +118,7 @@ describe('Item Model Unit Tests:', function(done) {
             });
         });
 
-        it('NU_P_G311_E006: should be able to save item with floating price with 2 decimal places', function(done) {
+        it('NU_P_G311_E006: should be able to save an item with floating price with 2 decimal places', function(done) {
             item1.price = 4.56;
 
             return item1.save(function(err) {
@@ -119,7 +130,7 @@ describe('Item Model Unit Tests:', function(done) {
             });
         });
 
-        it('NU_P_G311_E007: should be able to save item with floating price with more than 2 decimal places', function(done) {
+        it('NU_P_G311_E007: should be able to save an item with floating price with more than 2 decimal places', function(done) {
             item1.price = 4.567890;
 
             return item1.save(function(err) {
@@ -131,7 +142,7 @@ describe('Item Model Unit Tests:', function(done) {
             });
         });
 
-        it('NU_P_G311_E008: should be able to save item with USD currency with spaces before and after it', function(done) {
+        it('NU_P_G311_E008: should be able to save an item with USD currency with spaces before and after it', function(done) {
             item1.currency = {
                 code: '  USD ',
                 symbol: '$'
@@ -147,7 +158,7 @@ describe('Item Model Unit Tests:', function(done) {
             });
         });
 
-        it('NU_P_G311_E009: should be able to show an error when try to save item with less 3-characters currency code', function(done) {
+        it('NU_P_G311_E009: should be able to show an error when try to save an Item with less 3-characters currency code', function(done) {
             item1.currency = {
                 code: 'US',
                 symbol: '$'
@@ -163,7 +174,7 @@ describe('Item Model Unit Tests:', function(done) {
             });
         });
 
-        it('NU_P_G311_E010: should be able to show an error when try to save item with more 3-characters currency code', function(done) {
+        it('NU_P_G311_E010: should be able to show an error when try to save an Item with more 3-characters currency code', function(done) {
             item1.currency = {
                 code: 'USDollar',
                 symbol: '$'
@@ -181,11 +192,4 @@ describe('Item Model Unit Tests:', function(done) {
 
 	});
 
-	afterEach(function(done) {
-		Item.remove().exec();
-		Groupbuy.remove().exec();
-		User.remove().exec();
-
-		done();
-	});
 });

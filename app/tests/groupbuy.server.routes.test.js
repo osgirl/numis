@@ -20,6 +20,10 @@ var credentials, user, groupbuy;
  */
 describe('Groupbuy CRUD tests', function() {
 	beforeEach(function(done) {
+		// Remove old previous data
+		Groupbuy.remove().exec();
+		User.remove().exec();
+
 		// Create user credentials
 		credentials = {
 			username: 'username',
@@ -36,10 +40,6 @@ describe('Groupbuy CRUD tests', function() {
 			password: credentials.password,
 			provider: 'local'
 		});
-
-		// Remove old previous data
-		Groupbuy.remove().exec();
-		User.remove().exec();
 
 		// Save a user to the test db and create new Groupbuy
 		user.save(function() {
