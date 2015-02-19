@@ -1,7 +1,7 @@
 'use strict';
 
 
-var errorTypes = ['ValidationError', 'DuplicateError', 'UnexpectedError'];
+var errorTypes = ['ValidationError', 'DuplicateError', 'UnexpectedError', 'NotLogged', 'NotAuthorized'];
 
 /**
  * Get unique error field name
