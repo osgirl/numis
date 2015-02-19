@@ -1,5 +1,40 @@
 <section data-ng-controller="GroupbuysTabBuyersController">
-<p>
-  PESTAÑA DE LOS PARTICIPANTES
-</p>
+    <section data-ng-controller="GroupbuysTabConfigController" data-ng-init="loadMembersData()">
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+
+                <!-- Panel de miembros -->
+                <div class="panel panel-default">
+
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{'groupbuys.Buyers' | translate}}:</h3>
+                    </div>
+
+                    <!-- Visibilidad NO permitida -->
+                    <div class="panel-body" data-ng-hide="visibility.show_members_list">
+                        <div>
+                            {{'groupbuys.Information_Not_Available' | translate}}.
+                        </div>
+                    </div>
+                    <!-- FIN Visibilidad NO permitida -->
+
+                    <!-- Visibilidad permitida -->
+                    <div class="panel-body" data-ng-show="visibility.show_members_list">
+                        <div>
+                            <div data-ng-repeat="member in groupbuy.members_extended_data track by $index">
+                                <img ng-src="{{member.avatar}}" /> <span>{{member.username}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FIN Visibilidad permitida -->
+
+                </div>
+                <!-- FIN Panel de miembros -->
+
+            </div>
+        </div>
+        <!--  FIN Panel de la pestaña -->
+    </section>
+
 </section>
