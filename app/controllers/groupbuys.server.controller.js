@@ -286,7 +286,7 @@ exports.getMembersList = function(req, res) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.jsonp( users.formattingUserList(groupbuy.members, req) );
+			res.jsonp( users.formattingUserList(groupbuy.members, req, 'members') );
 		}
 	});
 };
@@ -387,7 +387,7 @@ exports.getManagersList = function(req, res) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.jsonp( users.formattingUserList(groupbuy.managers, req) );
+			res.jsonp( users.formattingUserList(groupbuy.managers, req, 'managers') );
 		}
 	});
 };

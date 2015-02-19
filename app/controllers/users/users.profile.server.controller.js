@@ -63,7 +63,7 @@ var formattingUser = exports.formattingUser = function(user, req, reduce) {
 /**
  * Formatting user details to send
  */
-var formattingUserList = exports.formattingUserList = function(users, req, reduce) {
+var formattingUserList = exports.formattingUserList = function(users, req, collectionName) {
 	var selfURL  = (req && req.url) ? req.url : '',
 		usersURL = '';
 
@@ -87,6 +87,12 @@ var formattingUserList = exports.formattingUserList = function(users, req, reduc
 		for (var i = 0; i < users.length; i++) {
 			result._embedded.users.push( formattingUser(users[i], req, true) );
 		}
+	}
+
+	// Rename embedded collection
+	if (collectionName && typeof collectionName !== 'undefined' && collectionName !== 'users') {
+		result._embedded[collectionName] = result._embedded.users;
+		delete result._embedded.users;
 	}
 
 	return result;
@@ -128,7 +134,7 @@ exports.update = function(req, res) {
 	if (user) {
     	// Merge existing user
         user = _.extend(user, req.body);
-        //user.updated = Date.now();	// It'll be done in pre-save hook. 
+        //user.updated = Date.now();	// It'll be done in pre-save hook.
         user.displayName = user.firstName + ' ' + user.lastName;
 
         user.save(function(err) {
