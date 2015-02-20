@@ -49,6 +49,7 @@
     "method-override": "~2.3.0",
     "mongoose": "~3.8.20",
     "mongoose-file": "git+https://github.com/lbacas/mongoose-file.git",
+    "mongoose-l2r": "^0.1.2",
     "mongoose-url-slugs": "^0.1.0",
     "mongoose-l2r": "^0.1.2",
     "morgan": "~1.5.0",

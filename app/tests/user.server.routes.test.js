@@ -38,13 +38,13 @@ describe('User CRUD tests', function() {
 			username: credentials.username,
 			password: credentials.password,
 			provider: 'local',
-			roles: ['admin']
+			roles: ['user', 'admin']
 		});
 
 		// Save a user to the test db and create new User
 		user.save(function(err) {
 			if (err) console.error(err);
-			
+
 			// Define another users
 			user2 = {
 				firstName: 'John',
@@ -77,7 +77,7 @@ describe('User CRUD tests', function() {
 						if (userSaveErr) done(userSaveErr);
 
 						// Get a list of Users
-						agent.get('/api/v1/users?sortField=username')
+						agent.get('/api/v1/users')
 							.expect(200)
 							.end(function(usersGetErr, usersGetRes) {
 								// Handle User save error

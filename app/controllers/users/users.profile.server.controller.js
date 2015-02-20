@@ -41,7 +41,7 @@ var formattingUser = exports.formattingUser = function(user, req, reduce) {
 
 		if (!reduce) {
 			if (user.provider === 'local') {
-				result._links.password = { href: parentURL + '/password', title: 'Change own password'};
+				result._links.password = { href: parentURL + '/password', title: 'Change my own password'};
 			}
 
 			if (isAdmin || isMe) {

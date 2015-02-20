@@ -11,18 +11,6 @@ var mongoose 	 = require('mongoose'),
 	_ 			 = require('lodash');
 
 
-var checkVisibility = function(groupbuy, property, isAdmin, isMember, isManager) {
-	if (isAdmin)
-		return true;
-
-		return (groupbuy.visibility[property] === 'public' || 
-				groupbuy.visibility[property] === 'restricted' && isMember || 
-				groupbuy.visibility[property] === 'private' && isManager
-			   );
-	};
-
-
-
 /**
  * Formatting groupbuy details to send
  */
@@ -30,14 +18,14 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, re
 	reduce = reduce || false;
 
 	var user 	  	 = req.user,
-		isAdmin   	 = (user && user.roles && user.roles.indexOf('admin') !== -1),
-		isMember  	 = (isAdmin || (groupbuy.members && groupbuy.members.indexOf(user._id) !== -1) ),
-		isManager 	 = (isAdmin || (groupbuy.managers && groupbuy.managers.indexOf(user._id) !== -1) ),
+		isAdmin   	 = user.isAdmin(),
+		isMember  	 = (isAdmin || groupbuy.isMember(user._id) ),
+		isManager 	 = (isAdmin || groupbuy.isManager(user._id) ),
 		showUpdates  = !reduce && isMember,
-		showMembers  = !reduce && checkVisibility(groupbuy, 'members', isAdmin, isMember, isManager),
-		showManagers = !reduce && checkVisibility(groupbuy, 'managers', isAdmin, isMember, isManager),
-		showItems 	 = !reduce && checkVisibility(groupbuy, 'items', isAdmin, isMember, isManager),
 		showVisibilityInfo = !reduce && isManager,
+		showMembers  = !reduce && groupbuy.checkVisibility(user, 'members'),
+		showManagers = !reduce && groupbuy.checkVisibility(user, 'managers'),
+		showItems 	 = !reduce && groupbuy.checkVisibility(user, 'items'),
 		result 	  	 = {},
 		i;
 
@@ -86,16 +74,16 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, re
 
 		if (showItems) {
 			result._embedded = {items: []};
-/*
-TODO
-			for (i = 0; i < groupbuy.items.length; i++) {
-				result._embedded.items.push({
-					href:  selfURL + '/items/' + groupbuy.items[i]._id,
-					title: groupbuy.items[i].title,
-					name:  groupbuy.items[i].name
-				});
-			}
-*/
+	/*
+	TODO
+				for (i = 0; i < groupbuy.items.length; i++) {
+					result._embedded.items.push({
+						href:  selfURL + '/items/' + groupbuy.items[i]._id,
+						title: groupbuy.items[i].title,
+						name:  groupbuy.items[i].name
+					});
+				}
+	*/
 		}
 	}
 
@@ -136,11 +124,9 @@ exports.create = function(req, res) {
 	var groupbuy = new Groupbuy(req.body);
 	// Set user creator
 	groupbuy.user = req.user;
-	// Add user creator as manager and member
-	groupbuy.members  = [ groupbuy.user ];
-	groupbuy.managers = [ groupbuy.user ];
 
-	groupbuy.save(function(err) {
+	// Add user creator as manager and member
+	groupbuy.addManager(groupbuy.user, function(err) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
@@ -203,50 +189,34 @@ exports.list = function(req, res) {
 };
 
 /**
-* Add a member to an existing groupbuy
-*/
+ * Add a member to an existing groupbuy
+ */
 exports.addMember = function(req, res) {
 	var groupbuy = req.groupbuy,
 		userId 	 = (req.body && req.body.userId && mongoose.Types.ObjectId.isValid(req.body.userId)) ? req.body.userId : undefined,
 		err      = null;
 
-	// TODO !! ñapa
-	//
-	// TODO: Esto no queda nada bonito aquí.
-	// Check user is a valid user
 	User.findById(userId, function(err, user) {
 		if (!err && !user) {
 			err = {message: 'You can not add the user as member. The user ID (' + userId + ') is not a valid.'};
 		} else {
-			// Check if user is a member yet
-			if (groupbuy.members.indexOf(userId) === -1) {
-				groupbuy.members.push(userId);
-
-				groupbuy.save(function(err) {
-					if (err) {
-						return res.status(400).send({
-							message: errorHandler.getErrorMessage(err)
-						});
-					} else {
-						res.set('Content-Type', 'application/vnd.hal+json');
-						res.jsonp(groupbuy);
-					}
-				});
-			} else {
-				err = {message: 'You can not add the user to this Groupbuy. The user is already member.'};
-			}
+			groupbuy.addMember(userId, function(err) {
+				if (err) {
+					return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
+				} else {
+					res.status(204).end();
+				}
+			});
 		}
 		if (err) {
-			return res.status(400).send({
-				message: errorHandler.getErrorMessage(err)
-			});
+			return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
 		}
 	});
 };
 
 /**
-* Remove a member from an existing groupbuy
-*/
+ * Remove a member from an existing groupbuy
+ */
 exports.deleteMember = function(req, res) {
 	var groupbuy = req.groupbuy,
 		member   = req.profile,
@@ -299,41 +269,20 @@ exports.addManager = function(req, res) {
 		userId 	 = (req.body && req.body.userId && mongoose.Types.ObjectId.isValid(req.body.userId)) ? req.body.userId : undefined,
 		err      = null;
 
-	// TODO !! ñapa
-	//
-	// TODO: Esto no queda nada bonito aquí.
-	// Check user is a valid user
 	User.findById(userId, function(err, user) {
 		if (!err && !user) {
 			err = {message: 'You can not add the user as manager. The user ID (' + userId + ') is not a valid.'};
 		} else {
-			// Check if user is a manager yet
-			if (groupbuy.managers.indexOf(userId) === -1) {
-				groupbuy.managers.push(userId);
-
-				// Add manager as member of Groupbuy.
-				if (groupbuy.members.indexOf(userId) === -1) {
-					groupbuy.members.push(userId);
+			groupbuy.addManager(userId, function(err) {
+				if (err) {
+					return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
+				} else {
+					res.status(204).end();
 				}
-
-				groupbuy.save(function(err) {
-					if (err) {
-						return res.status(400).send({
-							message: errorHandler.getErrorMessage(err)
-						});
-					} else {
-						res.set('Content-Type', 'application/vnd.hal+json');
-						res.jsonp(groupbuy);
-					}
-				});
-			} else {
-				err = {message: 'You can not add the user as manager in this Groupbuy. The user is already manager.'};
-			}
+			});
 		}
 		if (err) {
-			return res.status(400).send({
-				message: errorHandler.getErrorMessage(err)
-			});
+			return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
 		}
 	});
 
@@ -405,12 +354,41 @@ exports.groupbuyByID = function(req, res, next, id) {
 	});
 };
 
+
 /**
- * Groupbuy authorization middleware
+ * Groupbuy authorization middleware by roles
  */
-exports.hasAuthorization = function(req, res, next) {
-	if (req.groupbuy.user.id !== req.user.id) {
-		return res.status(403).send('User is not authorized');
-	}
-	next();
+exports.hasAuthorization = function(roles) {
+	return function(req, res, next) {
+		return next();
+
+	/*
+console.log(req.groupbuy);
+
+		if (_.intersection(req.groupbuy.getRoles(req.user), roles).length) {
+			return next();
+		} else {
+			return res.status(403).send({
+				name: 'NotAuthorized',
+				message: 'User is not authorized'
+			});
+		}
+		*/
+	};
+};
+
+/**
+ * Groupbuy authorization middleware by visibility configuration
+ */
+exports.hasVisibility = function(property) {
+	return function(req, res, next) {
+		if (req.groupbuy.checkVisibility(req.user, property) ) {
+			return next();
+		} else {
+			return res.status(403).send({
+				name: 'NotAuthorized',
+				message: 'User is not authorized'
+			});
+		}
+	};
 };

@@ -172,7 +172,7 @@ module.exports = function(db) {
 		if (!err) return next();
 
 		// Log it
-		console.error(err.stack);
+		console.trace(err.stack);
 
 		// Error page
 		res.status(500).render('500', {

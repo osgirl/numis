@@ -102,6 +102,78 @@ var GroupbuySchema = new Schema({
 
 
 /**
+ * Instance method for adding an user as a member
+ */
+GroupbuySchema.methods.addMember = function(userId, callback) {
+	if (!this.isMember(userId) ) {
+		this.members.push(userId);
+
+		this.save(callback);
+	}
+};
+
+/**
+ * Instance method for adding an user as a manager
+ */
+GroupbuySchema.methods.addManager = function(userId, callback) {
+	if (!this.isManager(userId) ) {
+		this.managers.push(userId);
+
+		if (!this.isMember(userId) ) {
+			this.members.push(userId);
+		}
+
+		this.save(callback);
+	}
+};
+
+/**
+ * Instance method for check if an user is member
+ */
+GroupbuySchema.methods.isMember = function(userId) {
+	return (this.members && typeof this.members !== 'undefined' && this.members.indexOf(userId) !== -1);
+};
+
+
+/**
+ * Instance method for check if an user is manager
+ */
+GroupbuySchema.methods.isManager = function(userId) {
+	return (this.managers && typeof this.managers !== 'undefined' && this.managers.indexOf(userId) !== -1);
+};
+
+
+/**
+ * Instance method for get user roles in the groupbuy
+ */
+GroupbuySchema.methods.getRoles = function(user) {
+	var roles = [];
+
+	if (user.isAdmin() || this.isManager(user.id) ) {
+		roles = ['manager', 'member'];
+	} else if (this.isMember(user.id) ) {
+		roles = ['member'];
+	}
+
+	return roles;
+};
+
+/**
+ * Instance method for check permissions on the groupbuy
+ */
+GroupbuySchema.methods.checkVisibility = function(user, property) {
+	if (user.isAdmin()) {
+		return true;
+	} else {
+		return (this.visibility[property] === 'public' || 
+				this.visibility[property] === 'restricted' && this.isMember(user.id) || 
+				this.visibility[property] === 'private' && this.isManager(user.id)
+		);
+	}
+};
+
+
+/**
  * Add plugins to Groupbuy schema.
  */
 // Slug plugin
@@ -123,4 +195,11 @@ GroupbuySchema.pre('save', function(next) {
 });
 
 
+// Compile a 'Groupbuy' model using the GroupbuySchema as the structure.
+// Mongoose also creates a MongoDB collection called 'groupbuys' for these documents.
+//
+// Notice that the 'Groupbuy' model is capitalized, this is because when a model is compiled,
+// the result is a constructor function that is used to create instances of the model.
+// The instances created from the model constructor are documents which will be persisted
+// by Mongo.
 mongoose.model('Groupbuy', GroupbuySchema);

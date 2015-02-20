@@ -38,12 +38,16 @@ describe('Groupbuy Model Unit Tests:', function() {
 			groupbuy = new Groupbuy({
 				title: 'Groupbuy Title',
 				description: 'Groupbuy Description',
+				manager: [user],
+				member: [user],
 				user: user
 			});
 
 			groupbuy2 = new Groupbuy({
 				title: 'Groupbuy-Title',
 				description: 'Groupbuy Description',
+				manager: [user],
+				member: [user],
 				user: user
 			});
 

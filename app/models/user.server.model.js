@@ -177,6 +177,13 @@ UserSchema.statics.findUniqueUsername = function(username, suffix, callback) {
 	});
 };
 
+/**
+ * Create instance method for check if an user is platform admin
+ */
+UserSchema.methods.isAdmin = function() {
+	return (this.roles.indexOf('admin') !== -1);
+};
+
 
 /**
 * Add plugins to User schema.
