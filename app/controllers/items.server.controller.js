@@ -10,7 +10,7 @@ var mongoose = require('mongoose'),
 
 
 /**
- * Formatting groupbuy details to send
+ * Formatting item details to send
  */
 var formattingItem = exports.formattingItem = function(item, req, reduce) {
 	reduce = reduce || false;
@@ -71,7 +71,7 @@ var formattingItem = exports.formattingItem = function(item, req, reduce) {
 };
 
 /**
- * Formatting groupbuy details to send
+ * Formatting items list to send
  */
 var formattingItemList = exports.formattingItemList = function(items, req) {
 	var item;
@@ -101,7 +101,7 @@ exports.create = function(req, res) {
 
 	item.user = req.user;
 
-	item.save(function(err, item) {
+	item.save(function(err) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {

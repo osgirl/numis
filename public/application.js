@@ -54,7 +54,7 @@ angular.module(ApplicationConfiguration.applicationModuleName).config(['Restangu
 		RestangularProvider.setBaseUrl('http://localhost:3000/api/v1/');
 
 		RestangularProvider.setDefaultHeaders(
-			{ "Content-Type": "application/json" }
+			{ 'Content-Type': 'application/json' }
 		);
 
 		// Add a response intereceptor to extract the JSON from the response Object
@@ -80,7 +80,7 @@ angular.module(ApplicationConfiguration.applicationModuleName).config(['Restangu
 
 */
 
-			if (operation == "getList") {
+			if (operation === 'getList') {
 
 				var resp = data._embedded[what];
 				resp._links = data._links;
@@ -94,7 +94,7 @@ angular.module(ApplicationConfiguration.applicationModuleName).config(['Restangu
 
 		// Parse elements
 		RestangularProvider.setRestangularFields({
-			id: "_id"
+			id: '_id'
 		});
 		RestangularProvider.setRestangularFields({
 			selfLink: 'self.link'
