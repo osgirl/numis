@@ -13,16 +13,21 @@ var should = require('should'),
 /**
  * Globals
  */
-var credentials, user, groupbuy;
+var credentials, credentialsA, user, admin, groupbuy;
 
 /**
  * Groupbuy routes tests
  */
 describe('Groupbuy CRUD tests', function() {
 	beforeEach(function(done) {
-		// Create user credentials
+		// Create users credentials
 		credentials = {
 			username: 'username',
+			password: 'password'
+		};
+
+		credentialsA = {
+			username: 'admin',
 			password: 'password'
 		};
 
@@ -37,15 +42,32 @@ describe('Groupbuy CRUD tests', function() {
 			provider: 'local'
 		});
 
+		// Create a new admin user
+		admin = new User({
+			firstName: 'Admin',
+			lastName: 'Istrator',
+			displayName: 'Admin Istrator',
+			email: 'admin@test.com',
+			username: credentialsA.username,
+			password: credentialsA.password,
+			provider: 'local',
+			roles: ['admin']
+		});
+
 		// Remove old previous data
 		Groupbuy.remove().exec();
 		User.remove().exec();
 
 		// Save a user to the test db and create new Groupbuy
-		user.save(function() {
+		user.save(function(err) {
+			if (err) console.error(err);
+
 			groupbuy = {
 				title: 'Groupbuy Name',
-				description: 'Groupbuy Description'
+				description: 'Groupbuy Description',
+				manager: [user.id],
+				member: [user.id],
+				user: user.id
 			};
 
 			done();
@@ -245,7 +267,6 @@ describe('Groupbuy CRUD tests', function() {
 		});
 	});
 
-
 	it('NU_T_G002_E107: should not be able to get a single Groupbuy if not signed in', function(done) {
 		// Create new Groupbuy model instance
 		var groupbuyObj = new Groupbuy(groupbuy);
@@ -265,7 +286,48 @@ describe('Groupbuy CRUD tests', function() {
 		});
 	});
 
-	it('NU_T_G002_E108: should be able to delete Groupbuy instance if signed in', function(done) {
+	it('NU_T_G002_E108: should be able to delete Groupbuy instance if the user is a platform admin', function(done) {
+		admin.save(function(err) {
+			if (err) console.error(err);
+
+			agent.post('/auth/signin')
+				.send(credentialsA)
+				.expect(200)
+				.end(function(signinErr, signinRes) {
+					// Handle signin error
+					if (signinErr) done(signinErr);
+
+					// Get the userId
+					var userId = user.id;
+
+					// Save a new Groupbuy
+					agent.post('/api/v1/groupbuys')
+						.send(groupbuy)
+						.expect(201)
+						.end(function(groupbuySaveErr, groupbuySaveRes) {
+							// Handle Groupbuy save error
+							if (groupbuySaveErr) done(groupbuySaveErr);
+
+							// Delete existing Groupbuy
+							agent.delete('/api/v1/groupbuys/' + groupbuySaveRes.body._id)
+								.send(groupbuy)
+								.expect(204)
+								.end(function(groupbuyDeleteErr, groupbuyDeleteRes) {
+									// Handle Groupbuy error error
+									if (groupbuyDeleteErr) done(groupbuyDeleteErr);
+
+									// Set assertions
+									(groupbuyDeleteRes.body).should.be.empty;
+
+									// Call the assertion callback
+									done();
+								});
+						});
+				});
+		});
+	});
+
+	it('NU_T_G002_E109: should not be able to delete Groupbuy instance if the user is not a platform admin', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -287,13 +349,9 @@ describe('Groupbuy CRUD tests', function() {
 						// Delete existing Groupbuy
 						agent.delete('/api/v1/groupbuys/' + groupbuySaveRes.body._id)
 							.send(groupbuy)
-							.expect(204)
+							.expect(403)
 							.end(function(groupbuyDeleteErr, groupbuyDeleteRes) {
-								// Handle Groupbuy error error
-								if (groupbuyDeleteErr) done(groupbuyDeleteErr);
-
-								// Set assertions
-								(groupbuyDeleteRes.body).should.be.empty;
+								(groupbuyDeleteRes.body.name).should.match('NotAuthorized');
 
 								// Call the assertion callback
 								done();
@@ -302,7 +360,7 @@ describe('Groupbuy CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G002_E109: should not be able to delete Groupbuy instance if not signed in', function(done) {
+	it('NU_T_G002_E110: should not be able to delete Groupbuy instance if not signed in', function(done) {
 		// Set Groupbuy user
 		groupbuy.user = user;
 

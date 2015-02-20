@@ -23,7 +23,7 @@ var formattingOrder = function(order, req, reduce) {
 
 	if (order && order._id) {
 		try {
-			selfURL     = order.toLink();
+			selfURL     = '/api/v1' + order.toLink();
 			parentURL   = selfURL.replace(/\/[a-f\d]{24}$/i, '');
 		} catch (ex) {
 			console.trace(ex);
@@ -40,7 +40,7 @@ var formattingOrder = function(order, req, reduce) {
 				}
 
 				if (order.populated('groupbuy') !== undefined) {
-					groupbuyURL  = '/api/v1' + order.idToLink(order.groupbuy.id, 'User', [], {});
+					groupbuyURL  = '/api/v1' + order.idToLink(order.groupbuy.id, 'Groupbuy', [], {});
 				} else {
 					groupbuyURL  = '/api/v1' + rels.groupbuy;
 				}

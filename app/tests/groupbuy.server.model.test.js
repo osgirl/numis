@@ -24,19 +24,26 @@ describe('Groupbuy Model Unit Tests:', function() {
 			displayName: 'Full Name',
 			email: 'test@test.com',
 			username: 'username',
-			password: 'password'
+			password: 'password',
+			provider: 'local'
 		});
 
-		user.save(function() {
+		user.save(function(err) {
+			if (err) console.error(err);
+
 			groupbuy = new Groupbuy({
 				title: 'Groupbuy Title',
 				description: 'Groupbuy Description',
+				manager: [user],
+				member: [user],
 				user: user
 			});
 
 			groupbuy2 = new Groupbuy({
 				title: 'Groupbuy-Title',
 				description: 'Groupbuy Description',
+				manager: [user],
+				member: [user],
 				user: user
 			});
 

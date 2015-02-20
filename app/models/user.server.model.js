@@ -186,6 +186,14 @@ UserSchema.statics.findUniqueUsername = function(username, suffix, callback) {
 	});
 };
 
+/**
+ * Create instance method for check if an user is platform admin
+ */
+UserSchema.methods.isAdmin = function() {
+	return (this.roles.indexOf('admin') !== -1);
+};
+
+
 // Compile a 'User' model using the UserSchema as the structure.
 // Mongoose also creates a MongoDB collection called 'users' for these documents.
 //
