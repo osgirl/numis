@@ -1,4 +1,4 @@
-<section data-ng-controller="GroupbuysTabManagersController">
+<section data-ng-controller="GroupbuysTabManagersController" data-ng-init="loadManagersData()">
 
     <div class="panel panel-default">
         <div class="panel-body">
@@ -10,13 +10,13 @@
                 </div>
                 <div class="panel-body">
 
-                    <div data-ng-repeat="manager in groupbuy.managers track by $index">
+                    <div data-ng-repeat="manager in groupbuy.managers_extended_data track by $index">
                         <span data-ng-show="(userRole == 'manager')">
-                            <button type="button" class="btn btn-danger" aria-label="" data-ng-click="deleteManager(manager);">
+                            <button type="button" class="btn btn-danger" aria-label="" data-ng-click="deleteManager(manager._id);">
                                 <span class="glyphicon glyphicon-minus-sign" aria-hidden="true"></span>
                             </button>
                         </span>
-                        <span data-ng-bind-html="manager"></span>
+                        <img ng-src="{{manager.avatar}}" /> <span>{{manager.username}}</span>
                     </div>
                     <br />
                     <div data-ng-show="error && (userRole == 'manager')" class="alert alert-danger" role="alert">
@@ -42,13 +42,12 @@
 
                     <hr>
 
-                    <div ng-repeat="user in usersList | filter:filterUsers track by $index ">
+                    <div ng-repeat="user in groupbuy.usersList | filter:filterUsers track by $index ">
 
-                        <button type="button" class="btn btn-success" aria-label="" data-ng-click="addManager(user);">
+                        <button type="button" class="btn btn-success" aria-label="" data-ng-click="addManager(user._id);">
                             <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                         </button>
-                        <span>{{user}}</span>
-
+                        <img ng-src="{{user.avatar}}" /> <span>{{user.username}}</span>
                     </div>
 
                 </div>
