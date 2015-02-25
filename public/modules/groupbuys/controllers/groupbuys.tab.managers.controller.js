@@ -5,10 +5,6 @@ angular.module('groupbuys').controller('GroupbuysTabManagersController', ['$scop
   function($scope, Restangular, $stateParams, $location, $translate, Authentication, Groupbuys) {
     $scope.authentication = Authentication;
 
-
-
-
-
     // ----------------
 
     /*
@@ -42,11 +38,8 @@ angular.module('groupbuys').controller('GroupbuysTabManagersController', ['$scop
             $scope.groupbuy.managers_extended_data = managersList;
 
         }, function errorCallback() {
-            // TODO translate this key and don't use alert
-            alert('Error getting data from server');
+            $scope.error = $translate.instant('groupbuys.Error_connecting_server');
         });
-
-
 
         if ($scope.userRole === 'manager'){
             // Load all users list
@@ -94,8 +87,7 @@ angular.module('groupbuys').controller('GroupbuysTabManagersController', ['$scop
                 $scope.groupbuy.usersList = usersList;
 
             }, function errorCallback() {
-                // TODO translate this key and don't use alert
-                alert('Error getting data from server');
+                $scope.error = $translate.instant('groupbuys.Error_connecting_server');
             });
 
         }
@@ -117,28 +109,34 @@ angular.module('groupbuys').controller('GroupbuysTabManagersController', ['$scop
 
             if ($scope.groupbuy.managers.length > 1 ) {
 
-                // Find, add and delete from managers_extended_data
-                var position = $scope.findPosition(managerId, $scope.groupbuy.managers_extended_data);
-                if( position !== -1) {
-                    $scope.groupbuy.usersList.push($scope.groupbuy.managers_extended_data[position]);
-                    $scope.groupbuy.managers_extended_data.splice(position, 1);
-                }
-
-                // Find and delete from managers
-                var i = $scope.groupbuy.managers.indexOf(managerId);
-                if(i !== -1) {
-                    $scope.groupbuy.managers.splice(i, 1);
-                }
-
-                // NOTE: Still being an member
-
                 // Updating the server via API
-                // TODO
-                console.log('Update via api (TODO)');
+                var payload = {};
+                payload.userId = managerId;
+
+                Restangular.one('groupbuys',$stateParams.groupbuyId).one('managers',managerId).remove().then(function() {
+
+                    // Find, add and delete from managers_extended_data
+                    var position = $scope.findPosition(managerId, $scope.groupbuy.managers_extended_data);
+                    if( position !== -1) {
+                        $scope.groupbuy.usersList.push($scope.groupbuy.managers_extended_data[position]);
+                        $scope.groupbuy.managers_extended_data.splice(position, 1);
+                    }
+
+                    // Find and delete from managers
+                    var i = $scope.groupbuy.managers.indexOf(managerId);
+                    if(i !== -1) {
+                        $scope.groupbuy.managers.splice(i, 1);
+                    }
+
+                    // NOTES: Still being an member
+                    //        No need to save as the manager is updated via API
+
+                }, function(serverResponse) {
+                    $scope.error = $translate.instant('groupbuys.Error_connecting_server');
+                });
 
             } else {
-                // TODO Translate
-                $scope.error = 'No se puede eliminar el ultimo gestor';
+                $scope.error = $translate.instant('groupbuys.Last_manager_cannot_be_deleted');
             }
         }
     };
@@ -156,32 +154,36 @@ angular.module('groupbuys').controller('GroupbuysTabManagersController', ['$scop
     $scope.addManager = function(managerId) {
         if (managerId !== '' ) {
 
-            // Updating the Scope with the required data:
-
-            // Find element in extended lists
-            var position = $scope.findPosition(managerId, $scope.groupbuy.usersList);
-
-            if( position !== -1) {
-
-                // Add the found user to simple lists
-                $scope.groupbuy.managers.push(managerId);
-                $scope.groupbuy.members.push(managerId);
-
-                // Add the found user to extended lists
-                $scope.groupbuy.managers_extended_data.push($scope.groupbuy.usersList[position]);
-                $scope.groupbuy.members_extended_data.push($scope.groupbuy.usersList[position]);
-
-
-                // Delete from users list
-                $scope.groupbuy.usersList.splice(position, 1);
-            }
-
             // Updating the server via API
-            // TODO
-            console.log('Update via api (TODO)');
+            var payload = {};
+            payload.userId = managerId;
 
-            // No need to save as the manager is updated via API
-            // $scope.update();
+            Restangular.one('groupbuys',$stateParams.groupbuyId).all('managers').post(payload).then(function() {
+
+                // Updating the Scope with the required data:
+                // Find element in extended lists
+                var position = $scope.findPosition(managerId, $scope.groupbuy.usersList);
+
+                if( position !== -1) {
+
+                    // Add the found user to simple lists
+                    $scope.groupbuy.managers.push(managerId);
+                    $scope.groupbuy.members.push(managerId);
+
+                    // Add the found user to extended lists
+                    $scope.groupbuy.managers_extended_data.push($scope.groupbuy.usersList[position]);
+                    $scope.groupbuy.members_extended_data.push($scope.groupbuy.usersList[position]);
+
+
+                    // Delete from users list
+                    $scope.groupbuy.usersList.splice(position, 1);
+                }
+
+                // NOTE: No need to save as the manager is updated via API
+
+            }, function(serverResponse) {
+                $scope.error = $translate.instant('groupbuys.Error_connecting_server');
+            });
 
         }
     };
