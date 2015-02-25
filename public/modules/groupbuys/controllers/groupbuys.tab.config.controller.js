@@ -80,7 +80,7 @@ angular.module('groupbuys').controller('GroupbuysTabConfigController', ['$scope'
                 break;
             default:
         }
-    }
+    };
 
     // ----------------------
 
@@ -95,7 +95,7 @@ angular.module('groupbuys').controller('GroupbuysTabConfigController', ['$scope'
     $scope.changeState = function(newState) {
 
         console.log('estado: '+newState);
-    }
+    };
 
 
     // ----------------------
@@ -113,7 +113,7 @@ angular.module('groupbuys').controller('GroupbuysTabConfigController', ['$scope'
         $scope.groupbuy.visibility[key] = status;
         $scope.loadConfig();
         $scope.update();
-    }
+    };
 
     // ----------------------
 
