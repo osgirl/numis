@@ -18,7 +18,7 @@ module.exports = function(app) {
 	// Groupbuy Members Routes
 	app.route('/api/v1/groupbuys/:groupbuyId/members')
 		.get(users.requiresLogin, groupbuys.hasVisibility('members'), core.prepareQueryParams, groupbuys.getMembersList)
-		.put(users.requiresLogin, groupbuys.addMember);
+		.post(users.requiresLogin, groupbuys.addMember);
 
 	app.route('/api/v1/groupbuys/:groupbuyId/members/:userId')
 		.delete(users.requiresLogin, groupbuys.hasAuthorization(['manager']), groupbuys.deleteMember);
@@ -26,7 +26,7 @@ module.exports = function(app) {
 	// Groupbuy Managers Routes
 	app.route('/api/v1/groupbuys/:groupbuyId/managers')
 		.get(users.requiresLogin, groupbuys.hasVisibility('managers'), core.prepareQueryParams, groupbuys.getManagersList)
-		.put(users.requiresLogin, groupbuys.hasAuthorization(['manager']), groupbuys.addManager);
+		.post(users.requiresLogin, groupbuys.hasAuthorization(['manager']), groupbuys.addManager);
 
 	app.route('/api/v1/groupbuys/:groupbuyId/managers/:userId')
 		.delete(users.requiresLogin, groupbuys.hasAuthorization(['manager']), groupbuys.deleteManager);
