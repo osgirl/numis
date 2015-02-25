@@ -33,7 +33,9 @@ var formattingUser = exports.formattingUser = function(user, req, reduce) {
 					templated: true
 				},
 
-				groupbuys: []
+				groupbuys: {
+					href: selfURL + '/groupbuys', title: 'List of groupbuys belongs to'
+				},
 			},
 			_id: 	  user._id,
 			username: user.username,

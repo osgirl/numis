@@ -185,10 +185,28 @@ exports.delete = function(req, res) {
  */
 exports.list = function(req, res) {
 	var query  = req.query.filter || null,
-		sort   = req.query.sort || 'title',
+		sort,
 		limit  = req.query.limit || 25,
 		page   = req.query.page || 1,
 		fields = req.query.fields || '_id title name description status members manager user';
+
+	// Add query filters and default sorting
+	if (!req.profile && typeof req.profile === 'undefined') {
+		/* /groupbuys -- Show all groupbuys */
+		sort = req.query.sort || {title: 1};
+
+	} else if (req.profile && typeof req.profile !== 'undefined') {
+		/* /users/:userId/groupbuys -- Show groupbys filtered by user */
+		query = {$or: [
+				    { members:  req.profile._id },
+				    { managers: req.profile._id }
+				] };
+		sort  = req.query.sort || 'title';
+
+	} else {
+		// Invalid
+		return res.status(400).send( {message: 'Unsupported request!'} );
+	}
 
 	Groupbuy.paginate(query, page, limit, function(err, totalPages, groupbuys, count) {
 		if (err) {
