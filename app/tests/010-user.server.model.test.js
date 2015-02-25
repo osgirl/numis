@@ -18,39 +18,43 @@ var user, user2, user3;
 describe('User Model Unit Tests:', function() {
 	before(function(done) {
 		// Remove old previous data
-		User.remove().exec();
+		User.remove().exec(function(err) {
+			if (err) {
+				done(err);
+			} else {
+				user = new User({
+					firstName: 'Full',
+					lastName: 'Name',
+					displayName: 'Full Name',
+					email: 'test@example.net',
+					username: 'username',
+					password: 'password',
+					provider: 'local'
+				});
 
-		user = new User({
-			firstName: 'Full',
-			lastName: 'Name',
-			displayName: 'Full Name',
-			email: 'test@example.net',
-			username: 'username',
-			password: 'password',
-			provider: 'local'
+				user2 = new User({
+					firstName: 'Full',
+					lastName: 'Name',
+					displayName: 'Full Name',
+					email: 'test@example.net',
+					username: 'username',
+					password: 'password',
+					provider: 'local'
+				});
+
+				user3 = new User({
+					firstName: 'John',
+					lastName: 'Doe',
+					email: 'jdoe@example.net',
+					username: 'jdoe',
+					password: 'password',
+					provider: 'local',
+					homeAddress: 'Fake Street 123, 22150 Springfiled, Virginia USA'
+				});
+
+				done();
+			}
 		});
-
-		user2 = new User({
-			firstName: 'Full',
-			lastName: 'Name',
-			displayName: 'Full Name',
-			email: 'test@example.net',
-			username: 'username',
-			password: 'password',
-			provider: 'local'
-		});
-
-		user3 = new User({
-			firstName: 'John',
-			lastName: 'Doe',
-			email: 'jdoe@example.net',
-			username: 'jdoe',
-			password: 'password',
-			provider: 'local',
-			homeAddress: 'Fake Street 123, 22150 Springfiled, Virginia USA'
-		});
-
-		done();
 	});
 
 	/*

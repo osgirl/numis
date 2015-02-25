@@ -69,11 +69,9 @@ describe('Groupbuy CRUD tests', function() {
 			groupbuy = {
 				title: 'Groupbuy Name',
 				description: 'Groupbuy Description',
-				manager: [user.id],
-				member: [user.id],
-				user: user.id
+				user: user._id
 			};
-
+			
 			done();
 		});
 	});
@@ -408,6 +406,56 @@ describe('Groupbuy CRUD tests', function() {
 			});
 
 		});
+	});
+
+	it('NU_P_G002_E111: should be able to get a list of Groupbuys that an user belong to if signed in', function(done) {
+	    admin.save(function(err) {
+	        if (err) console.error(err);
+
+	        // Set Groupbuy user
+	        //groupbuy.user = user;
+
+	        // Create new Groupbuy model instance
+	        var groupbuyObj = new Groupbuy(groupbuy);
+
+	        // Add a manager and save the Groupbuy
+	        groupbuyObj.addManager(user._id, function(err) {
+	            agent.post('/auth/signin')
+	                .send(credentialsA)
+	                .set('Accept', 'application/json')
+	                .expect('Content-Type', /json/)
+	                .expect(200)
+	                .end(function(signinErr, signinRes) {
+	                    // Handle signin error
+	                    if (signinErr) done(signinErr);
+
+	                    // Get the userId
+	                    var userId = user.id;
+
+	                    // Get groupbuys that users belong to
+	                    agent.get('/api/v1/users/'+ userId + '/groupbuys')
+	                        .expect(200)
+	                        .end(function(groupbuysGetErr, groupbuysGetRes) {
+	                            // Handle Groupbuy save error
+	                            if (groupbuysGetErr) done(groupbuysGetErr);
+
+	                            // Get Groupbuys list
+	                            var groupbuys = groupbuysGetRes.body._embedded.groupbuys;
+
+	                            // Set assertions
+	                            groupbuys.should.be.an.Array.with.lengthOf(1);
+
+	                            (groupbuys[0].title).should.match(groupbuyObj.title);
+	                            (groupbuys[0].description).should.match(groupbuyObj.description);
+	                            (groupbuys[0].status).should.match(groupbuyObj.status);
+
+	                            // Handle Groupbuy error error
+	                            done();
+	                        });
+
+	                });
+	        });
+	    });
 	});
 
 });
