@@ -78,7 +78,30 @@ describe('Groupbuy CRUD tests', function() {
 		});
 	});
 
-	it('NU_T_G002_E101: should be able to save Groupbuy instance if logged in', function(done) {
+	/*
+	 *  NU_P_Gxyy_Eabb:
+	 *          x) Test side:
+	 *              0 - Server
+	 *              1 - Client
+	 *
+	 *          yy) Module:
+	 *              01 - Users
+	 *              02 - Groupbuys
+	 *              03 - Items
+	 *              04 - Orders
+	 *              05 - Mesenger
+	 *
+	 *          a) Subgroup (in Server side):
+	 *              0 - Mongoose
+	 *              1 - REST API
+	 *              2 - Pagination, sorting and filtering
+	 *              3 - Permission
+	 *
+	 *          bb) Test number
+	 */
+
+
+	it('NU_P_G002_E101: should be able to save Groupbuy instance if logged in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -127,7 +150,7 @@ describe('Groupbuy CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G002_E102: should not be able to save Groupbuy instance if not logged in', function(done) {
+	it('NU_P_G002_E102: should not be able to save Groupbuy instance if not logged in', function(done) {
 		agent.get('/auth/signout')
 			.expect(302)	// Redirect to '/'
 			.end(function(signoutErr, signoutRes) {
@@ -147,7 +170,7 @@ describe('Groupbuy CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G002_E103: should not be able to save Groupbuy instance if no title is provided', function(done) {
+	it('NU_P_G002_E103: should not be able to save Groupbuy instance if no title is provided', function(done) {
 		// Invalidate name field
 		groupbuy.title = '';
 		groupbuy.name = '_';
@@ -179,7 +202,7 @@ describe('Groupbuy CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G002_E104: should not be able to save Groupbuy instance if no description is provided', function(done) {
+	it('NU_P_G002_E104: should not be able to save Groupbuy instance if no description is provided', function(done) {
 		// Invalidate name field
 		groupbuy.description = '';
 
@@ -210,7 +233,7 @@ describe('Groupbuy CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G002_E105: should be able to update Groupbuy instance if signed in', function(done) {
+	it('NU_P_G002_E105: should be able to update Groupbuy instance if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -250,7 +273,7 @@ describe('Groupbuy CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G002_E106: should not be able to get a list of Groupbuys if not signed in', function(done) {
+	it('NU_P_G002_E106: should not be able to get a list of Groupbuys if not signed in', function(done) {
 		// Create new Groupbuy model instance
 		var groupbuyObj = new Groupbuy(groupbuy);
 
@@ -271,7 +294,7 @@ describe('Groupbuy CRUD tests', function() {
 		});
 	});
 
-	it('NU_T_G002_E107: should not be able to get a single Groupbuy if not signed in', function(done) {
+	it('NU_P_G002_E107: should not be able to get a single Groupbuy if not signed in', function(done) {
 		// Create new Groupbuy model instance
 		var groupbuyObj = new Groupbuy(groupbuy);
 
@@ -290,7 +313,7 @@ describe('Groupbuy CRUD tests', function() {
 		});
 	});
 
-	it('NU_T_G002_E108: should be able to delete Groupbuy instance if the user is a platform admin', function(done) {
+	it('NU_P_G002_E108: should be able to delete Groupbuy instance if the user is a platform admin', function(done) {
 		admin.save(function(err) {
 			if (err) console.error(err);
 
@@ -331,7 +354,7 @@ describe('Groupbuy CRUD tests', function() {
 		});
 	});
 
-	it('NU_T_G002_E109: should not be able to delete Groupbuy instance if the user is not a platform admin', function(done) {
+	it('NU_P_G002_E109: should not be able to delete Groupbuy instance if the user is not a platform admin', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -364,7 +387,7 @@ describe('Groupbuy CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G002_E110: should not be able to delete Groupbuy instance if not signed in', function(done) {
+	it('NU_P_G002_E110: should not be able to delete Groupbuy instance if not signed in', function(done) {
 		// Set Groupbuy user
 		groupbuy.user = user;
 
@@ -386,4 +409,5 @@ describe('Groupbuy CRUD tests', function() {
 
 		});
 	});
+
 });

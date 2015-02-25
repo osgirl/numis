@@ -55,15 +55,38 @@ describe('Groupbuy Model Unit Tests:', function() {
 		});
 	});
 
+	/*
+	 *  NU_P_Gxyy_Eabb:
+	 *          x) Test side:
+	 *              0 - Server
+	 *              1 - Client
+	 *
+	 *          yy) Module:
+	 *              01 - Users
+	 *              02 - Groupbuys
+	 *              03 - Items
+	 *              04 - Orders
+	 *              05 - Mesenger
+	 *
+	 *          a) Subgroup (in Server side):
+	 *              0 - Mongoose
+	 *              1 - REST API
+	 *              2 - Pagination, sorting and filtering
+	 *              3 - Permission
+	 *
+	 *          bb) Test number
+	 */
+
+
 	describe('Method Save', function() {
-		it('NU_T_G002_E001: should be able to save without problems', function(done) {
+		it('NU_P_G002_E001: should be able to save without problems', function(done) {
 			return groupbuy.save(function(err) {
 				should.not.exist(err);
 				done();
 			});
 		});
 
-		it('NU_T_G002_E002: should be able to show an error when try to save without title', function(done) {
+		it('NU_P_G002_E002: should be able to show an error when try to save without title', function(done) {
 			groupbuy.title = '';
 
 			return groupbuy.save(function(err) {
@@ -72,7 +95,7 @@ describe('Groupbuy Model Unit Tests:', function() {
 			});
 		});
 
-		it('NU_T_G002_E003: should fail to save an existing groupbuy again', function(done) {
+		it('NU_P_G002_E003: should fail to save an existing groupbuy again', function(done) {
 			groupbuy.save(function(err) {
 				if (err) console.error(err);
 
@@ -83,7 +106,7 @@ describe('Groupbuy Model Unit Tests:', function() {
 			});
 		});
 
-		it('NU_T_G002_E004: should be able to save two groupbuys with similar title and same name (slug) beginning', function(done) {
+		it('NU_P_G002_E004: should be able to save two groupbuys with similar title and same name (slug) beginning', function(done) {
 			groupbuy.save(function(err) {
 				if (err) console.error(err);
 
@@ -93,6 +116,7 @@ describe('Groupbuy Model Unit Tests:', function() {
 				});
 			});
 		});
+
 	});
 
 });

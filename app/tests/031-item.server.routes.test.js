@@ -108,7 +108,30 @@ describe('Item CRUD tests', function() {
 		});
 	});
 
-	it('NU_P_G311_E101: should be able to save Item instance if logged in', function(done) {
+	/*
+	 *  NU_P_Gxyy_Eabb:
+	 *          x) Test side:
+	 *              0 - Server
+	 *              1 - Client
+	 *
+	 *          yy) Module:
+	 *              01 - Users
+	 *              02 - Groupbuys
+	 *              03 - Items
+	 *              04 - Orders
+	 *              05 - Mesenger
+	 *
+	 *          a) Subgroup (in Server side):
+	 *              0 - Mongoose
+	 *              1 - REST API
+	 *              2 - Pagination, sorting and filtering
+	 *              3 - Permission
+	 *
+	 *          bb) Test number
+	 */
+
+
+	it('NU_P_G003_E101: should be able to save Item instance if logged in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -156,7 +179,7 @@ describe('Item CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G311_E102: should not be able to save Item instance if not logged in', function(done) {
+	it('NU_P_G003_E102: should not be able to save Item instance if not logged in', function(done) {
 		var GroupbuyId = groupbuy1._id;
 
 		agent.get('/auth/signout')
@@ -179,7 +202,7 @@ describe('Item CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G311_E103: should not be able to save Item instance if no title is provided', function(done) {
+	it('NU_P_G003_E103: should not be able to save Item instance if no title is provided', function(done) {
 		var GroupbuyId = groupbuy1._id;
 
 		// Invalidate name field
@@ -209,7 +232,7 @@ describe('Item CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G311_E104: should be able to update Item instance if signed in', function(done) {
+	it('NU_P_G003_E104: should be able to update Item instance if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -256,7 +279,7 @@ describe('Item CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G311_E105: should not be able to get a list of Items if not signed in', function(done) {
+	it('NU_P_G003_E105: should not be able to get a list of Items if not signed in', function(done) {
 		// Create new Item model instance
 		var itemObj = new Item(item1);
 
@@ -277,7 +300,7 @@ describe('Item CRUD tests', function() {
 		});
 	});
 
-	it('NU_P_G311_E106: should not be able to get a single Item if not signed in', function(done) {
+	it('NU_P_G003_E106: should not be able to get a single Item if not signed in', function(done) {
 		// Create new Item model instance
 		var itemObj = new Item(item1);
 
@@ -296,7 +319,7 @@ describe('Item CRUD tests', function() {
 		});
 	});
 
-	it('NU_P_G311_E107: should be able to delete Item instance if signed in', function(done) {
+	it('NU_P_G003_E107: should be able to delete Item instance if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -333,7 +356,7 @@ describe('Item CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G311_E108: should not be able to delete Item instance if not signed in', function(done) {
+	it('NU_P_G003_E108: should not be able to delete Item instance if not signed in', function(done) {
 		// Set Item user
 		item1.user = user1;
 

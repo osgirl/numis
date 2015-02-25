@@ -59,7 +59,30 @@ describe('User CRUD tests', function() {
 		});
 	});
 
-	it('NU_T_G111_E101: should be able to save User instance if logged in', function(done) {
+	/*
+	 *  NU_P_Gxyy_Eabb:
+	 *          x) Test side:
+	 *              0 - Server
+	 *              1 - Client
+	 *
+	 *          yy) Module:
+	 *              01 - Users
+	 *              02 - Groupbuys
+	 *              03 - Items
+	 *              04 - Orders
+	 *              05 - Mesenger
+	 *
+	 *          a) Subgroup (in Server side):
+	 *              0 - Mongoose
+	 *              1 - REST API
+	 *              2 - Pagination, sorting and filtering
+	 *              3 - Permission
+	 *
+	 *          bb) Test number
+	 */
+
+
+	it('NU_P_G001_E101: should be able to save User instance if logged in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -108,7 +131,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G111_E102: should not be able to save User instance if not logged in', function(done) {
+	it('NU_P_G001_E102: should not be able to save User instance if not logged in', function(done) {
 		agent.post('/api/v1/users')
 			.send(user2)
 			.expect(401)
@@ -122,7 +145,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G111_E103: should not be able to save User instance if no firstName, lastNmae, email, username are provided', function(done) {
+	it('NU_P_G001_E103: should not be able to save User instance if no firstName, lastNmae, email, username are provided', function(done) {
 		user2.firstName = '';
 		user2.lastName = '';
 		user2.email = '';
@@ -160,7 +183,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G111_E104: should not be able to save User instance if email is not valid', function(done) {
+	it('NU_P_G001_E104: should not be able to save User instance if email is not valid', function(done) {
 		// Invalidate email field
 		user2.email = 'fake email@';
 
@@ -191,7 +214,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G111_E105: should not be able to save User instance if username already exists', function(done) {
+	it('NU_P_G001_E105: should not be able to save User instance if username already exists', function(done) {
 		// Duplicate username field
 		user2.username = user.username;
 
@@ -225,7 +248,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G111_E106: should not be able to save User instance if password has less than 8 characters', function(done) {
+	it('NU_P_G001_E106: should not be able to save User instance if password has less than 8 characters', function(done) {
 		// Duplicate username field
 		user2.password = '1234567';
 
@@ -256,7 +279,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G111_E107: should be able to save User instance but not save role specification', function(done) {
+	it('NU_P_G001_E107: should be able to save User instance but not save role specification', function(done) {
 		// Duplicate username field
 		user2.roles = ['user', 'admin', 'other'];
 
@@ -287,7 +310,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G111_E108: should be able to update User instance if signed in', function(done) {
+	it('NU_P_G001_E108: should be able to update User instance if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -322,7 +345,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G111_E109: should not be able to update User instance if not signed in', function(done) {
+	it('NU_P_G001_E109: should not be able to update User instance if not signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -366,7 +389,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it.skip('NU_T_G111_E110: should be able to update User roles if have admin role', function(done) {
+	it.skip('NU_P_G001_E110: should be able to update User roles if have admin role', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -400,7 +423,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G111_E111: should be able to get a list of Users if signed in', function(done) {
+	it('NU_P_G001_E111: should be able to get a list of Users if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -436,7 +459,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G111_E112: should not be able to get a list of Users if not signed in', function(done) {
+	it('NU_P_G001_E112: should not be able to get a list of Users if not signed in', function(done) {
 		// Request Users
 		agent.get('/api/v1/users')
 			.expect(401)
@@ -450,7 +473,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G111_E113: should be able to get a single User if signed in', function(done) {
+	it('NU_P_G001_E113: should be able to get a single User if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -483,7 +506,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G111_E114: should not be able to get a single User if not signed in', function(done) {
+	it('NU_P_G001_E114: should not be able to get a single User if not signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -515,7 +538,7 @@ describe('User CRUD tests', function() {
 		});
 	});
 
-	it('NU_T_G111_E115: should not be able to delete User instance if signed in', function(done) {
+	it('NU_P_G001_E115: should not be able to delete User instance if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -549,7 +572,7 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_T_G111_E116: should not be able to delete User instance if not signed in', function(done) {
+	it('NU_P_G001_E116: should not be able to delete User instance if not signed in', function(done) {
 		// Set User user
 		user.user = user;
 

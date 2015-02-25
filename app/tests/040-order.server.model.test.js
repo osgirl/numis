@@ -108,15 +108,38 @@ describe('Order Model Unit Tests:', function() {
 		});
 	});
 
+	/*
+	 *  NU_P_Gxyy_Eabb:
+	 *          x) Test side:
+	 *              0 - Server
+	 *              1 - Client
+	 *
+	 *          yy) Module:
+	 *              01 - Users
+	 *              02 - Groupbuys
+	 *              03 - Items
+	 *              04 - Orders
+	 *              05 - Mesenger
+	 *
+	 *          a) Subgroup (in Server side):
+	 *              0 - Mongoose
+	 *              1 - REST API
+	 *              2 - Pagination, sorting and filtering
+	 *              3 - Permission
+	 *
+	 *          bb) Test number
+	 */
+
+
 	describe('Method Save', function() {
-		it('1 - should be able to save without problems', function(done) {
+		it('NU_P_G004_E001: should be able to save without problems', function(done) {
 			return order.save(function(err) {
 				should.not.exist(err);
 				done();
 			});
 		});
 
-		it('2 - should be able to show an error when try to save without user', function(done) {
+		it('NU_P_G004_E002: should be able to show an error when try to save without user', function(done) {
 			order.user = '';
 
 			return order.save(function(err) {
@@ -125,7 +148,7 @@ describe('Order Model Unit Tests:', function() {
 			});
 		});
 
-		it('3 - should be able to show an error when try to save without groupbuy', function(done) {
+		it('NU_P_G004_E003: should be able to show an error when try to save without groupbuy', function(done) {
 			order.groupbuy = '';
 
 			return order.save(function(err) {
@@ -134,7 +157,7 @@ describe('Order Model Unit Tests:', function() {
 			});
 		});
 
-		it('4 - should be able to save order with one request with one item without problems', function(done) {
+		it('NU_P_G004_E004: should be able to save order with one request with one item without problems', function(done) {
 			var request = {
 				user: user,
 				items: [ {item: item1, quantity: 1} ]
@@ -155,7 +178,7 @@ describe('Order Model Unit Tests:', function() {
 			});
 		});
 
-		it('5 - should be able to save order with one request with nevative quantity without problems', function(done) {
+		it('NU_P_G004_E005: should be able to save order with one request with nevative quantity without problems', function(done) {
 			var request = {
 				user: user,
 				items: [ {item: item1, quantity: -1} ]
@@ -174,7 +197,7 @@ describe('Order Model Unit Tests:', function() {
 			});
 		});
 
-		it('6 - should be able to save order with one requests with many items without problems', function(done) {
+		it('NU_P_G004_E006: should be able to save order with one requests with many items without problems', function(done) {
 			var request = {
 				user: user,
 				items: [
@@ -200,7 +223,7 @@ describe('Order Model Unit Tests:', function() {
 			});
 		});
 
-		it('7 - should be able to save order with many requests without problems', function(done) {
+		it('NU_P_G004_E007: should be able to save order with many requests without problems', function(done) {
 			var request1, request2, request3;
 
 			request1 = {
@@ -301,7 +324,7 @@ describe('Order Model Unit Tests:', function() {
 			});
 		});
 
-		it('8 - should be able to calculate summary with 0 requests without problems', function(done) {
+		it('NU_P_G004_E008: should be able to calculate summary with 0 requests without problems', function(done) {
 			order.calculateSummary(function(err) {
 				should.not.exist(err);
 
@@ -313,7 +336,7 @@ describe('Order Model Unit Tests:', function() {
 			});
 		});
 
-		it('9 - should be able to calculate summary with 1 request without problems', function(done) {
+		it('NU_P_G004_E009: should be able to calculate summary with 1 request without problems', function(done) {
 			var request = {
 				items: [
 						{item: item1, quantity: 1},
@@ -337,7 +360,7 @@ describe('Order Model Unit Tests:', function() {
 			});
 		});
 
-		it('10 - should be able to calculate summary with many request without problems', function(done) {
+		it('NU_P_G004_E010: should be able to calculate summary with many request without problems', function(done) {
 			var request1, request2, request3;
 
 			request1 = {
@@ -393,7 +416,7 @@ describe('Order Model Unit Tests:', function() {
 			});
 		});
 
-		it('11 - should be able to remove previous request without problems', function(done) {
+		it('NU_P_G004_E011: should be able to remove previous request without problems', function(done) {
 			var request1, request2, request3;
 
 			request1 = {

@@ -194,7 +194,30 @@ describe('Order CRUD tests', function() {
 
 	});
 
-	it('1 - should be able to save Order instance if logged in', function(done) {
+	/*
+	 *  NU_P_Gxyy_Eabb:
+	 *          x) Test side:
+	 *              0 - Server
+	 *              1 - Client
+	 *
+	 *          yy) Module:
+	 *              01 - Users
+	 *              02 - Groupbuys
+	 *              03 - Items
+	 *              04 - Orders
+	 *              05 - Mesenger
+	 *
+	 *          a) Subgroup (in Server side):
+	 *              0 - Mongoose
+	 *              1 - REST API
+	 *              2 - Pagination, sorting and filtering
+	 *              3 - Permission
+	 *
+	 *          bb) Test number
+	 */
+
+
+	it('NU_P_G004_E101: should be able to save Order instance if logged in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials3)
 			.expect(200)
@@ -246,7 +269,7 @@ describe('Order CRUD tests', function() {
 			});
 	});
 
-	it('2 - should not be able to save Order instance if not logged in', function(done) {
+	it('NU_P_G004_E102: should not be able to save Order instance if not logged in', function(done) {
 		agent.post('/api/v1/orders')
 			.send(order)
 			.expect(401)
@@ -258,7 +281,7 @@ describe('Order CRUD tests', function() {
 			});
 	});
 
-	it('3 - should be able to save Order instance if no user is provided', function(done) {
+	it('NU_P_G004_E103: should be able to save Order instance if no user is provided', function(done) {
 		// Invalidate user field
 		order.user = null;
 
@@ -287,7 +310,7 @@ describe('Order CRUD tests', function() {
 			});
 	});
 
-	it('4 - should not be able to save Order instance if no groupbuy is provided', function(done) {
+	it('NU_P_G004_E104: should not be able to save Order instance if no groupbuy is provided', function(done) {
 		// Invalidate user field
 		order.groupbuy = null;
 
@@ -315,7 +338,7 @@ describe('Order CRUD tests', function() {
 			});
 	});
 
-	it('5 - should not be able to update user or groupbuy in an existing Order instance', function(done) {
+	it('NU_P_G004_E105: should not be able to update user or groupbuy in an existing Order instance', function(done) {
 		// Login member3
 		agent.post('/auth/signin')
 			.send(credentials3)
@@ -388,7 +411,7 @@ describe('Order CRUD tests', function() {
 			});
 	});
 
-	it('6 - should not be able to get a list of Orders if not signed in', function(done) {
+	it('NU_P_G004_E106: should not be able to get a list of Orders if not signed in', function(done) {
 		// Save the Order
 		order.save(function() {
 			// Request Orders
@@ -405,7 +428,7 @@ describe('Order CRUD tests', function() {
 		});
 	});
 
-	it('7 - should not be able to get a single Order if not signed in', function(done) {
+	it('NU_P_G004_E107: should not be able to get a single Order if not signed in', function(done) {
 		// Save the Order
 		order.save(function() {
 			request(app).get('/api/v1/orders/' + order._id)
@@ -421,7 +444,7 @@ describe('Order CRUD tests', function() {
 		});
 	});
 
-	it('8 - should not be able to delete Order instance if haven\'t admin role', function(done) {
+	it('NU_P_G004_E108: should not be able to delete Order instance if haven\'t admin role', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials1)
 			.expect(200)
@@ -472,7 +495,7 @@ describe('Order CRUD tests', function() {
 			});
 	});
 
-	it('9 - should be able to delete Order instance if have admin role', function(done) {
+	it('NU_P_G004_E109: should be able to delete Order instance if have admin role', function(done) {
 		agent.post('/auth/signin')
 			.send(credentialsA)
 			.expect(200)
@@ -513,7 +536,7 @@ describe('Order CRUD tests', function() {
 			});
 	});
 
-	it('10 - should not be able to delete Order instance if not signed in', function(done) {
+	it('NU_P_G004_E110: should not be able to delete Order instance if not signed in', function(done) {
 		// Set Order user
 		order.user = member3;
 
@@ -533,7 +556,7 @@ describe('Order CRUD tests', function() {
 		});
 	});
 
-	it('11 - should be able to add a request to an Order instance', function(done) {
+	it('NU_P_G004_E111: should be able to add a request to an Order instance', function(done) {
 		// Save the Order
 		order.save(function() {
 			agent.post('/auth/signin')
@@ -580,7 +603,7 @@ describe('Order CRUD tests', function() {
 		});
 	});
 
-	it('12 - should be able to add some requests to an Order instance and calculate summary and subtotal', function(done) {
+	it('NU_P_G004_E112: should be able to add some requests to an Order instance and calculate summary and subtotal', function(done) {
 		// Save the Order
 		order.save(function(err) {
 			agent.post('/auth/signin')
@@ -693,7 +716,7 @@ describe('Order CRUD tests', function() {
 		});
 	});
 
-	it('13 - should be able to list orders filtering by myself', function(done) {
+	it('NU_P_G004_E113: should be able to list orders filtering by myself', function(done) {
 		var groupbuy2 = new Groupbuy({
 			title: 'Groupbuy #2',
 			description: '...',
@@ -806,7 +829,7 @@ describe('Order CRUD tests', function() {
 		});
 	});
 
-	it('14 - should be able to list orders filtering by groupbuy that user is manager', function(done) {
+	it('NU_P_G004_E114: should be able to list orders filtering by groupbuy that user is manager', function(done) {
 		var order2 = new Order({
 			groupbuy: groupbuy,
 			user: manager2.id
@@ -874,8 +897,7 @@ describe('Order CRUD tests', function() {
 		});
 	});
 
-
-	it('15 - should not be able to list orders filtering by groupbuy that user is not member', function(done) {
+	it('NU_P_G004_E115: should not be able to list orders filtering by groupbuy that user is not member', function(done) {
 		var groupbuy2 = new Groupbuy({
 			title: 'Groupbuy #2',
 			description: '...',
@@ -988,8 +1010,7 @@ describe('Order CRUD tests', function() {
 		});
 	});
 
-
-	it('16 - should not be able to list orders made by another user', function(done) {
+	it('NU_P_G004_E116: should not be able to list orders made by another user', function(done) {
 		// Groupbuy1 have Items: 1, 2 & 3
 		// Order (1) is made by manager1 to groupbuy (1)
 		order.save(function(err) {
@@ -1017,7 +1038,7 @@ describe('Order CRUD tests', function() {
 		});
 	});
 
-	it('16 - should be able to list orders made by another user if I am an admin', function(done) {
+	it('NU_P_G004_E117: should be able to list orders made by another user if I am an admin', function(done) {
 		// Groupbuy1 have Items: 1, 2 & 3
 		// Order (1) is made by manager1 to groupbuy (1)
 		order.save(function(err) {
@@ -1051,6 +1072,5 @@ describe('Order CRUD tests', function() {
 			});
 		});
 	});
-
 
 });
