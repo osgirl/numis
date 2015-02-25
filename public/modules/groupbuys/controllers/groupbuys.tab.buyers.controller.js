@@ -50,7 +50,7 @@ angular.module('groupbuys').controller('GroupbuysTabBuyersController', ['$scope'
                 var members_extended_data = [];
 
                 for (var i=0; i<data.length; i++) {
-                
+
                     var element = [];
 
                     element._id = data[i]._id;
@@ -69,14 +69,14 @@ angular.module('groupbuys').controller('GroupbuysTabBuyersController', ['$scope'
 
         }
 
-        // Load members items data if it's necessary
+/*        // Load members items data if it's necessary
         if ($scope.visibility.show_members_items) {
 
 
 
 
         }
-
+*/
     };
 
     // ----------------------
