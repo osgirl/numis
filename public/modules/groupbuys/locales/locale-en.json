@@ -22,6 +22,8 @@
         "New_Update": "New update",
         "Written_on": "Written on",
         "Join_this_groupbuy": "Join this groupbuy",
+        "Leave_this_groupbuy": "Leave this groupbuy",
+        "Managers_cant_leave": "Managers can't leave the groupbuy, you must cease being manager first",
         "Add_Manager": "Add manager",
         "Search": "Search",
         "Filter": "Filter",

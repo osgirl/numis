@@ -7,6 +7,7 @@ angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope','
 
     $scope.newUpdate = '';
 
+    // ----------------
 
     /*
     @ngdoc method
@@ -38,6 +39,7 @@ angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope','
         }
     };
 
+    // ----------------
 
     /*
     @ngdoc method
@@ -49,8 +51,29 @@ angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope','
     */
     $scope.joinGroupbuy = function() {
         console.log ('UNIRSE A LA COMPRA');
-        //$location.path('groupbuys/' + $scope.groupbuy.slug + '/manage');
+        // TODO
+        //$location.path('groupbuys/' + $stateParams.groupbuyId );
     };
+
+    // ----------------
+
+    /*
+    @ngdoc method
+    * @name groupbuys.controller:GroupbuysTabInfoController.$scope.leaveGroupbuy
+    * @methodOf groupbuys.controller:GroupbuysTabInfoController
+
+    @description
+    * Removes an member from the groupbuy.
+    */
+    $scope.leaveGroupbuy = function() {
+        console.log (' ABANDONAR COMPRA');
+        // TODO
+        //$location.path('groupbuys/);
+    };
+
+
+
+    // ----------------
 
   }
 ]);

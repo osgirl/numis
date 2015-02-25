@@ -22,6 +22,8 @@
         "New_Update": "Nueva actualización",
         "Written_on": "Escrito el día",
         "Join_this_groupbuy": "Unirse a esta compra",
+        "Leave_this_groupbuy": "Abandonar esta compra",
+        "Managers_cant_leave": "Los gestores no pueden abandonar las compras en grupo, debe dejar de ser gestor primero",
         "Add_Manager": "Añadir gestor",
         "Search": "Buscar",
         "Filter": "Filtrar",

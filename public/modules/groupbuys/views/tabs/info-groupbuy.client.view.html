@@ -81,6 +81,21 @@
             </div>
             <!-- FIN Panel de actualizaciones -->
 
+            <!-- Panel de abandonar -->
+            <div data-ng-show="(userRole == 'member' && !authentication.user.memberCanAdmin)">
+                <form data-ng-submit="leaveGroupbuy()" name="leaveForm" novalidate>
+                    <div class="form-group">
+                        <input type="submit" value="{{'groupbuys.Leave_this_groupbuy' | translate}}" class="btn btn-danger">
+                    </div>
+                </form>
+            </div>
+            <div data-ng-show="(authentication.user.memberCanAdmin)">
+                <div class="alert alert-warning" role="alert">
+                    {{'groupbuys.Managers_cant_leave' | translate}}.
+                </div>
+            </div>
+            <!-- FIN Panel de abandonar -->
+
           </div>
     </div>
 <!--  FIN Panel de la pestaña -->
