@@ -1,24 +1,25 @@
 'use strict';
 
 module.exports = function(app) {
-	var users = require('../../app/controllers/users.server.controller'),
+	var core      = require('../../app/controllers/core.server.controller'),
+		users     = require('../../app/controllers/users.server.controller'),
 		groupbuys = require('../../app/controllers/groupbuys.server.controller'),
-		items = require('../../app/controllers/items.server.controller');
+		items     = require('../../app/controllers/items.server.controller');
 
 	// Items Routes
 	app.route('/api/v1/groupbuys/:groupbuyId/items')
-		.get(users.requiresLogin, items.list)
+		.get(users.requiresLogin, groupbuys.hasVisibility('items'), core.prepareQueryParams, items.list)
 		.post(users.requiresLogin, items.create);
 
 	app.route('/api/v1/groupbuys/:groupbuyId/items/:itemId')
-		.get(users.requiresLogin, items.read)
+		.get(users.requiresLogin, groupbuys.hasVisibility('items'), items.read)
 		.put(users.requiresLogin, items.hasAuthorization, items.update)
 		.delete(users.requiresLogin, items.hasAuthorization, items.delete);
 
 /*
 	// End-points routes to manage image of the items.
 	app.route('/api/v1/groupbuys/:groupbuyId/items/image')
-		.get(users.requiresLogin, users.getImage)
+		.get(users.requiresLogin, groupbuys.hasVisibility('items'), users.getImage)
 		.put(users.requiresLogin, items.hasAuthorization, items.updateImage)
 		.delete(users.requiresLogin, items.hasAuthorization, users.deleteImage);
 */

@@ -7,7 +7,7 @@ module.exports = function(grunt) {
 		serverJS: 	 ['gruntfile.js', 'server.js', 'config/**/*.js', 'app/**/*.js'],
 		appServerJS: ['app/**/*.js', '!'],
 		clientViews: ['public/modules/**/views/**/*.html'],
-		clientJS: 	 ['public/js/*.js', 'public/modules/**/*.js'],
+		clientJS: 	 ['public/*.js', 'public/modules/**/*.js'],
 		clientCSS: 	 ['public/modules/**/*.css'],
 		mochaTests:  ['app/tests/**/*.js']
 	};
@@ -133,7 +133,8 @@ module.exports = function(grunt) {
 			src: watchFiles.mochaTests,
 			options: {
 				reporter: 'spec',
-				require: 'server.js'
+				require: 'server.js',
+				timeout: 10000
 			}
 		},
 		karma: {

@@ -3,11 +3,12 @@
 /**
  * Module dependencies.
  */
-var _ = require('lodash'),
+var _            = require('lodash'),
 	errorHandler = require('../errors.server.controller.js'),
-	mongoose = require('mongoose'),
-	passport = require('passport'),
-	User = mongoose.model('User');
+	core         = require('../core.server.controller'),
+	mongoose     = require('mongoose'),
+	passport     = require('passport'),
+	User         = mongoose.model('User');
 
 /**
  * Formatting user details to send
@@ -41,7 +42,7 @@ var formattingUser = exports.formattingUser = function(user, req, reduce) {
 
 		if (!reduce) {
 			if (user.provider === 'local') {
-				result._links.password = { href: parentURL + '/password', title: 'Change own password'};
+				result._links.password = { href: parentURL + '/password', title: 'Change my own password'};
 			}
 
 			if (isAdmin || isMe) {
@@ -63,9 +64,11 @@ var formattingUser = exports.formattingUser = function(user, req, reduce) {
 /**
  * Formatting user details to send
  */
-var formattingUserList = exports.formattingUserList = function(users, req, collectionName) {
-	var selfURL  = (req && req.url) ? req.url : '',
-		usersURL = '';
+var formattingUserList = exports.formattingUserList = function(users, req, options) {
+	// Add 'collectionName' key if not exists
+	options = _.assign({collectionName: 'users'}, options);
+
+	var selfURL = (typeof req.url !== 'undefined') ? req.url : '';
 
 	// Prepare response in JSON+HAL format.
 	var result = {
@@ -76,22 +79,19 @@ var formattingUserList = exports.formattingUserList = function(users, req, colle
 			users: []
 		}
 	};
+	// Adding paggination links to result collection
+	result._links = _.assign(result._links, core.addPaginationLinks(selfURL, options) );
 
+	// Adding embedded users
 	if (users || typeof users !== 'undefined') {
-		var isAdmin = (req && req.user && typeof req.user.roles !== 'undefined' && req.user.roles.indexOf('admin') !== -1);
-
-		if (users.length) {
-			usersURL = ('/api/v1' + users[0].toLink() ).replace(/\/[a-f\d]{24}$/i, '');
-		}
-
 		for (var i = 0; i < users.length; i++) {
 			result._embedded.users.push( formattingUser(users[i], req, true) );
 		}
 	}
 
 	// Rename embedded collection
-	if (collectionName && typeof collectionName !== 'undefined' && collectionName !== 'users') {
-		result._embedded[collectionName] = result._embedded.users;
+	if (options.collectionName !== 'users') {
+		result._embedded[options.collectionName] = result._embedded.users;
 		delete result._embedded.users;
 	}
 
@@ -180,13 +180,19 @@ exports.delete = function(req, res) {
  * List of Users
  */
 exports.list = function(req, res) {
-	User.find().select('_id username name provider roles').sort('username').exec(function(err, users) {
+	var query  = null,
+		sort   = req.query.sort || 'username',
+		limit  = req.query.limit || 25,
+		page   = req.query.page || 1,
+		fields = req.query.fields || {};
+
+	User.paginate(query, page, limit, function(err, totalPages, users, count) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.jsonp( formattingUserList(users, req) );
+			res.jsonp( formattingUserList(users, req, {page: page, totalPages: totalPages, numElems: limit, totalElems: count, selFields: fields}) );
 		}
-	});
+	}, { columns: fields, sortBy : sort });
 };
 
 

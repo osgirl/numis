@@ -40,22 +40,37 @@ describe('Item CRUD tests', function() {
 			provider: 'local'
 		});
 
-		groupbuy1 = new Groupbuy({
-			title: 'Groupbuy A',
-			description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras semper suscipit velit, hendrerit fringilla purus mollis vitae. Praesent auctor non lectus ac consectetur. Maecenas quis consequat quam. Nullam sed feugiat neque. In hendrerit sagittis lacinia. Proin venenatis leo quis orci ultrices facilisis. Morbi rutrum augue vel est accumsan feugiat. Vestibulum interdum tincidunt metus in lobortis.<br/><br/>Integer blandit dui ut scelerisque iaculis. Aliquam fringilla pulvinar cursus. Sed porttitor laoreet nunc a ultrices. Ut ac gravida turpis. Proin a ipsum sed erat tempor ultrices in vitae sem. Quisque auctor ex ante, at semper magna rutrum at. Nunc non maximus metus, in rutrum ligula. Nullam accumsan at ante sed ornare. Suspendisse est sem, varius eu mi eu, bibendum finibus neque. Sed vehicula malesuada velit. Maecenas ut augue ligula. Cras blandit libero ut lobortis ornare. Cras varius varius vestibulum.<br/><br/>Nulla a hendrerit enim. Nunc consequat dolor nec orci aliquet, a tempor dolor consequat. Donec elementum nisi lacus, ut cursus nibh facilisis vel. Mauris eget sapien porttitor, elementum dui condimentum, luctus lacus. Aenean quis volutpat lectus. Aenean porta iaculis egestas. Aenean sollicitudin tincidunt interdum.<br/><br/>In maximus nunc sit amet felis molestie, ut imperdiet nunc tincidunt. Etiam in magna quis velit commodo euismod a at elit. Mauris tristique elementum lobortis. Phasellus posuere sollicitudin justo, et rutrum urna varius at. Vivamus facilisis nulla sem, pellentesque maximus lorem bibendum sed. Phasellus aliquet leo a nibh tincidunt ultrices. Nulla a venenatis tortor, accumsan egestas dolor.<br/><br/>Fusce vestibulum lacinia neque quis imperdiet. Curabitur ultricies diam eu tellus maximus vestibulum. Curabitur bibendum turpis vitae lorem fermentum aliquet. Morbi vel odio neque. Cras et dignissim massa, nec aliquam leo. In egestas ut dui eu sodales. In vel sagittis urna, ullamcorper imperdiet ligula. Sed nec malesuada augue, quis facilisis sapien.',
-			user: user1
-		});
-
-		groupbuy2 = new Groupbuy({
-			title: 'Groupbuy B',
-			description: 'Buscar información en <a href="https://www.google.es/">Google</a>',
-			user: user1
-		});
+		// Remove old previous data
+		Item.remove().exec();
+		Groupbuy.remove().exec();
+		User.remove().exec();
 
 		// Save a user and 2 groupbuys to the test db
-		user1.save(function() {
-			groupbuy1.save(function() {
-				groupbuy2.save(function() {
+		user1.save(function(err) {
+			if (err) console.error(err);
+
+			groupbuy1 = new Groupbuy({
+				title: 'Groupbuy A',
+				description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras semper suscipit velit, hendrerit fringilla purus mollis vitae. Praesent auctor non lectus ac consectetur. Maecenas quis consequat quam. Nullam sed feugiat neque. In hendrerit sagittis lacinia. Proin venenatis leo quis orci ultrices facilisis. Morbi rutrum augue vel est accumsan feugiat. Vestibulum interdum tincidunt metus in lobortis.<br/><br/>Integer blandit dui ut scelerisque iaculis. Aliquam fringilla pulvinar cursus. Sed porttitor laoreet nunc a ultrices. Ut ac gravida turpis. Proin a ipsum sed erat tempor ultrices in vitae sem. Quisque auctor ex ante, at semper magna rutrum at. Nunc non maximus metus, in rutrum ligula. Nullam accumsan at ante sed ornare. Suspendisse est sem, varius eu mi eu, bibendum finibus neque. Sed vehicula malesuada velit. Maecenas ut augue ligula. Cras blandit libero ut lobortis ornare. Cras varius varius vestibulum.<br/><br/>Nulla a hendrerit enim. Nunc consequat dolor nec orci aliquet, a tempor dolor consequat. Donec elementum nisi lacus, ut cursus nibh facilisis vel. Mauris eget sapien porttitor, elementum dui condimentum, luctus lacus. Aenean quis volutpat lectus. Aenean porta iaculis egestas. Aenean sollicitudin tincidunt interdum.<br/><br/>In maximus nunc sit amet felis molestie, ut imperdiet nunc tincidunt. Etiam in magna quis velit commodo euismod a at elit. Mauris tristique elementum lobortis. Phasellus posuere sollicitudin justo, et rutrum urna varius at. Vivamus facilisis nulla sem, pellentesque maximus lorem bibendum sed. Phasellus aliquet leo a nibh tincidunt ultrices. Nulla a venenatis tortor, accumsan egestas dolor.<br/><br/>Fusce vestibulum lacinia neque quis imperdiet. Curabitur ultricies diam eu tellus maximus vestibulum. Curabitur bibendum turpis vitae lorem fermentum aliquet. Morbi vel odio neque. Cras et dignissim massa, nec aliquam leo. In egestas ut dui eu sodales. In vel sagittis urna, ullamcorper imperdiet ligula. Sed nec malesuada augue, quis facilisis sapien.',
+				manager: [user1.id],
+				member: [user1.id],
+				user: user1.id
+			});
+
+			groupbuy2 = new Groupbuy({
+				title: 'Groupbuy B',
+				description: 'Buscar información en <a href="https://www.google.es/">Google</a>',
+				manager: [user1.id],
+				member: [user1.id],
+				user: user1.id
+			});
+
+			groupbuy1.save(function(err) {
+				if (err) console.error(err);
+
+				groupbuy2.save(function(err) {
+					if (err) console.error(err);
+
 					// Create two Items to Groupbuy 1
 					item1 = {
 						title: 'Item A1',
@@ -93,7 +108,30 @@ describe('Item CRUD tests', function() {
 		});
 	});
 
-	it('NU_P_G311_E101: should be able to save Item instance if logged in', function(done) {
+	/*
+	 *  NU_P_Gxyy_Eabb:
+	 *          x) Test side:
+	 *              0 - Server
+	 *              1 - Client
+	 *
+	 *          yy) Module:
+	 *              01 - Users
+	 *              02 - Groupbuys
+	 *              03 - Items
+	 *              04 - Orders
+	 *              05 - Mesenger
+	 *
+	 *          a) Subgroup (in Server side):
+	 *              0 - Mongoose
+	 *              1 - REST API
+	 *              2 - Pagination, sorting and filtering
+	 *              3 - Permission
+	 *
+	 *          bb) Test number
+	 */
+
+
+	it('NU_P_G003_E101: should be able to save Item instance if logged in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -141,7 +179,7 @@ describe('Item CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G311_E102: should not be able to save Item instance if not logged in', function(done) {
+	it('NU_P_G003_E102: should not be able to save Item instance if not logged in', function(done) {
 		var GroupbuyId = groupbuy1._id;
 
 		agent.get('/auth/signout')
@@ -164,7 +202,7 @@ describe('Item CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G311_E103: should not be able to save Item instance if no title is provided', function(done) {
+	it('NU_P_G003_E103: should not be able to save Item instance if no title is provided', function(done) {
 		var GroupbuyId = groupbuy1._id;
 
 		// Invalidate name field
@@ -194,7 +232,7 @@ describe('Item CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G311_E104: should be able to update Item instance if signed in', function(done) {
+	it('NU_P_G003_E104: should be able to update Item instance if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -241,7 +279,7 @@ describe('Item CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G311_E105: should not be able to get a list of Items if not signed in', function(done) {
+	it('NU_P_G003_E105: should not be able to get a list of Items if not signed in', function(done) {
 		// Create new Item model instance
 		var itemObj = new Item(item1);
 
@@ -262,7 +300,7 @@ describe('Item CRUD tests', function() {
 		});
 	});
 
-	it('NU_P_G311_E106: should not be able to get a single Item if not signed in', function(done) {
+	it('NU_P_G003_E106: should not be able to get a single Item if not signed in', function(done) {
 		// Create new Item model instance
 		var itemObj = new Item(item1);
 
@@ -281,7 +319,7 @@ describe('Item CRUD tests', function() {
 		});
 	});
 
-	it('NU_P_G311_E107: should be able to delete Item instance if signed in', function(done) {
+	it('NU_P_G003_E107: should be able to delete Item instance if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -318,7 +356,7 @@ describe('Item CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G311_E108: should not be able to delete Item instance if not signed in', function(done) {
+	it('NU_P_G003_E108: should not be able to delete Item instance if not signed in', function(done) {
 		// Set Item user
 		item1.user = user1;
 

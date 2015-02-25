@@ -3,14 +3,17 @@
 /**
  * Module dependencies.
  */
-var mongoose 	  = require('mongoose'),
-	slugPlugin	  = require('mongoose-url-slugs'),
-	filePluginLib = require('mongoose-file'),
-	filePlugin	  = filePluginLib.filePlugin,
-	l2rPlugin	  = require('mongoose-l2r'),
-	crypto	 	  = require('crypto'),
-	path		  = require('path'),
-	Schema 	 	  = mongoose.Schema;
+var mongoose       = require('mongoose'),
+	slugPlugin     = require('mongoose-url-slugs'),
+	filePluginLib  = require('mongoose-file'),
+	filePlugin     = filePluginLib.filePlugin,
+	paginatePlugin = require('mongoose-paginate'),
+	l2rPlugin      = require('mongoose-l2r'),
+	//thumbnailPluginLib = require('mongoose-thumbnail'),
+	//thumbnailPlugin	 = thumbnailPluginLib.thumbnailPlugin,
+	crypto	       = require('crypto'),
+	path           = require('path'),
+	Schema 	       = mongoose.Schema;
 
 /**
  * A Validation function for local strategy properties
@@ -177,12 +180,22 @@ UserSchema.statics.findUniqueUsername = function(username, suffix, callback) {
 	});
 };
 
+/**
+ * Create instance method for check if an user is platform admin
+ */
+UserSchema.methods.isAdmin = function() {
+	return (this.roles.indexOf('admin') !== -1);
+};
+
 
 /**
-* Add plugins to User schema.
-*/
+ * Add plugins to User schema.
+ */
 // Slug plugin
 UserSchema.plugin(slugPlugin('username', {field: 'name'}));
+
+// Paginate plugin
+UserSchema.plugin(paginatePlugin);
 
 // L2r plugin
 UserSchema.plugin(l2rPlugin);
@@ -196,6 +209,19 @@ UserSchema.plugin(filePlugin, {
 	upload_to: filePluginLib.make_upload_to_model(uploads, 'avatars'),
 	relative_to: uploads_base
 });
+
+/*
+UserSchema.plugin(thumbnailPlugin, {
+	name: 'avatar',
+	format: 'png',
+	size: 80,
+	inline: false,
+	save: true,
+	upload_to: thumbnailPluginLib.make_upload_to_model(uploads, 'avatars'),
+	relative_to: uploads_base
+});
+*/
+
 
 
 

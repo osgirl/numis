@@ -3,13 +3,14 @@
 /**
  * Module dependencies.
  */
-var mongoose 	  = require('mongoose'),
-	slugPlugin	  = require('mongoose-url-slugs'),
-	filePluginLib = require('mongoose-file'),
-	filePlugin	  = filePluginLib.filePlugin,
-	l2rPlugin	  = require('mongoose-l2r'),
-	path		  = require('path'),
-	Schema        = mongoose.Schema;
+var mongoose       = require('mongoose'),
+	slugPlugin     = require('mongoose-url-slugs'),
+	filePluginLib  = require('mongoose-file'),
+	filePlugin     = filePluginLib.filePlugin,
+	paginatePlugin = require('mongoose-paginate'),
+	l2rPlugin      = require('mongoose-l2r'),
+	path           = require('path'),
+	Schema         = mongoose.Schema;
 
 
 var getPrice = function (num) {
@@ -107,6 +108,9 @@ ItemSchema.pre('save', function(next) {
  */
 // Slug plugin
 ItemSchema.plugin(slugPlugin('title', {field: 'name'}));
+
+// Paginate plugin
+ItemSchema.plugin(paginatePlugin);
 
 // L2r plugin
 ItemSchema.plugin(l2rPlugin);
