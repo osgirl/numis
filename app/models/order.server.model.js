@@ -3,11 +3,12 @@
 /**
  * Module dependencies.
  */
-var mongoose  = require('mongoose'),
-	crypto	  = require('crypto'),
-	l2rPlugin = require('mongoose-l2r'),
-	_         = require('lodash'),
-	Schema    = mongoose.Schema;
+var mongoose       = require('mongoose'),
+	crypto         = require('crypto'),
+	paginatePlugin = require('mongoose-paginate'),
+	l2rPlugin      = require('mongoose-l2r'),
+	_              = require('lodash'),
+	Schema         = mongoose.Schema;
 
 
 
@@ -259,8 +260,11 @@ OrderSchema.methods.calculateSummary = function(callback) {
 
 
 /**
- * Add plugins to Item schema.
+ * Add plugins to Order schema.
  */
+// Paginate plugin
+OrderSchema.plugin(paginatePlugin);
+
 // L2r plugin
 OrderSchema.plugin(l2rPlugin);
 

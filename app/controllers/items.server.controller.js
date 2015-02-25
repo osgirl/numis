@@ -3,10 +3,11 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose'),
+var mongoose     = require('mongoose'),
+	core         = require('./core.server.controller'),
 	errorHandler = require('./errors.server.controller'),
-	Item = mongoose.model('Item'),
-	_ = require('lodash');
+	_            = require('lodash'),
+	Item         = mongoose.model('Item');
 
 
 /**
@@ -73,17 +74,22 @@ var formattingItem = exports.formattingItem = function(item, req, reduce) {
 /**
  * Formatting items list to send
  */
-var formattingItemList = exports.formattingItemList = function(items, req) {
-	var item;
+var formattingItemList = exports.formattingItemList = function(items, req, options) {
+	var selfURL = (typeof req.url !== 'undefined') ? req.url : '';
+
 	var result = {
 		_links: {
-			self: { href: req.url }
+			self: { href: selfURL }
 		},
 		_embedded: {
 			items: []
 		}
 	};
 
+	// Adding paggination links to result collection
+	result._links = _.assign(result._links, core.addPaginationLinks(selfURL, options) );
+
+	// Adding embedded items
 	for (var i = 0; i < items.length; i++) {
 		result._embedded.items.push( formattingItem(items[i], req, true) );
 	}
@@ -154,13 +160,19 @@ exports.delete = function(req, res) {
  * List of Items
  */
 exports.list = function(req, res) {
-	Item.find().sort('title').exec(function(err, items) {
+	var query  = req.query.filter || null,
+		sort   = req.query.sort || 'title',
+		limit  = req.query.limit || 25,
+		page   = req.query.page || 1,
+		fields = req.query.fields || {};
+
+	Item.paginate(query, page, limit, function(err, totalPages, items, count) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.jsonp( formattingItemList(items, req) );
+			res.jsonp( formattingItemList(items, req, {page: page, totalPages: totalPages, numElems: limit, totalElems: count, selFields: fields}) );
 		}
-	});
+	}, { columns: fields, sortBy : sort });
 };
 
 

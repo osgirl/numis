@@ -4,11 +4,13 @@
  * Module dependencies.
  */
 var mongoose 	 = require('mongoose'),
+	core         = require('./core.server.controller'),
 	errorHandler = require('./errors.server.controller'),
 	users 		 = require('./users.server.controller'),
+	_ 			 = require('lodash'),
 	User 		 = mongoose.model('User'),
-	Groupbuy 	 = mongoose.model('Groupbuy'),
-	_ 			 = require('lodash');
+	Groupbuy 	 = mongoose.model('Groupbuy');
+
 
 
 /**
@@ -93,9 +95,8 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, re
 /**
  * Formatting groupbuy details to send
  */
-var formattingGroupbuyList = exports.formattingGroupbuyList = function(groupbuys, req) {
-	var selfURL 	 = (req && req.url) ? req.url : '',
-		groupbuysURL = '';
+var formattingGroupbuyList = exports.formattingGroupbuyList = function(groupbuys, req, options) {
+	var selfURL = (typeof req.url !== 'undefined') ? req.url : '';
 
 	// Prepare response in JSON+HAL format.
 	var result = {
@@ -107,6 +108,10 @@ var formattingGroupbuyList = exports.formattingGroupbuyList = function(groupbuys
 		}
 	};
 
+	// Adding paggination links to result collection
+	result._links = _.assign(result._links, core.addPaginationLinks(selfURL, options) );
+
+	// Adding embedded groupbuys
 	if (groupbuys || typeof groupbuys !== 'undefined') {
 		for (var i = 0; i < groupbuys.length; i++) {
 			result._embedded.groupbuys.push( formattingGroupbuy(groupbuys[i], req, true) );
@@ -179,13 +184,19 @@ exports.delete = function(req, res) {
  * List of Groupbuys
  */
 exports.list = function(req, res) {
-	Groupbuy.find().select('_id title name description status members manager user').sort('title').populate('user', 'username roles').exec(function(err, groupbuys) {
+	var query  = req.query.filter || null,
+		sort   = req.query.sort || 'title',
+		limit  = req.query.limit || 25,
+		page   = req.query.page || 1,
+		fields = req.query.fields || '_id title name description status members manager user';
+
+	Groupbuy.paginate(query, page, limit, function(err, totalPages, groupbuys, count) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.jsonp( formattingGroupbuyList(groupbuys, req) );
+			res.jsonp( formattingGroupbuyList(groupbuys, req, {page: page, totalPages: totalPages, numElems: limit, totalElems: count, selFields: fields}) );
 		}
-	});
+	}, { columns: fields, populate: ['user'], sortBy : sort });
 };
 
 /**
@@ -252,11 +263,31 @@ exports.deleteMember = function(req, res) {
  * Get list of members in a groupbuy
  */
 exports.getMembersList = function(req, res) {
-	Groupbuy.findById(req.groupbuy._id).populate('members').exec(function(err, groupbuy) {
+	var query   = req.query.filter || null,
+		sort    = _.keys(req.query.sort) || 'username',
+		sortDir = _.values(req.query.sort)[0] || 1,
+		limit   = req.query.limit || 25,
+		page    = req.query.page || 1;
+
+	Groupbuy.findById(req.groupbuy._id).populate('members', '_id name username avatar roles').exec(function(err, groupbuy) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.jsonp( users.formattingUserList(groupbuy.members, req, 'members') );
+			var count      = groupbuy.members.length,
+				totalPages = Math.ceil(count / limit) || 1,
+				members,
+				options;
+
+			// Sort the array
+			members = _.sortByAll(groupbuy.members, sort);
+			// If sortDir is -1, reverse the array
+			if (parseInt(sortDir) === -1) { members = _(members).reverse().value(); }
+			// Make pagination
+			members = _.slice(members, (page * limit) - limit, (page * limit));
+			// Fill options
+			options = {page: page, totalPages: totalPages, numElems: limit, totalElems: members.length, collectionName: 'members'};
+
+			res.jsonp( users.formattingUserList(members, req, options) );
 		}
 	});
 };
@@ -329,14 +360,34 @@ exports.deleteManager = function(req, res) {
 };
 
 /**
- * Get list of members in a groupbuy
+ * Get list of managers in a groupbuy
  */
 exports.getManagersList = function(req, res) {
-	Groupbuy.findById(req.groupbuy._id).populate('managers').exec(function(err, groupbuy) {
+	var query   = req.query.filter || null,
+		sort    = _.keys(req.query.sort) || 'username',
+		sortDir = _.values(req.query.sort)[0] || 1,
+		limit   = req.query.limit || 25,
+		page    = req.query.page || 1;
+
+	Groupbuy.findById(req.groupbuy._id).populate('managers', '_id name username avatar roles').exec(function(err, groupbuy) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.jsonp( users.formattingUserList(groupbuy.managers, req, 'managers') );
+			var count      = groupbuy.managers.length,
+				totalPages = Math.ceil(count / limit) || 1,
+				managers,
+				options;
+
+			// Sort the array
+			managers = _.sortByAll(groupbuy.managers, sort);
+			// If sortDir is -1, reverse the array
+			if (parseInt(sortDir) === -1) { managers = _(managers).reverse().value(); }
+			// Make pagination
+			managers = _.slice(managers, (page * limit) - limit, (page * limit));
+			// Fill options
+			options = {page: page, totalPages: totalPages, numElems: limit, totalElems: managers.length, collectionName: 'managers'};
+
+			res.jsonp( users.formattingUserList(managers, req, options) );
 		}
 	});
 };
@@ -363,7 +414,7 @@ exports.hasAuthorization = function(roles) {
 		return next();
 
 	/*
-console.log(req.groupbuy);
+	console.log(req.groupbuy);
 
 		if (_.intersection(req.groupbuy.getRoles(req.user), roles).length) {
 			return next();
@@ -382,7 +433,7 @@ console.log(req.groupbuy);
  */
 exports.hasVisibility = function(property) {
 	return function(req, res, next) {
-		if (req.groupbuy.checkVisibility(req.user, property) ) {
+		if (req.groupbuy && req.groupbuy.checkVisibility(req.user, property) ) {
 			return next();
 		} else {
 			return res.status(403).send({

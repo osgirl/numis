@@ -1,14 +1,15 @@
 'use strict';
 
 module.exports = function(app) {
-	var users     = require('../../app/controllers/users.server.controller'),
+	var core      = require('../../app/controllers/core.server.controller'),
+		users     = require('../../app/controllers/users.server.controller'),
 		groupbuys = require('../../app/controllers/groupbuys.server.controller'),
 		orders    = require('../../app/controllers/orders.server.controller');
 
 
 	// Orders Routes
 	app.route('/api/v1/orders')
-		.get(users.requiresLogin, users.hasAuthorization(['admin']), orders.list)
+		.get(users.requiresLogin, users.hasAuthorization(['admin']), core.prepareQueryParams, orders.list)
 		.post(users.requiresLogin, orders.create);
 
 	app.route('/api/v1/orders/:orderId')
@@ -26,10 +27,10 @@ module.exports = function(app) {
 		.post(users.requiresLogin, groupbuys.hasAuthorization(['manager']), orders.calculateSummary);
 
 	app.route('/api/v1/users/:userId/orders')
-		.get(users.requiresLogin, users.hasAuthorization(['self','admin']), orders.list);
+		.get(users.requiresLogin, users.hasAuthorization(['self','admin']), core.prepareQueryParams, orders.list);
 
 	app.route('/api/v1/groupbuys/:groupbuyId/orders')
-		.get(users.requiresLogin, groupbuys.hasVisibility('itemsByMember'), orders.list);
+		.get(users.requiresLogin, groupbuys.hasVisibility('itemsByMember'), core.prepareQueryParams, orders.list);
 
 
 	// Finish by binding the middlewares

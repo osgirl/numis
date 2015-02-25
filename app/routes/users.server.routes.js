@@ -7,11 +7,12 @@ var passport = require('passport');
 
 module.exports = function(app) {
 	// User Routes
-	var users = require('../../app/controllers/users.server.controller');
+	var core      = require('../../app/controllers/core.server.controller'),
+		users     = require('../../app/controllers/users.server.controller');
 
 	// Users Routes
 	app.route('/api/v1/users')
-		.get(users.requiresLogin, users.hasAuthorization(['user']), users.list)
+		.get(users.requiresLogin, users.hasAuthorization(['user']), core.prepareQueryParams, users.list)
 		.post(users.requiresLogin, users.hasAuthorization(['admin']), users.create);
 
 	app.route('/api/v1/users/me').get(users.requiresLogin, users.me);

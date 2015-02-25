@@ -3,10 +3,11 @@
 /**
  * Module dependencies.
  */
-var mongoose   = require('mongoose'),
-	slugPlugin = require('mongoose-url-slugs'),
-	l2rPlugin  = require('mongoose-l2r'),
-	Schema	   = mongoose.Schema;
+var mongoose       = require('mongoose'),
+	slugPlugin     = require('mongoose-url-slugs'),
+	paginatePlugin = require('mongoose-paginate'),
+	l2rPlugin      = require('mongoose-l2r'),
+	Schema         = mongoose.Schema;
 
 /**
  * Groupbuy Schema
@@ -178,6 +179,9 @@ GroupbuySchema.methods.checkVisibility = function(user, property) {
  */
 // Slug plugin
 GroupbuySchema.plugin(slugPlugin('title', {field: 'name'}));
+
+// Paginate plugin
+GroupbuySchema.plugin(paginatePlugin);
 
 // L2r plugin
 GroupbuySchema.plugin(l2rPlugin);

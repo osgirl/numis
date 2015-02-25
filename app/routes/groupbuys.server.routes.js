@@ -1,12 +1,13 @@
 'use strict';
 
 module.exports = function(app) {
-	var users     = require('../../app/controllers/users.server.controller'),
+	var core      = require('../../app/controllers/core.server.controller'),
+		users     = require('../../app/controllers/users.server.controller'),
 		groupbuys = require('../../app/controllers/groupbuys.server.controller');
 
 	// Groupbuys Routes
 	app.route('/api/v1/groupbuys')
-		.get(users.requiresLogin, groupbuys.list)
+		.get(users.requiresLogin, core.prepareQueryParams, groupbuys.list)
 		.post(users.requiresLogin, groupbuys.create);
 
 	app.route('/api/v1/groupbuys/:groupbuyId')
@@ -16,7 +17,7 @@ module.exports = function(app) {
 
 	// Groupbuy Members Routes
 	app.route('/api/v1/groupbuys/:groupbuyId/members')
-		.get(users.requiresLogin, groupbuys.hasVisibility('members'), groupbuys.getMembersList)
+		.get(users.requiresLogin, groupbuys.hasVisibility('members'), core.prepareQueryParams, groupbuys.getMembersList)
 		.put(users.requiresLogin, groupbuys.addMember);
 
 	app.route('/api/v1/groupbuys/:groupbuyId/members/:userId')
@@ -24,7 +25,7 @@ module.exports = function(app) {
 
 	// Groupbuy Managers Routes
 	app.route('/api/v1/groupbuys/:groupbuyId/managers')
-		.get(users.requiresLogin, groupbuys.hasVisibility('managers'), groupbuys.getManagersList)
+		.get(users.requiresLogin, groupbuys.hasVisibility('managers'), core.prepareQueryParams, groupbuys.getManagersList)
 		.put(users.requiresLogin, groupbuys.hasAuthorization(['manager']), groupbuys.addManager);
 
 	app.route('/api/v1/groupbuys/:groupbuyId/managers/:userId')
@@ -33,7 +34,7 @@ module.exports = function(app) {
 
 	// List Groupbuys form specified user
 	app.route('/api/v1/users/:userId/groupbuys')
-		.get(users.requiresLogin, users.hasAuthorization(['self','admin']), groupbuys.list);
+		.get(users.requiresLogin, users.hasAuthorization(['self','admin']), core.prepareQueryParams, groupbuys.list);
 
 
 	// Finish by binding the Item middleware

@@ -1,13 +1,14 @@
 'use strict';
 
 module.exports = function(app) {
-	var users = require('../../app/controllers/users.server.controller'),
+	var core      = require('../../app/controllers/core.server.controller'),
+		users     = require('../../app/controllers/users.server.controller'),
 		groupbuys = require('../../app/controllers/groupbuys.server.controller'),
-		items = require('../../app/controllers/items.server.controller');
+		items     = require('../../app/controllers/items.server.controller');
 
 	// Items Routes
 	app.route('/api/v1/groupbuys/:groupbuyId/items')
-		.get(users.requiresLogin, groupbuys.hasVisibility('items'), items.list)
+		.get(users.requiresLogin, groupbuys.hasVisibility('items'), core.prepareQueryParams, items.list)
 		.post(users.requiresLogin, items.create);
 
 	app.route('/api/v1/groupbuys/:groupbuyId/items/:itemId')

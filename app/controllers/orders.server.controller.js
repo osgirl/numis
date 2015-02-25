@@ -3,10 +3,11 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose'),
+var mongoose     = require('mongoose'),
+	core         = require('./core.server.controller'),
 	errorHandler = require('./errors.server.controller'),
-	Order = mongoose.model('Order'),
-	_ = require('lodash');
+	_            = require('lodash'),
+	Order        = mongoose.model('Order');
 
 
 /**
@@ -73,17 +74,23 @@ var formattingOrder = function(order, req, reduce) {
 /**
  * Formatting orders list to send
  */
-var formattingOrderList = function(orders, req) {
-	var order;
+var formattingOrderList = function(orders, req, options) {
+	var selfURL = (typeof req.url !== 'undefined') ? req.url : '';
+
+	// Prepare response in JSON+HAL format.
 	var result = {
 		_links: {
-			self: { href: req.url }
+			self: { href: selfURL }
 		},
 		_embedded: {
 			orders: []
 		}
 	};
 
+	// Adding paggination links to result collection
+	result._links = _.assign(result._links, core.addPaginationLinks(selfURL, options) );
+
+	// Adding embedded orders
 	for (var i = 0; i < orders.length; i++) {
 		result._embedded.orders.push( formattingOrder(orders[i], req, true) );
 	}
@@ -168,38 +175,37 @@ exports.delete = function(req, res) {
 exports.list = function(req, res) {
 	var query = {},
 		sort,
-		limit = req.param.limit || 25,
-		offset = req.param.offset || 0;
+		limit = req.query.limit || 25,
+		page  = req.query.page || 1,
+		fields = req.query.fields || null;
 
+	// Add query filters and default sorting
 	if (!req.profile && !req.groupbuy && typeof req.profile === 'undefined' && typeof req.groupbuy === 'undefined') {
-		//  /orders -- Show all orders
-		// TODO: Admin profile required
-		sort = req.param.sort || '-updated';
+		/* /orders -- Show all orders */
+		sort = req.query.sort || {updated: -1};
 
 	} else if (req.profile && typeof req.profile !== 'undefined') {
-		//  /users/:userId/orders -- Show orders filtered by user
-		// TODO: Admin or itself
+		/* /users/:userId/orders -- Show orders filtered by user */
 		query = {user: req.profile};
-		sort  = req.param.sort || '-updated';
+		sort  = req.query.sort || '-updated';
 
 	} else if (req.groupbuy && typeof req.groupbuy !== 'undefined') {
-		//  /groupbuys/:groupbuyId/orders -- Show orders filtered by groupbuy
-		// TODO: Admin or groupbuy manager
+		/* /groupbuys/:groupbuyId/orders -- Show orders filtered by groupbuy */
 		query = {groupbuy: req.groupbuy};
-		sort  = req.param.sort || 'user.username';
+		sort  = req.query.sort || 'user.username';
 
 	} else {
 		// Invalid
 		return res.status(400).send( {message: 'Unsupported request!'} );
 	}
 
-	Order.find(query).populate('user', 'username').populate('groupbuy', 'title').sort(sort).exec(function(err, orders) {
+	Order.paginate(query, page, limit, function(err, totalPages, orders, count) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.jsonp( formattingOrderList(orders, req) );
+			res.jsonp( formattingOrderList(orders, req, {page: page, totalPages: totalPages, numElems: limit, totalElems: count, selFields: fields}) );
 		}
-	});
+	}, { columns: fields, populate: ['user', 'groupbuy'], sortBy : sort });
 };
 
 /**
