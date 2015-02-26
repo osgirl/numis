@@ -1,5 +1,157 @@
-<section data-ng-controller="GroupbuysTabPaymentsController">
-<p>
-  PESTAÑA DE LOS PAGOS
-</p>
+<section data-ng-controller="GroupbuysTabPaymentsController" data-ng-init="loadPaymentData()">
+    <div class="panel panel-default">
+        <div class="panel-body">
+
+            <!-- Vista de participante -->
+            <div data-ng-show="(userRole !== 'manager')">
+                <form data-ng-submit="joinGroupbuy()" name="memberManagerForm" novalidate>
+                    <!-- Panel de informacion del pago -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Información sobre el pago</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Información sobre el pago" disabled readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FIN Panel de informacion del pago -->
+
+                    <!-- Panel de cantidad a pagar -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Cantidad a pagar</h3>
+                        </div>
+                        <div class="panel-body">
+                            <b>Precio items: </b><span>XXX</span> +<br />
+                            <b>Envio proporcional: </b><span>XXX</span> +<br />
+                            <b>Envio Propio: </b><span>XXX</span> +<br />
+                            <b>Otros: </b><span>XXX</span><br />
+                            <span>---------------------</span><br />
+                            <b>TOTAL: </b><span>XXX</span><br />
+
+
+                        </div>
+                    </div>
+                    <!-- FIN Panel de cantidad a pagar -->
+
+                    <!-- Panel de notas sobre el pago -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Notas sobre el pago para los gestores</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Notas sobre el pago para los gestores" ></textarea>
+                            </div>
+                        </div>
+                        <div>
+                            <input type="checkbox"></td><span>Pagado</span><br />
+                            <input type="checkbox" disabled readonly></td><span>Recibido</span>
+                        </div>
+                    </div>
+                    <!-- FIN Panel de notas sobre el pago -->
+                    <input type="submit" value="Guardar" class="btn btn-default">
+                </form>
+            </div>
+            <!-- FIN Vista de participante -->
+
+
+            <!-- Vista de gestor -->
+            <div data-ng-show="(userRole == 'manager')">
+
+                <form data-ng-submit="joinGroupbuy()" name="PaymentManagerForm" novalidate>
+                    <!-- Panel de informacion del pago -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Información sobre el pago</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Información sobre el pago" ></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FIN Panel de informacion del pago -->
+
+                    <!-- Panel de costes de envio -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Costes de envio entre el proveedor y gestores</h3>
+                        </div>
+                        <div class="panel-body">
+                            <span>Coste del envio entre el proveedor y el gestor (a partes iguales):</span>
+                            <input type="text">
+                        </div>
+                    </div>
+                    <!-- FIN Panel de costes de envio -->
+
+                    <!-- Panel de participantes -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Desglose de participantes</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="tg" style="border-style:solid; border-width:1px;">
+                                <tr>
+                                <th class=>Participante</th>
+                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Precio Items</th>
+                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Envio porporcional</th>
+                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Envio Propio</th>
+                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Otros</th>
+                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Total</th>
+                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Pagado</th>
+                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Notas de pago</th>
+                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Recibido</th>
+                                </tr>
+                                <tr>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;">Uno</td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="text"></td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="text"></td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="checkbox" disabled readonly></td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;">Ver notas</td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="checkbox"></td>
+                                </tr>
+                                <tr>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;">Dos</td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="text"></td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="text"></td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="checkbox" disabled readonly></td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;">Ver notas</td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="checkbox"></td>
+                                </tr>
+                                <tr>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;"></td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="text"></td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="text"></td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="checkbox" disabled readonly></td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;">Ver notas</td>
+                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="checkbox"></td>
+                                </tr>
+                                </table>
+
+                        </div>
+                    </div>
+                    <!-- FIN Panel de participantes -->
+                    <input type="submit" value="Guardar" class="btn btn-default">
+                </form>
+            </div>
+            <!-- FIN Vista de gestor -->
+
+
+
+          </div>
+    </div>
+<!--  FIN Panel de la pestaña -->
+
 </section>
