@@ -16,6 +16,7 @@
         "No": "No",
         "Ok": "Ok",
         "Cancel": "Cancel",
-        "Create": "Create"
+        "Create": "Create",
+        "Error_connecting_server": "Error connecting server"
     }
 }
