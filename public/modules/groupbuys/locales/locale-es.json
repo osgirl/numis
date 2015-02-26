@@ -52,7 +52,6 @@
         "Payments_Status": "Estado de los pagos",
         "Shipments_Status": "Estado de los envios",
         "Information_Not_Available": "Información no disponible",
-        "Error_connecting_server": "Error de conexión con el servidor",
         "Last_manager_cannot_be_deleted": "No se puede eliminar el ultimo gestor"
     }
 }

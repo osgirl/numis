@@ -38,7 +38,7 @@ angular.module('groupbuys').controller('GroupbuysTabManagersController', ['$scop
             $scope.groupbuy.managers_extended_data = managersList;
 
         }, function errorCallback() {
-            $scope.error = $translate.instant('groupbuys.Error_connecting_server');
+            $scope.error = $translate.instant('core.Error_connecting_server');
         });
 
         if ($scope.userRole === 'manager'){
@@ -87,7 +87,7 @@ angular.module('groupbuys').controller('GroupbuysTabManagersController', ['$scop
                 $scope.groupbuy.usersList = usersList;
 
             }, function errorCallback() {
-                $scope.error = $translate.instant('groupbuys.Error_connecting_server');
+                $scope.error = $translate.instant('core.Error_connecting_server');
             });
 
         }
@@ -132,7 +132,7 @@ angular.module('groupbuys').controller('GroupbuysTabManagersController', ['$scop
                     //        No need to save as the manager is updated via API
 
                 }, function(serverResponse) {
-                    $scope.error = $translate.instant('groupbuys.Error_connecting_server');
+                    $scope.error = $translate.instant('core.Error_connecting_server');
                 });
 
             } else {
@@ -182,7 +182,7 @@ angular.module('groupbuys').controller('GroupbuysTabManagersController', ['$scop
                 // NOTE: No need to save as the manager is updated via API
 
             }, function(serverResponse) {
-                $scope.error = $translate.instant('groupbuys.Error_connecting_server');
+                $scope.error = $translate.instant('core.Error_connecting_server');
             });
 
         }

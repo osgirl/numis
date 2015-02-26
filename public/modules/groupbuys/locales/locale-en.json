@@ -52,7 +52,6 @@
         "Payments_Status": "Payments status",
         "Shipments_Status": "Shipments status",
         "Information_Not_Available": "Information not available",
-        "Error_connecting_server": "Error connecting server",
         "Last_manager_cannot_be_deleted": "Last manager can not be deleted"
     }
 }
