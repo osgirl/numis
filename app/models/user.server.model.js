@@ -5,14 +5,12 @@
  */
 var mongoose       = require('mongoose'),
 	slugPlugin     = require('mongoose-url-slugs'),
-	filePluginLib  = require('mongoose-file'),
-	filePlugin     = filePluginLib.filePlugin,
+	filePlugin     = require('mongoose-file').filePlugin,
 	paginatePlugin = require('mongoose-paginate'),
 	l2rPlugin      = require('mongoose-l2r'),
-	//thumbnailPluginLib = require('mongoose-thumbnail'),
-	//thumbnailPlugin	 = thumbnailPluginLib.thumbnailPlugin,
 	crypto	       = require('crypto'),
 	path           = require('path'),
+	lwip           = require('lwip'),
 	Schema 	       = mongoose.Schema;
 
 /**
@@ -30,10 +28,71 @@ var validateLocalStrategyPassword = function(password) {
 };
 
 
+var makeUploadToModel = function(basedir, subdir) {
+	var b_dir, s_dir, upload_to_model;
+
+	b_dir = basedir;
+    s_dir = subdir;
+
+	upload_to_model = function(fileObj) {
+      	var dstdir, id;
+
+		dstdir = b_dir;
+      	if (s_dir) {
+			dstdir = path.join(dstdir, s_dir);
+      	}
+      	id = this.get('id');
+      	if (id) {
+			dstdir = path.join(dstdir, id + '.' + fileObj.extension.toLowerCase());
+		} else {
+			dstdir = path.join(dstdir, fileObj.name);
+		}
+      	return dstdir;
+    };
+    return upload_to_model;
+};
+
+
+var generateAvatarImages = function(pathname, imgFile, oldValue) {
+	var fileExt  = path.extname(imgFile),
+		fileName = path.dirname(imgFile) + path.sep + path.basename(imgFile, fileExt);
+
+	var generate_image = function(srcFile, dstFile, resizeSize, callback) {
+		lwip.open(srcFile, function(err, image) {
+			if (err) throw err;
+
+			// Crop to make a square image
+			var cropSize = (image.width() > image.height() ) ? image.height() : image.width();
+
+			image.batch()
+				.crop(cropSize, cropSize)
+				.resize(resizeSize, resizeSize)
+				.writeFile(dstFile, function(err) {
+					if (callback && typeof callback === 'function') {
+						callback(err);
+					} else {
+						if (err) throw err;
+					}
+				});
+		});
+	};
+
+	// Crop and resize the image into supported sizes
+	generate_image(imgFile, fileName + '-bg' + fileExt, 256, function(err) {
+		generate_image(imgFile, fileName + '-md' + fileExt, 128, function(err) {
+			generate_image(imgFile, fileName + '-sm' + fileExt, 48, function(err) {
+				if (err) throw err;
+			});
+		});
+	});
+};
+
+
+
 /**
-* Creates a new Person.
-* @class Person
-*/
+ * Creates a new Person.
+ * @class Person
+ */
 
 /**
  * User Schema
@@ -205,23 +264,11 @@ var uploads_base = path.join(__dirname, '../../'),
 	uploads 	 = path.join(uploads_base, 'uploads');
 
 UserSchema.plugin(filePlugin, {
-	name: 'avatar',
-	upload_to: filePluginLib.make_upload_to_model(uploads, 'avatars'),
+	name:        'avatar',
+	change_cb:   generateAvatarImages,
+	upload_to:   makeUploadToModel(uploads, 'avatars'),
 	relative_to: uploads_base
 });
-
-/*
-UserSchema.plugin(thumbnailPlugin, {
-	name: 'avatar',
-	format: 'png',
-	size: 80,
-	inline: false,
-	save: true,
-	upload_to: thumbnailPluginLib.make_upload_to_model(uploads, 'avatars'),
-	relative_to: uploads_base
-});
-*/
-
 
 
 

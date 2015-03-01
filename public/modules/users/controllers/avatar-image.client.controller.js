@@ -11,12 +11,18 @@
  * Contolador de la imágen de avatar en el perfil de usuario
  */
 
-angular.module('users').controller('AvatarImageController', ['$scope', '$upload', '$timeout',
-	function($scope, $upload, $timeout) {
+angular.module('users').controller('AvatarImageController', ['$scope', 'Restangular', 'Authentication', '$translate', '$upload', '$timeout',
+	function($scope, Restangular, Authentication, $translate, $upload, $timeout) {
 
-// TODO: Modificar con angular-hal
-		$scope.imgAvatarSrc = $scope.user._links['ht:avatar'].medium.href;
-		$scope.imgAvatarDefault = ['modules/users/img/no-user-image-square.jpg'];
+		$scope.authentication = Authentication;
+
+		Restangular.one('users', 'me').get().then(function(data) {
+			//$scope.user = data;
+			$scope.imgAvatarSrc = data._links.avatar.href;
+
+		}, function errorCallback() {
+			$scope.error = $translate.instant('core.Error_connecting_server');
+		});
 
 		/**
 		* @ngdoc method
@@ -61,7 +67,9 @@ angular.module('users').controller('AvatarImageController', ['$scope', '$upload'
 			}).success(function(data, status, headers, config) {
 				// file is uploaded successfully
 				// Refresh avatar image
-				$scope.imgAvatarSrc = $scope.imgAvatarSrc + '&decache=' + Math.random();
+				$timeout(function() {
+					$scope.imgAvatarSrc = $scope.imgAvatarSrc + '?decache=' + Math.random();
+				}, 2000);
 
 			}).error(function(err) {
 				$scope.uploadInProgress = false;

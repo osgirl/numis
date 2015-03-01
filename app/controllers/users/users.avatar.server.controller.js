@@ -6,6 +6,7 @@
 var _ 			 = require('lodash'),
 	errorHandler = require('../errors.server.controller.js'),
 	mongoose     = require('mongoose'),
+	path         = require('path'),
 	User 		 = mongoose.model('User');
 
 /**
@@ -14,7 +15,14 @@ var _ 			 = require('lodash'),
 exports.getAvatar = function(req, res) {
 	// Init Variables
 	var user = req.profile,
-		size = req.param('size', 'md');
+		size = req.query.size,
+		supportedSizes = ['sm', 'md', 'bg'],
+		fileExt,
+		fileName;
+
+	if (supportedSizes.indexOf(size) === -1) {
+		size = 'md';
+	}
 
 	if (user && user.avatar && user.avatar.path) {
 		var options = {
@@ -26,12 +34,12 @@ exports.getAvatar = function(req, res) {
 			}
 		};
 
-		res.sendFile(user.avatar.path, options, function (err) {
+		fileExt  = path.extname(user.avatar.path);
+		fileName = path.dirname(user.avatar.path) + path.sep + path.basename(user.avatar.path, fileExt);
+
+		res.sendFile(fileName + '-' + size + fileExt, options, function (err) {
 			if (err) {
-				console.log(err);
 				res.status(err.status).end();
-			} else {
-				console.log('Sent:', user.avatar.name);
 			}
 		});
 	} else {
