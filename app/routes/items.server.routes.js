@@ -18,9 +18,9 @@ module.exports = function(app) {
 
 	// End-points routes to manage image of the items.
 	app.route('/api/v1/groupbuys/:groupbuyId/items/:itemId/image')
-		.get(users.requiresLogin, groupbuys.hasVisibility('items'), users.getImage)
+		.get(users.requiresLogin, groupbuys.hasVisibility('items'), items.getImage)
 		.put(users.requiresLogin, items.hasAuthorization, items.updateImage)
-		.delete(users.requiresLogin, items.hasAuthorization, users.deleteImage);
+		.delete(users.requiresLogin, items.hasAuthorization, items.deleteImage);
 
 	// Finish by binding the Item middleware
 	app.param('itemId', items.itemByID);
