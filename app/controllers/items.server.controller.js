@@ -42,9 +42,8 @@ var formattingItem = exports.formattingItem = function(item, req, reduce) {
 		result._links = {
 			self: { href: selfURL },
 			image: {
-				href: selfURL + '/image{?size}',
-				title: 'Item picture',
-				templated: true
+				href: selfURL + '/image',
+				title: 'Item picture'
 			}
 		};
 

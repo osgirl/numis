@@ -28,9 +28,8 @@ var formattingUser = exports.formattingUser = function(user, req, reduce) {
 				self: { href: selfURL },
 				collection: { href: parentURL, title: 'Users list' },
 				avatar: {
-					href: selfURL + '/avatar{?size}',
-					title: 'Avatar image',
-					templated: true
+					href: selfURL + '/avatar',
+					title: 'Avatar image'
 				},
 
 				groupbuys: {
