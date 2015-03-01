@@ -6,6 +6,7 @@
 var mongoose     = require('mongoose'),
 	core         = require('./core.server.controller'),
 	errorHandler = require('./errors.server.controller'),
+	path         = require('path'),
 	_            = require('lodash'),
 	Item         = mongoose.model('Item');
 
@@ -173,6 +174,107 @@ exports.list = function(req, res) {
 		}
 	}, { columns: fields, sortBy : sort });
 };
+
+
+
+/**
+ * Get item image
+ */
+exports.getImage = function(req, res) {
+	// Init Variables
+	var item = req.item,
+		size = req.query.size,
+		supportedSizes = ['sm', 'md', 'bg'],
+		fileExt,
+		fileName;
+
+	if (supportedSizes.indexOf(size) === -1) {
+		size = 'md';
+	}
+
+	if (item && item.image && item.image.path) {
+		var options = {
+			dotfiles: 'deny',
+			lastModified: item.image.lastModified || false,
+			headers: {
+				'x-timestamp': Date.now(),
+				'x-sent': true
+			}
+		};
+
+		fileExt  = path.extname(item.image.path);
+		fileName = path.dirname(item.image.path) + path.sep + path.basename(item.image.path, fileExt);
+
+		res.sendFile(fileName + '-' + size + fileExt, options, function (err) {
+			if (err) {
+				res.status(err.status).end();
+			}
+		});
+	} else {
+		res.status(404).end();
+	}
+};
+
+/**
+ * Update item image
+ */
+exports.updateImage = function(req, res, next) {
+	// Init Variables
+	var item = req.item;
+
+	if (!req.files || !req.files.file) {
+		res.status(400).send({
+			message: 'Has not received any picture'
+		});
+
+	} else {
+		var file = req.files.file;
+
+		// Generating necesary image attributes.
+		file.type = file.mimetype;
+		file.lastModifiedDate = Date.now();
+
+		// Updating the user model
+		item.set('image.file', file);
+
+		// Saving it...
+		item.save(function(err) {
+			if (err) {
+				return res.status(400).send({
+					message: errorHandler.getErrorMessage(err)
+				});
+			} else {
+				res.status(204).end();
+			}
+		});
+	}
+
+};
+
+/**
+* Delete user avatar
+*/
+exports.deleteImage = function(req, res) {
+	// Init Variables
+	var item = req.item;
+
+	item.image = {};
+	item.image.lastModified = Date.now();
+
+	// Saving it...
+	item.update({_id: item._id}, { $set: {image: item.image, upated: item.updated}}, {}, function(err) {
+		if (err) {
+			return res.status(400).send({
+				message: errorHandler.getErrorMessage(err)
+			});
+		} else {
+			res.status(204).end();
+		}
+	});
+};
+
+
+
 
 
 /**
