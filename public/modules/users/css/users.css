@@ -12,3 +12,11 @@
 	right: 10px;
 	position: absolute;
 }
+
+.btn-upload-avatar {
+	position: relative;
+	padding: 0;
+	font-size: 32px;
+	bottom: 32px;
+	left: -12%;
+}

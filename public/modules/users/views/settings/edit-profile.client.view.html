@@ -4,9 +4,11 @@
 		<h3 class="col-xs-12 col-md-6 col-lg-6">{{user.username}}</h3>
 		<div class="col-xs-12 col-md-6 col-lg-6 text-right" data-ng-controller="AvatarImageController">
 			<div class="drop-box" ng-file-drop="onFileSelect($files)" drag-over-class="{accept:'dragover', reject:'dragover-err', delay:100}" allow-dir="true" accept="image/*">
-				<img class="img-responsive img-circle" ng-src="{{imgAvatarSrc}}" fb-src="imgAvatarDefault" alt="avatar" />
+				<img class="img-responsive img-circle" ng-src="{{imgAvatarSrc}}" fb-src="['/modules/users/img/no-user-image-square.jpg']" alt="avatar" />
+				<button ng-file-select="onFileSelect($files)" accept="image/*" class="btn btn-link btn-lg btn-upload-avatar" aria-label="__Upload image__">
+					<span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
+				</button>
 			</div>
-			<button ng-file-select="onFileSelect($files)" accept="image/*">Upload</button>
 		</div>
 		<div class="col-xs-12 col-md-12 col-lg-12">
 			<form name="userForm" data-ng-submit="updateUserProfile(userForm.$valid)" class="signin form-horizontal" autocomplete="off">
