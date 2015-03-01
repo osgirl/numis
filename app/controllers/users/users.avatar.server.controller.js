@@ -85,7 +85,7 @@ exports.updateAvatar = function(req, res, next) {
 					if (err) {
 						res.status(400).send(err);
 					} else {
-						res.status(201).end();
+						res.status(204).end();
 					}
 				});
 			}
@@ -117,7 +117,7 @@ exports.deleteAvatar = function(req, res) {
 					if (err) {
 						res.status(400).send(err);
 					} else {
-						res.json(user);
+						res.status(204).end();
 					}
 				});
 			}

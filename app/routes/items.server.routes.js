@@ -16,13 +16,12 @@ module.exports = function(app) {
 		.put(users.requiresLogin, items.hasAuthorization, items.update)
 		.delete(users.requiresLogin, items.hasAuthorization, items.delete);
 
-/*
 	// End-points routes to manage image of the items.
-	app.route('/api/v1/groupbuys/:groupbuyId/items/image')
+	app.route('/api/v1/groupbuys/:groupbuyId/items/:itemId/image')
 		.get(users.requiresLogin, groupbuys.hasVisibility('items'), users.getImage)
 		.put(users.requiresLogin, items.hasAuthorization, items.updateImage)
 		.delete(users.requiresLogin, items.hasAuthorization, users.deleteImage);
-*/
+
 	// Finish by binding the Item middleware
 	app.param('itemId', items.itemByID);
 	app.param('groupbuyId', groupbuys.groupbuyByID);

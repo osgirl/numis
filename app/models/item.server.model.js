@@ -10,6 +10,7 @@ var mongoose       = require('mongoose'),
 	paginatePlugin = require('mongoose-paginate'),
 	l2rPlugin      = require('mongoose-l2r'),
 	path           = require('path'),
+	lwip           = require('lwip'),
 	Schema         = mongoose.Schema;
 
 
@@ -17,9 +18,71 @@ var getPrice = function (num) {
     return (num / 100);
 };
 
+
 var setPrice = function (num) {
     return Math.round(num * 100);
 };
+
+
+var makeUploadToModel = function(basedir, subdir) {
+	var b_dir, s_dir, upload_to_model;
+
+	b_dir = basedir;
+    s_dir = subdir;
+
+	upload_to_model = function(fileObj) {
+      	var dstdir, id;
+
+		dstdir = b_dir;
+      	if (s_dir) {
+			dstdir = path.join(dstdir, s_dir);
+      	}
+      	id = this.get('id');
+      	if (id) {
+			dstdir = path.join(dstdir, id + '.' + fileObj.extension.toLowerCase());
+		} else {
+			dstdir = path.join(dstdir, fileObj.name);
+		}
+      	return dstdir;
+    };
+    return upload_to_model;
+};
+
+
+var generateItemImages = function(pathname, imgFile, oldValue) {
+	var fileExt  = path.extname(imgFile),
+		fileName = path.dirname(imgFile) + path.sep + path.basename(imgFile, fileExt);
+
+	var generate_image = function(srcFile, dstFile, resizeSize, callback) {
+		lwip.open(srcFile, function(err, image) {
+			if (err) throw err;
+
+			// Crop to make a square image
+			var cropSize = (image.width() > image.height() ) ? image.height() : image.width();
+
+			image.batch()
+				.crop(cropSize, cropSize)
+				.resize(resizeSize, resizeSize)
+				.writeFile(dstFile, function(err) {
+					if (callback && typeof callback === 'function') {
+						callback(err);
+					} else {
+						if (err) throw err;
+					}
+				});
+		});
+	};
+
+	// Crop and resize the image into supported sizes
+	generate_image(imgFile, fileName + '-bg' + fileExt, 256, function(err) {
+		generate_image(imgFile, fileName + '-md' + fileExt, 128, function(err) {
+			generate_image(imgFile, fileName + '-sm' + fileExt, 64, function(err) {
+				if (err) throw err;
+			});
+		});
+	});
+};
+
 
 
 /**
@@ -120,11 +183,11 @@ var uploads_base = path.join(__dirname, '../../'),
 	uploads 	 = path.join(uploads_base, 'uploads');
 
 ItemSchema.plugin(filePlugin, {
-	name: 'image',
-	upload_to: filePluginLib.make_upload_to_model(uploads, 'items'),
+	name:        'image',
+	change_cb:   generateItemImages,
+	upload_to:   makeUploadToModel(uploads, 'items'),
 	relative_to: uploads_base
 });
-
 
 
 ItemSchema.set('toJSON', { getters: true, virtuals: false });
