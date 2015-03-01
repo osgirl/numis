@@ -13,6 +13,10 @@ angular.module('groupbuys').config(['$stateProvider',
 				url: '/groupbuys/create',
 				templateUrl: 'modules/groupbuys/views/create-groupbuy.client.view.html'
 			}).
+			state('myGroupbuys', {
+				url: '/groupbuys/my-list',
+				templateUrl: 'modules/groupbuys/views/my-list-groupbuys.client.view.html'
+			}).
 			state('viewGroupbuy', {
 				url: '/groupbuys/:groupbuyId',
 				templateUrl: 'modules/groupbuys/views/view-groupbuy.client.view.html'
