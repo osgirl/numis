@@ -86,6 +86,10 @@ var formattingItemList = exports.formattingItemList = function(items, req, optio
 		}
 	};
 
+	// Adding count properties
+	if ( options.numElems !== 'undefined' )   { result.numElems = options.numElems; }
+	if ( options.totalElems !== 'undefined' ) { result.totalElems = options.totalElems; }
+
 	// Adding paggination links to result collection
 	result._links = _.assign(result._links, core.addPaginationLinks(selfURL, options) );
 
@@ -170,7 +174,7 @@ exports.list = function(req, res) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.jsonp( formattingItemList(items, req, {page: page, totalPages: totalPages, numElems: limit, totalElems: count, selFields: fields}) );
+			res.jsonp( formattingItemList(items, req, {page: page, totalPages: totalPages, numElems: items.length, totalElems: count, selFields: fields}) );
 		}
 	}, { columns: fields, sortBy : sort });
 };

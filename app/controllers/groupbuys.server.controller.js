@@ -108,6 +108,10 @@ var formattingGroupbuyList = exports.formattingGroupbuyList = function(groupbuys
 		}
 	};
 
+	// Adding count properties
+	if ( options.numElems !== 'undefined' )   { result.numElems = options.numElems; }
+	if ( options.totalElems !== 'undefined' ) { result.totalElems = options.totalElems; }
+
 	// Adding paggination links to result collection
 	result._links = _.assign(result._links, core.addPaginationLinks(selfURL, options) );
 
@@ -212,7 +216,7 @@ exports.list = function(req, res) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.jsonp( formattingGroupbuyList(groupbuys, req, {page: page, totalPages: totalPages, numElems: limit, totalElems: count, selFields: fields}) );
+			res.jsonp( formattingGroupbuyList(groupbuys, req, {page: page, totalPages: totalPages, numElems: groupbuys.length, totalElems: count, selFields: fields}) );
 		}
 	}, { columns: fields, populate: ['user'], sortBy : sort });
 };
@@ -293,17 +297,22 @@ exports.getMembersList = function(req, res) {
 		} else {
 			var count      = groupbuy.members.length,
 				totalPages = Math.ceil(count / limit) || 1,
+				totalElems,
 				members,
 				options;
 
 			// Sort the array
 			members = _.sortByAll(groupbuy.members, sort);
+
+			// Count all managers
+			totalElems = members.length;
+
 			// If sortDir is -1, reverse the array
 			if (parseInt(sortDir) === -1) { members = _(members).reverse().value(); }
 			// Make pagination
 			members = _.slice(members, (page * limit) - limit, (page * limit));
 			// Fill options
-			options = {page: page, totalPages: totalPages, numElems: limit, totalElems: members.length, collectionName: 'members'};
+			options = {page: page, totalPages: totalPages, numElems: members.length, totalElems: totalElems, collectionName: 'members'};
 
 			res.jsonp( users.formattingUserList(members, req, options) );
 		}
@@ -393,17 +402,22 @@ exports.getManagersList = function(req, res) {
 		} else {
 			var count      = groupbuy.managers.length,
 				totalPages = Math.ceil(count / limit) || 1,
+				totalElems,
 				managers,
 				options;
 
 			// Sort the array
 			managers = _.sortByAll(groupbuy.managers, sort);
+
+			// Count all managers
+			totalElems = managers.length;
+
 			// If sortDir is -1, reverse the array
 			if (parseInt(sortDir) === -1) { managers = _(managers).reverse().value(); }
 			// Make pagination
 			managers = _.slice(managers, (page * limit) - limit, (page * limit));
 			// Fill options
-			options = {page: page, totalPages: totalPages, numElems: limit, totalElems: managers.length, collectionName: 'managers'};
+			options = {page: page, totalPages: totalPages, numElems: managers.length, totalElems: totalElems, collectionName: 'managers'};
 
 			res.jsonp( users.formattingUserList(managers, req, options) );
 		}
