@@ -65,6 +65,35 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 	/**
 	* @ngdoc method
+	* @name groupbuys.controller:GroupbuysController.$scope.loadMyList
+	* @methodOf groupbuys.controller:GroupbuysController
+	*
+	* @description
+	* Gets the user list of Groupbuys from the server and processes it.
+	*/
+	$scope.loadMyList = function(){
+		var serverData = Restangular.one('users',$scope.authentication.user._id).all('groupbuys').getList();
+
+		serverData.then(function(data) {
+
+			// Add the real URL to the elements
+			for (var i=0; i<data.length; i++) {
+				data[i].restangularUrl = data[i].getRequestedUrl();
+			}
+
+			$scope.groupbuys = data;
+
+		}, function errorCallback() {
+	// TODO translate this key and don't use alert
+			alert('Error getting data from server');
+		});
+	};
+
+
+	// ----------------------
+
+	/**
+	* @ngdoc method
 	* @name groupbuys.controller:GroupbuysController.$scope.create
 	* @methodOf groupbuys.controller:GroupbuysController
 	*
