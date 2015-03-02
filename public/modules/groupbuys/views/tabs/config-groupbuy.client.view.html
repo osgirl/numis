@@ -1,5 +1,105 @@
-<section data-ng-controller="GroupbuysTabConfigController">
-<p>
-  PESTAÑA DE CONFIGURACION
-</p>
+<section data-ng-controller="GroupbuysTabConfigController" data-ng-init="loadConfig()">
+    <div class="panel panel-default" data-ng-show="(userRole == 'manager')">
+        <div class="panel-body">
+
+            <!-- Panel de estados -->
+            <div class="panel panel-default">
+
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{'groupbuys.States' | translate}}:</h3>
+                </div>
+                <div class="panel-body">
+
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default disabled">{{'groupbuys.New' | translate}}</button>
+                        <button type="button" class="btn btn-default disabled">{{'groupbuys.Published' | translate}}</button>
+                        <button type="button" class="btn btn-default disabled">{{'groupbuys.Consolidate' | translate}}</button>
+                        <button type="button" class="btn btn-success disabled active">{{'groupbuys.Payments' | translate}}</button>
+                        <button type="button" class="btn btn-warning" ng-click="changeState('paid')">{{'groupbuys.Paid' | translate}}</button>
+                        <button type="button" class="btn btn-info disabled">{{'groupbuys.Shipments' | translate}}</button>
+                        <button type="button" class="btn btn-info disabled">{{'groupbuys.Closed' | translate}}</button>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-danger">{{'groupbuys.Cancelled' | translate}}</button>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-danger">{{'groupbuys.Deleted' | translate}}</button>
+                    </div>
+                    <br />
+                    <div>
+                        <span>{{'groupbuys.Legend' | translate}}: </span>
+                        <span class="label label-default">{{'groupbuys.Previous_States' | translate}}</span>
+                        <span class="label label-success">{{'groupbuys.Actual_State' | translate}}</span>
+                        <span class="label label-warning">{{'groupbuys.Next_State' | translate}}</span>
+                        <span class="label label-danger">{{'groupbuys.Special_States' | translate}}</span>
+                    </div>
+                </div>
+            </div>
+            <!-- FIN Panel de estados -->
+
+            <!-- Panel de visualizacion -->
+            <div class="panel panel-default" data-ng-hide="(userRole == 'none')">
+
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{'groupbuys.Visibility' | translate}}:</h3>
+                </div>
+                <div class="panel-body">
+                    <div>
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <div>
+                                    {{'groupbuys.Members_List' | translate}}
+                                </div>
+                                <div>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-default ng-class:{ 'active' : visibility.members_public }"     ng-click="updateSettings('members','public')">{{'groupbuys.Public' | translate}}</button>
+                                        <button type="button" class="btn btn-default ng-class:{ 'active' : visibility.members_restricted }" ng-click="updateSettings('members','restricted')">{{'groupbuys.Only_Members' | translate}}</button>
+                                        <button type="button" class="btn btn-default ng-class:{ 'active' : visibility.members_private }"    ng-click="updateSettings('members','private')">{{'groupbuys.Do_Not_Show' | translate}}</button>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div>
+                                    {{'groupbuys.Items_Requested_By_Members' | translate}}
+                                </div>
+                                <div>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-default ng-class:{ 'active' : visibility.itemsByMember_public }"     ng-click="updateSettings('itemsByMember','public')">{{'groupbuys.Public' | translate}}</button>
+                                        <button type="button" class="btn btn-default ng-class:{ 'active' : visibility.itemsByMember_restricted }" ng-click="updateSettings('itemsByMember','restricted')">{{'groupbuys.Only_Members' | translate}}</button>
+                                        <button type="button" class="btn btn-default ng-class:{ 'active' : visibility.itemsByMember_private }"    ng-click="updateSettings('itemsByMember','private')">{{'groupbuys.Do_Not_Show' | translate}}</button>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div>
+                                    {{'groupbuys.Payments_Status' | translate}}
+                                </div>
+                                <div>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-default ng-class:{ 'active' : visibility.paymentStatus_restricted }" ng-click="updateSettings('paymentStatus','restricted')">{{'groupbuys.Only_Members' | translate}}</button>
+                                        <button type="button" class="btn btn-default ng-class:{ 'active' : visibility.paymentStatus_private }"    ng-click="updateSettings('paymentStatus','private')">{{'groupbuys.Do_Not_Show' | translate}}</button>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div>
+                                    {{'groupbuys.Shipments_Status' | translate}}
+                                </div>
+                                <div>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-default ng-class:{ 'active' : visibility.shipmentsState_restricted }" ng-click="updateSettings('shipmentsState','restricted')">{{'groupbuys.Only_Members' | translate}}</button>
+                                        <button type="button" class="btn btn-default ng-class:{ 'active' : visibility.shipmentsState_private }"    ng-click="updateSettings('shipmentsState','private')">{{'groupbuys.Do_Not_Show' | translate}}</button>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+            <!-- FIN Panel de visualizacion -->
+
+        </div>
+    </div>
+    <!--  FIN Panel de la pestaña -->
 </section>

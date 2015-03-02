@@ -1,22 +1,128 @@
-<section data-ng-controller="HomeController">
-	<div class="jumbotron text-center">
-		<div class="row">
-			<div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3 col-xs-12">
-				<img alt="MEAN.JS" class="img-responsive text-center" src="modules/core/img/brand/logo.png" />
+<section data-ng-controller="HomeController" data-ng-init="loadHomeData()">
+
+	<!-- Not logged user -->
+	<div data-ng-hide="authentication.user">
+		<div class="page-header">
+			<div class="jumbotron">
+				<h1>{{'core.Welcome_To' | translate}} {{'core.APP_TITLE' | translate}}</h1>
+				<p>{{'core.In_Order_To_Continue' | translate}}:</p>
+				<p>
+					<a class="btn btn-primary btn-lg" href="#!/signin" role="button"><span class="glyphicon glyphicon-log-in" aria-hidden="true"> {{'core.Sign_In' | translate}}</a>
+						o
+					<a class="btn btn-primary btn-lg" href="#!/signup" role="button"><span class="glyphicon glyphicon-edit" aria-hidden="true"> {{'core.Sign_Up' | translate}}</a>
+				</p>
+
 			</div>
 		</div>
-		<br>
-		<div class="row">
-			<p class="lead">
-				Open-Source Full-Stack Solution For MEAN Applications
-			</p>
+
+		<div class="panel panel-default" data-ng-show="cookiePolicyHide">
+			<div class="panel-heading">
+				<h3 class="panel-title">{{'core.Cookies_Policy' | translate}}</h3>
+			</div>
+			<div class="panel-body text-center">
+				<strong>Uso de Cookies</strong><br />
+				{{'core.Cookies_Agreement' | translate}}.<br />
+				<a role="button" class="btn btn-default" ng-click="cookiePolicyHideToogle()"><span class="glyphicon glyphicon-ok" aria-hidden="true">Acepto</a>
+				<a role="button" class="btn btn-default" ng-click="cookiePolicyViewToogle()"><span class="glyphicon glyphicon-book" aria-hidden="true">Ver politica de cookies</a>
+
+				<div data-ng-show="cookiePolicyView">
+
+					<!-- Cookies policy panel -->
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">{{'core.Cookies_Policy' | translate}}</h3>
+						</div>
+						<div class="panel-body">
+							<h4>{{'core.Cookies_Definition' | translate}}</h4>
+							<p ng-bind-html="'core.Cookies_Definition_Text' | translate"></p>
+							<h4>{{'core.Cookies_Types' | translate}}</h4>
+							<p ng-bind-html="'core.Cookies_Types_Text' | translate"></p>
+							<h4>{{'core.Cookies_Deletion' | translate}}</h4>
+							<p ng-bind-html="'core.Cookies_Deletion_Text' | translate"></p>
+						</div>
+					</div>
+					<!-- END cookies policy panel -->
+				</div>
+			</div>
 		</div>
-		<div class="row">
-			<p>
-				<a class="btn btn-primary btn-lg" href="http://meanjs.org" target="_blank">Learn more</a>
-			</p>
+
+	</div>
+	<!-- END Not logged user -->
+	<!-- Logged user -->
+	<div data-ng-show="authentication.user">
+		<div class="page-header">
+			{{'core.Welcome' | translate}} <strong data-ng-bind="authentication.user.username"></strong>
+		</div>
+		<div class="col-md-12">
+			<!-- Error area -->
+			<div data-ng-show="error" class="alert alert-danger" role="alert">
+				<strong data-ng-bind="error"></strong>
+			</div>
+			<!-- END error area-->
+			<div class="col-md-6">
+				<!-- Panel de mis compras -->
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">{{'core.My_Groupbuys' | translate}}</h3>
+					</div>
+					<div class="panel-body">
+						<a data-ng-repeat="groupbuy in myGroupbuys track by $index"  data-ng-href="#!/groupbuys/{{groupbuy._id}}" class="list-group-item">
+				            <strong><span data-ng-bind="groupbuy.title"></span></strong>
+				            <small><span ng-bind-html="groupbuy.description"></span></small>
+				        </a>
+						<div class="pull-right">
+							<a href="#!/groupbuys/my-list">{{'core.View_All_My_Groupbuys' | translate}}</a>
+						</div>
+					</div>
+				</div>
+				<!-- FIN Panel mis compras -->
+			</div>
+			<div class="col-md-6">
+				<!-- Panel de Avisos -->
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">{{'core.Notices' | translate}}</h3>
+					</div>
+					<div class="panel-body">
+
+					</div>
+				</div>
+				<!-- FIN Panel de Avisos -->
+			</div>
+		</div>
+		<div class="col-md-12">
+			<div class="col-md-6">
+				<!-- Panel de mis Compras nuevas -->
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">{{'core.New_Groupbuys' | translate}}</h3>
+					</div>
+					<div class="panel-body">
+						<a data-ng-repeat="groupbuy in allGroupbuys track by $index"  data-ng-href="#!/groupbuys/{{groupbuy._id}}" class="list-group-item">
+				            <strong><span data-ng-bind="groupbuy.title"></span></strong>
+				            <small><span ng-bind-html="groupbuy.description"></span></small>
+				        </a>
+						<div class="pull-right">
+							<a href="#!/groupbuys">{{'core.View_New_Groupbuys' | translate}}</a>
+						</div>
+					</div>
+				</div>
+				<!-- FIN Panel de mis Compras nuevas -->
+			</div>
+			<div class="col-md-6">
+				<!-- Panel de Mensajes -->
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">{{'core.Messaging' | translate}}</h3>
+					</div>
+					<div class="panel-body">
+
+					</div>
+				</div>
+				<!-- FIN Panel de Mensajes -->
+			</div>
 		</div>
 	</div>
-	<br>Enjoy &amp; Keep Us Updated,
-	<br>The MEAN.JS Team.
+	<!--  END Logged user -->
+
 </section>

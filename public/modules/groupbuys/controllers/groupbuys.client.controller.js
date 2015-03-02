@@ -65,6 +65,35 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 	/**
 	* @ngdoc method
+	* @name groupbuys.controller:GroupbuysController.$scope.loadMyList
+	* @methodOf groupbuys.controller:GroupbuysController
+	*
+	* @description
+	* Gets the user list of Groupbuys from the server and processes it.
+	*/
+	$scope.loadMyList = function(){
+		var serverData = Restangular.one('users',$scope.authentication.user._id).all('groupbuys').getList();
+
+		serverData.then(function(data) {
+
+			// Add the real URL to the elements
+			for (var i=0; i<data.length; i++) {
+				data[i].restangularUrl = data[i].getRequestedUrl();
+			}
+
+			$scope.groupbuys = data;
+
+		}, function errorCallback() {
+	// TODO translate this key and don't use alert
+			alert('Error getting data from server');
+		});
+	};
+
+
+	// ----------------------
+
+	/**
+	* @ngdoc method
 	* @name groupbuys.controller:GroupbuysController.$scope.create
 	* @methodOf groupbuys.controller:GroupbuysController
 	*
@@ -78,11 +107,13 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 			var newGroupbuy = {};
 			newGroupbuy.title = $scope.groupbuy.title;
 			newGroupbuy.description = $scope.groupbuy.description;
+			newGroupbuy.user = $scope.authentication.user._id;
 
 			Restangular.all('groupbuys').post(newGroupbuy).then(function(serverResponse) {
 
 			// Redirect after save
 			// TODO parse and get Id
+			$location.path('groupbuys');
 			//	$location.path('groupbuys/' + response._id + '/manage');
 
 			}, function(serverResponse) {
@@ -94,6 +125,19 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 
 	// ----------------------
+
+	/**
+	* @ngdoc method
+	* @name groupbuys.controller:GroupbuysController.$scope.update
+	* @methodOf groupbuys.controller:GroupbuysController
+	*
+	* @description
+	* Update existing Groupbuy
+	*/
+	$scope.update = function() {
+		$scope.groupbuy.save();
+	};
+
 	// ----------------------
 
 	/**
@@ -136,6 +180,9 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 			$scope.userRole = $scope.userRole();
 			$scope.loadTabs();
 
+			// Create the visibility options list
+			$scope.visibility = [];
+
 		}, function errorCallback() {
 			// TODO translate this key and don't use alert
 			alert('Error getting data from server');
@@ -157,6 +204,11 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 	$scope.userRole = function() {
 		var role = 'none';
 		var manage = false;
+
+		// Not member users didn't receive other members list.
+		if ( typeof $scope.groupbuy.members === 'undefined' ) {
+			return 'none';
+		}
 
 		if ($scope.authentication && $scope.authentication.user) {
 			var userId  = $scope.authentication.user._id;

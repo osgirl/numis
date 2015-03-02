@@ -57,6 +57,11 @@ angular.module(ApplicationConfiguration.applicationModuleName).config(['Restangu
 			{ 'Content-Type': 'application/json' }
 		);
 
+		// set only for get method (for pagination)
+		/*Restangular.setDefaultRequestParams(
+			'get', {limit: 10}
+		);*/
+
 		// Add a response intereceptor to extract the JSON from the response Object
 		RestangularProvider.addResponseInterceptor(function(data, operation, what, url, response, deferred) {
 
