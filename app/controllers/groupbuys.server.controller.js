@@ -27,14 +27,12 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, re
 		showVisibilityInfo = !reduce && isManager,
 		showMembers  = !reduce && groupbuy.checkVisibility(user, 'members'),
 		showManagers = !reduce && groupbuy.checkVisibility(user, 'managers'),
-		showItems 	 = !reduce && groupbuy.checkVisibility(user, 'items'),
 		result 	  	 = {},
 		i;
 
 	/* visibility TODO
 			shipmentsState: 'restricted',
 			paymentStatus: 'restricted',
-			itemsByMember: 'restricted',
 			itemNumbers: 'public',
 	*/
 
@@ -54,9 +52,24 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, re
 			_id: 		 groupbuy._id,
 			name: 		 groupbuy.name,
 			title: 		 groupbuy.title,
-			status: 	 groupbuy.status,
-			description: groupbuy.description
+			description: groupbuy.description,
+			status: 	 groupbuy.status
 		};
+
+		// Add next state property
+		if (groupbuy.status === 'cancelled' || groupbuy.status === 'deleted'  || groupbuy.status === 'closed') {
+			result.nextState = groupbuy.status;
+		} else {
+			var cicleOfLife = ['new', 'published', 'payments', 'paid', 'shipments', 'closed'],
+				pos = cicleOfLife.indexOf(groupbuy.status);
+
+			if (pos > -1 && pos < cicleOfLife.length -1) {
+				result.nextState = cicleOfLife[pos+1];
+			} else {
+				result.nextState = '';
+			}
+		}
+
 
 		if (showUpdates) {
 			result.updates = groupbuy.updates;
@@ -74,19 +87,6 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, re
 			result.managers = groupbuy.managers;
 		}
 
-		if (showItems) {
-			result._embedded = {items: []};
-	/*
-	TODO
-				for (i = 0; i < groupbuy.items.length; i++) {
-					result._embedded.items.push({
-						href:  selfURL + '/items/' + groupbuy.items[i]._id,
-						title: groupbuy.items[i].title,
-						name:  groupbuy.items[i].name
-					});
-				}
-	*/
-		}
 	}
 
 	return result;
