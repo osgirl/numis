@@ -1,5 +1,104 @@
-<section data-ng-controller="GroupbuysTabDeliveriesController">
-<p>
-  PESTAÑA DE LOS ENVIOS
-</p>
+<section data-ng-controller="GroupbuysTabDeliveriesController" data-ng-init="loadDeliveriesData()">
+    <div class="panel panel-default">
+        <div class="panel-body">
+
+            <!-- Vista de participante -->
+            <div data-ng-show="(userRole !== 'manager')">
+                <form data-ng-submit="joinGroupbuy()" name="memberManagerForm" novalidate>
+                    <!-- Panel de informacion del pago -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Dirección del envio</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <textarea id="deliveryAddress" data-ng-model="authentication.user.deliveryAddress"  name="deliveryAddress" class="form-control" rows="5" placeholder="Dirección del envio"></textarea>
+                            </div>
+                            <input type="button" value="Copiar dirección del perfil" ng-click="copyHomeAdress()" class="btn btn-default">
+                        </div>
+                    </div>
+                    <!-- FIN Panel de informacion del pago -->
+
+                    <!-- Panel de notas sobre el pago -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Detalles del envio</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Información sobre el pago" disabled readonly></textarea>
+                            </div>
+                        </div>
+                        <div>
+                            <input type="checkbox" disabled readonly></td><span>Enviado</span><br />
+                            <input type="checkbox"></td><span>Recibido</span>
+                        </div>
+                    </div>
+                    <!-- FIN Panel de notas sobre el pago -->
+                    <input type="submit" value="Guardar" class="btn btn-default">
+                </form>
+            </div>
+            <!-- FIN Vista de participante -->
+
+
+            <!-- Vista de gestor -->
+            <div data-ng-show="(userRole == 'manager')">
+
+                <form data-ng-submit="joinGroupbuy()" name="PaymentManagerForm" novalidate>
+                    <!-- Panel de informacion del envio -->
+                    <div class="row">
+                        <div class="col-md-3">
+                            <ul class="nav nav-pills nav-stacked">
+                                <li role="presentation" class="active"><a href="#"><img src="#" />Usuario 1</a></li>
+                                <li role="presentation"><a href="#"><img src="#" />Usuario 2</a></li>
+                                <li role="presentation"><a href="#"><img src="#" />Usuario 3</a></li>
+                                <li role="presentation"><a href="#"><img src="#" />Usuario 4</a></li>
+                                <li role="presentation"><a href="#"><img src="#" />Usuario 5</a></li>
+                                <li role="presentation"><a href="#"><img src="#" />Usuario 6</a></li>
+                                <li role="presentation"><a href="#"><img src="#" />Usuario 7</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-9">
+                            <!-- Direccion envio -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Direccion del envio</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Información sobre el pago" disabled readonly></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- FIN direccion envio-->
+                            <!-- Detalles envio -->
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">Detalles del envio</h3>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-group">
+                                        <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Información sobre el pago"></textarea>
+                                    </div>
+                                </div>
+                                <div>
+                                    <input type="checkbox" ></td><span>Enviado</span><br />
+                                    <input type="checkbox" disabled readonly></td><span>Recibido</span>
+                                </div>
+                                <input type="submit" value="Guardar" class="btn btn-default">
+                            </div>
+                            <!-- FIN Detalles envio-->
+                        </div>
+                    </div>
+
+                    <!-- FIN Panel de informacion del pago -->
+
+                </form>
+            </div>
+            <!-- FIN Vista de gestor -->
+
+          </div>
+    </div>
+<!--  FIN Panel de la pestaña -->
+
 </section>
