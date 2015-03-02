@@ -16,7 +16,7 @@
                                 <span class="glyphicon glyphicon-minus-sign" aria-hidden="true"></span>
                             </button>
                         </span>
-                        <img ng-src="{{manager.avatar}}" /> <span>{{manager.username}}</span>
+                        <img class="img-responsive img-circle" ng-src="{{manager.avatar}}?size=sm" fb-src="['/modules/users/img/no-user-image-square.jpg?size=sm']" alt="avatar" /><span>{{manager.username}}</span>
                     </div>
                     <br />
                     <div data-ng-show="error && (userRole == 'manager')" class="alert alert-danger" role="alert">
