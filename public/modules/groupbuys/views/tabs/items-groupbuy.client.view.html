@@ -1,5 +1,110 @@
-<section data-ng-controller="GroupbuysTabItemsController">
-<p>
-  PESTAÑA DE LOS ITEMS
-</p>
+<section data-ng-controller="GroupbuysTabItemsController"  data-ng-init="loadItemsData()">
+    <div class="panel panel-default">
+        <div class="panel-body">
+
+            <!-- Error area -->
+            <div data-ng-show="error" class="alert alert-danger" role="alert">
+                <strong data-ng-bind="error"></strong>
+            </div>
+            <!-- END error area-->
+
+            <!-- Vista de participante -->
+            <div data-ng-show="(userRole !== 'manager')">
+                <form data-ng-submit="joinGroupbuy()" name="memberManagerForm" novalidate>
+
+                    <!-- Items -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Items</h3>
+                        </div>
+                        <div class="panel-body">
+
+                            <div data-ng-repeat="item in groupbuy.items track by $index">
+                                <img ng-src="{{item._links.image.href}}?size=sm" /><br />
+                                <strong>{{item.title}}</strong><br />
+                                <span>{{item.description}}</span><br />
+                                Precio: <span>{{item.price}} {{item.currency.symbol}}</span><br />
+                                <div data-ng-hide="$last">
+                                    <hr />
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- FIN Items-->
+
+                </form>
+            </div>
+            <!-- FIN Vista de participante -->
+
+
+            <!-- Vista de gestor -->
+            <div data-ng-show="(userRole == 'manager')">
+                <form data-ng-submit="joinGroupbuy()" name="memberManagerForm" novalidate>
+
+                    <!-- Divisas -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Divisa de la compra</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>
+                                En caso de ser una compra en una divisa distinta al Euro, rellenar esta parte y el precio en divisa de los items.
+                            </p>
+                            <form>
+                                Nombre de la divisa: <input type="text"><br />
+                                Tasa de cambio: <input type="text"><br />
+                                Multiplicador: <input type="text"><br />
+
+                                <strong>NOTA: </strong> Recordar incluir los gastos de envio desde los proveedores hasta los gestores en el precio de los items, o en la pestaña de pagos.
+                                <br />
+                                <input type="submit" value="{{'groupbuys.Update' | translate}}" class="btn btn-default">
+                            </form>
+
+                        </div>
+                    </div>
+                    <!-- FIN divisas -->
+
+                    <!-- Items -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Items</h3>
+                        </div>
+                        <div class="panel-body">
+                            <form>
+                                Nombre<br />
+
+                                Cantidad maxima (0 = sin límite)<br />
+
+                                Precio Euro<br />
+
+                                Precio Divisa<br />
+
+                                Url Info<br />
+
+                                Descripción<br />
+
+                                Imagen<br />
+
+                                <input type="submit" value="{{'groupbuys.Update' | translate}}" class="btn btn-default">
+                            </form>
+
+
+                        </div>
+                    </div>
+                    <!-- FIN Items-->
+
+                </form>
+
+
+
+
+
+            </div>
+            <!-- FIN Vista de gestor -->
+
+          </div>
+    </div>
+<!--  FIN Panel de la pestaña -->
+
 </section>
