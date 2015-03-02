@@ -1,5 +1,192 @@
-<section data-ng-controller="GroupbuysTabMessagingController">
-<p>
-  PESTAÑA DE MENSAJERIA
-</p>
+<section data-ng-controller="GroupbuysTabMessagingController" data-ng-init="loadDeliveriesData()">
+    <div class="panel panel-default">
+        <div class="panel-body">
+
+            <!-- Vista de participante -->
+            <div data-ng-show="(userRole !== 'manager')">
+                <form data-ng-submit="joinGroupbuy()" name="memberManagerForm" novalidate>
+
+
+                    <!-- Conversacion -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Conversación con los gestores de la compra</h3>
+                        </div>
+                        <div class="panel-body">
+
+
+                            <div class="col-md-12">
+                                <div class="pull-right">
+                                    <div class="alert-success">
+                                        <span>Este es el contenido del comentario 1</span>
+                                    </div>
+                                    <span>Escrito el 16/05/13 a las 14:22</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="pull-left">
+                                    <div class="alert-info">
+                                        <span>Este es el contenido del comentario 1</span>
+                                    </div>
+                                    <span>Escrito el 16/05/13 a las 14:22</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="pull-right">
+                                    <div class="alert-success">
+                                        <span>Este es el contenido del comentario 2</span>
+                                    </div>
+                                    <span>Escrito el 16/05/13 a las 14:22</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="pull-left">
+                                    <div class="alert-info">
+                                        <span>Este es el contenido del comentario 3</span>
+                                    </div>
+                                    <span>Escrito el 16/05/13 a las 14:22</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="pull-right">
+                                    <div class="alert-success">
+                                        <span>Este es el contenido del comentario 4</span>
+                                    </div>
+                                    <span>Escrito el 16/05/13 a las 14:22</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="pull-right">
+                                    <div class="alert-success">
+                                        <span>Este es el contenido del comentario 5</span>
+                                    </div>
+                                    <span>Escrito el 16/05/13 a las 14:22</span>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                        <!-- Escribir -->
+                        <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Escribe algo..."></textarea>
+                        <input type="submit" value="Enviar" class="btn btn-default">
+                        <!-- FIN Escribir-->
+                    </div>
+                </div>
+                <!-- FIN Conversacion-->
+
+                </form>
+            </div>
+            <!-- FIN Vista de participante -->
+
+
+            <!-- Vista de gestor -->
+            <div data-ng-show="(userRole == 'manager')">
+
+                <form data-ng-submit="joinGroupbuy()" name="PaymentManagerForm" novalidate>
+                    <!-- Panel de informacion del pago -->
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <ul class="nav nav-pills nav-stacked">
+                                        <li role="presentation" class="active"><a href="#"><img src="#" />Usuario 1</a></li>
+                                        <li role="presentation"><a href="#"><img src="#" />Usuario 2</a></li>
+                                        <li role="presentation"><a href="#"><img src="#" />Usuario 3</a></li>
+                                        <li role="presentation"><a href="#"><img src="#" />Usuario 4</a></li>
+                                        <li role="presentation"><a href="#"><img src="#" />Usuario 5</a></li>
+                                        <li role="presentation"><a href="#"><img src="#" />Usuario 6</a></li>
+                                        <li role="presentation"><a href="#"><img src="#" />Usuario 7</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-9">
+                                    <!-- Conversacion -->
+                                    <div class="panel panel-default">
+                                        <div class="panel-body">
+                                            <div>
+
+
+
+                                                <div class="col-md-12">
+                                                    <div class="pull-left">
+                                                        <div class="alert-info">
+                                                            <span>Este es el contenido del comentario 1</span>
+                                                        </div>
+                                                        <span>Escrito el 16/05/13 a las 14:22</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-12">
+                                                    <div class="pull-right">
+                                                        <div class="alert-success">
+                                                            <span>Este es el contenido del comentario 1</span>
+                                                        </div>
+                                                        <span>Escrito el 16/05/13 a las 14:22</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-12">
+                                                    <div class="pull-left">
+                                                        <div class="alert-info">
+                                                            <span>Este es el contenido del comentario 2</span>
+                                                        </div>
+                                                        <span>Escrito el 16/05/13 a las 14:22</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-12">
+                                                    <div class="pull-right">
+                                                        <div class="alert-success">
+                                                            <span>Este es el contenido del comentario 3</span>
+                                                        </div>
+                                                        <span>Escrito el 16/05/13 a las 14:22</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-12">
+                                                    <div class="pull-left">
+                                                        <div class="alert-info">
+                                                            <span>Este es el contenido del comentario 4</span>
+                                                        </div>
+                                                        <span>Escrito el 16/05/13 a las 14:22</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-12">
+                                                    <div class="pull-left">
+                                                        <div class="alert-info">
+                                                            <span>Este es el contenido del comentario 5</span>
+                                                        </div>
+                                                        <span>Escrito el 16/05/13 a las 14:22</span>
+                                                    </div>
+                                                </div>
+
+
+
+                                            </div>
+                                            <!-- Escribir -->
+                                            <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Escribe algo..."></textarea>
+                                            <input type="submit" value="Enviar" class="btn btn-default">
+                                            <!-- FIN Escribir-->
+                                        </div>
+                                    </div>
+                                    <!-- FIN Conversacion-->
+
+
+
+                                </div>
+                            </div>
+                    <!-- FIN Panel de informacion del pago -->
+
+                </form>
+            </div>
+            <!-- FIN Vista de gestor -->
+
+          </div>
+    </div>
+<!--  FIN Panel de la pestaña -->
+
 </section>
