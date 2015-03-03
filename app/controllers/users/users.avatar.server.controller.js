@@ -75,7 +75,7 @@ exports.updateAvatar = function(req, res, next) {
 		user.updated = Date.now();
 
 		// Saving it...
-		user.save(function(err) {
+		user.update({ $set: {avatar: user.avatar, upated: user.updated}}, {}, function(err) {
 			if (err) {
 				return res.status(400).send({
 					message: errorHandler.getErrorMessage(err)
@@ -107,7 +107,7 @@ exports.deleteAvatar = function(req, res) {
 		user.updated = Date.now();
 
 		// Saving it...
-		user.update({_id: user._id}, { $set: {avatar: user.avatar, upated: user.updated}}, {}, function(err) {
+		user.update({ $set: {avatar: user.avatar, upated: user.updated}}, {}, function(err) {
 			if (err) {
 				return res.status(400).send({
 					message: errorHandler.getErrorMessage(err)

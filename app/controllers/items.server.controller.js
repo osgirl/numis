@@ -240,9 +240,10 @@ exports.updateImage = function(req, res, next) {
 
 		// Updating the user model
 		item.set('image.file', file);
+		item.updated = Date.now();
 
 		// Saving it...
-		item.save(function(err) {
+		item.update({ $set: {image: item.image, upated: item.updated}}, {}, function(err) {
 			if (err) {
 				return res.status(400).send({
 					message: errorHandler.getErrorMessage(err)
@@ -264,9 +265,10 @@ exports.deleteImage = function(req, res) {
 
 	item.image = {};
 	item.image.lastModified = Date.now();
+	item.updated = Date.now();
 
 	// Saving it...
-	item.update({_id: item._id}, { $set: {image: item.image, upated: item.updated}}, {}, function(err) {
+	item.update({ $set: {image: item.image, upated: item.updated}}, {}, function(err) {
 		if (err) {
 			return res.status(400).send({
 				message: errorHandler.getErrorMessage(err)
