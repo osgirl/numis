@@ -75,16 +75,14 @@ describe('Item CRUD tests', function() {
 							code: 'EUR',
 							symbol: '€'
 						},
-						user: user1._id,
-						groupbuy: groupbuy1._id
+						user: user1._id
 					};
 
 					item2 = {
 						title: 'Item A2',
 						description: 'Description A2',
 						price: 12.34,
-						user: user1._id,
-						groupbuy: groupbuy1._id
+						user: user1._id
 					};
 
 					// Create one Item to Groupbuy 2
