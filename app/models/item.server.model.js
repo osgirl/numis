@@ -103,6 +103,7 @@ var ItemSchema = new Schema({
     },
 	maxQuantity: {
 		type: Number,
+		default: 0,
 		min: [0, 'The maximum amount can not be negative. Specify 0 for no set maximum amount']
 	},
 	price: {
