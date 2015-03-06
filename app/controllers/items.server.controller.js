@@ -109,7 +109,9 @@ var formattingItemList = exports.formattingItemList = function(items, req, optio
 exports.create = function(req, res) {
 	var item  = new Item(req.body);
 
+	// Set user creator
 	item.user = req.user;
+	item.groupbuy = req.groupbuy;
 
 	item.save(function(err) {
 		if (err) {

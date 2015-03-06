@@ -188,6 +188,24 @@ GroupbuySchema.plugin(l2rPlugin);
 
 
 /**
+ * Hook a pre save method to add user creator as manager if there are not managers.
+ */
+GroupbuySchema.pre('save', function(next) {
+	if (this.managers.length === 0) {
+		if (!this.isManager(this.user) ) {
+			this.managers.push(this.user);
+
+			if (!this.isMember(this.user) ) {
+				this.members.push(this.user);
+			}
+		}
+	}
+
+	next();
+});
+
+
+/**
  * Hook a pre save method to modify udpated date.
  */
 GroupbuySchema.pre('save', function(next) {

@@ -429,7 +429,7 @@ exports.getManagersList = function(req, res) {
  * Groupbuy middleware
  */
 exports.groupbuyByID = function(req, res, next, id) {
-	Groupbuy.findById(id).populate('user', 'displayName').exec(function(err, groupbuy) {
+	Groupbuy.findById(id).populate('user', 'username').exec(function(err, groupbuy) {
 		if (err) return next(err);
 		if (! groupbuy) return next(new Error('Failed to load Groupbuy ' + id));
 		req.groupbuy = groupbuy;
