@@ -630,9 +630,4 @@ describe('Groupbuy Pagination tests', function() {
 			.end(done);
 	});
 
-	after(function(done) {
-		// Remove old previous data
-		User.remove().exec(done);
-	});
-
 });

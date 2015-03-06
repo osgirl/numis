@@ -598,11 +598,7 @@ describe('User CRUD tests', function() {
 	afterEach(function(done) {
 		agent.get('/auth/signout')
 			.expect(302)
-			.end(function(signoutErr, signoutRes) {
-				User.remove().exec();
-
-				done();
-			});
+			.end(done);
 	});
 
 });

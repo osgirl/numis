@@ -58,10 +58,6 @@ describe('Groupbuy CRUD tests', function() {
 			roles: ['admin']
 		});
 
-		// Remove old previous data
-		Groupbuy.remove().exec();
-		User.remove().exec();
-
 		// Save a user to the test db and create new Groupbuy
 		user.save(function(err) {
 			if (err) console.error(err);
@@ -71,7 +67,7 @@ describe('Groupbuy CRUD tests', function() {
 				description: 'Groupbuy Description',
 				user: user._id
 			};
-			
+
 			done();
 		});
 	});

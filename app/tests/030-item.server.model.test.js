@@ -34,11 +34,6 @@ describe('Item Model Unit Tests:', function(done) {
 			provider: 'local'
 		});
 
-		// Remove old previous data
-		Item.remove().exec();
-		Groupbuy.remove().exec();
-		User.remove().exec();
-
 		user1.save(function(err) {
 			if (err) console.error(err);
 

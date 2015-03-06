@@ -40,11 +40,6 @@ describe('Item CRUD tests', function() {
 			provider: 'local'
 		});
 
-		// Remove old previous data
-		Item.remove().exec();
-		Groupbuy.remove().exec();
-		User.remove().exec();
-
 		// Save a user and 2 groupbuys to the test db
 		user1.save(function(err) {
 			if (err) console.error(err);
