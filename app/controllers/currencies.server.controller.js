@@ -23,7 +23,9 @@ var formattingCurrency = function(currency, req) {
 
 		// Add links to response
 		result._links = {
-			self: { href: selfURL },
+			self:       { href: selfURL },
+			collection: { href: parentURL, title: 'Currencies list' },
+			default:    { href: parentURL + 'default', title: 'Default currency' }
 		};
 
 		// Remove fields
@@ -43,7 +45,8 @@ var formattingCurrencyList = function(currencies, req) {
 
 	var result = {
 		_links: {
-			self: { href: selfURL }
+			self:    { href: selfURL },
+			default: { href: selfURL + 'default', title: 'Default currency' }
 		},
 		_embedded: {
 			currencies: currencies
@@ -77,6 +80,19 @@ exports.list = function(req, res) {
 	});
 };
 
+
+/**
+ * Default Currency
+ */
+exports.getDefault = function(req, res) {
+	Currency.getDefault( function(err, currency) {
+		if (err) {
+			return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
+		} else {
+			res.jsonp( formattingCurrency(currency, req) );
+		}
+	});
+};
 
 /**
  * Currency middleware

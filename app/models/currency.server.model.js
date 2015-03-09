@@ -39,4 +39,37 @@ var CurrencySchema = new Schema({
 	}
 });
 
+
+/**
+ * Add validators to Currency schema.
+ */
+CurrencySchema.path('code').validate( function (value) {
+    return value.length === 3;
+}, 'Currency code must containt 3 characters.');
+
+
+/**
+ * Get default currency
+ */
+CurrencySchema.statics.getDefault = function(callback) {
+	this.find({enabled: true})
+		.sort('-priority name')
+		.select('id name code symbol')
+		.limit(1)
+		.exec(function(err, currencies) {
+			if (err) {
+				console.error (err);
+			} else {
+				var result = (currencies.length > 0) ? currencies[0] : null;
+				
+				if (callback) {
+					callback(err, result);
+				} else {
+					return result;
+				}
+			}
+		});
+};
+
+
 mongoose.model('Currency', CurrencySchema);
