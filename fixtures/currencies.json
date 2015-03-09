@@ -1,0 +1,139 @@
+[
+    {
+        "name": "Euro",
+        "code": "EUR",
+        "symbol": "€",
+        "priority": 100
+    },
+    {
+        "name": "US Dollar",
+        "code": "USD",
+        "symbol": "$",
+        "priority": 99
+    },
+    {
+        "name": "British Pound",
+        "code": "GBP",
+        "symbol": "£"
+    },
+    {
+        "name": "Indian Rupee",
+        "code": "INR",
+        "symbol": "₹"
+    },
+    {
+        "name": "Australian Dollar",
+        "code": "AUD",
+        "symbol": "$"
+    },
+    {
+        "name": "New Zealand Dollar",
+        "code": "NZD",
+        "symbol": "$"
+    },
+    {
+        "name": "Canadian Dollar",
+        "code": "CAD",
+        "symbol": "$"
+    },
+    {
+        "name": "Singapore Dollar",
+        "code": "SGD",
+        "symbol": "$"
+    },
+    {
+        "name": "Malaysian Ringgit",
+        "code": "MYR",
+        "symbol": "RM"
+    },
+    {
+        "name": "Japanese Yen",
+        "code": "JPY",
+        "symbol": "¥"
+    },
+    {
+        "name": "Chinese Yuan Renminbi",
+        "code": "CNY",
+        "symbol": "¥"
+    },
+    {
+        "name": "Hong Kong Dollar",
+        "code": "HKD",
+        "symbol": "HK$"
+    },
+    {
+        "name": "Mexican Peso",
+        "code": "MXN",
+        "symbol": "$"
+    },
+    {
+        "name": "Philippine Peso",
+        "code": "PHP",
+        "symbol": "₱"
+    },
+    {
+        "name": "Brazilian Real",
+        "code": "BRL",
+        "symbol": "R$"
+    },
+    {
+        "name": "Turkish Lira",
+        "code": "TRY",
+        "symbol": "₺"
+    },
+    {
+        "name": "Hungarian Forint",
+        "code": "HUF",
+        "symbol": "Ft"
+    },
+    {
+        "name": "Norwegian Krone",
+        "code": "NOK",
+        "symbol": "kr"
+    },
+    {
+        "name": "Russian Ruble",
+        "code": "RUB",
+        "symbol": "руб"
+    },
+    {
+        "name": "Polish Zloty",
+        "code": "PLN",
+        "symbol": "zł"
+    },
+    {
+        "name": "Colombian Peso",
+        "code": "COP",
+        "symbol": "$"
+    },
+    {
+        "name": "Chilean Peso",
+        "code": "CLP",
+        "symbol": "$"
+    },
+    {
+        "name": "Argentine Peso",
+        "code": "ARS",
+        "symbol": "$"
+    },
+    {
+        "name": "Czech Koruna",
+        "code": "CZK",
+        "symbol": "Kč"
+    },
+    {
+        "name": "Ukrainian Hryvnia",
+        "code": "UAH",
+        "symbol": "₴"
+    },
+    {
+        "name": "Romanian New Leu",
+        "code": "RON",
+        "symbol": "lei"
+    },
+    {
+        "name": "Venezuelan Bolivar",
+        "code": "VEF",
+        "symbol": "Bs"
+    }
+]

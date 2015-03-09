@@ -91,6 +91,12 @@ module.exports = function(grunt) {
 					ext: 'js,html',
 					watch: watchFiles.serverViews.concat(watchFiles.serverJS)
 				}
+			},
+			fixtures: {
+				script: 'load-fixtures.js',
+				options: {
+					nodeArgs: ['--debug']
+				}
 			}
 		},
 		'node-inspector': {
@@ -212,6 +218,9 @@ module.exports = function(grunt) {
 
 	// Create locales task(s)
 	grunt.registerTask('locales', ['clean:locales', 'merge-json']);
+
+	// Add fixtures to Database
+	grunt.registerTask('fixtures', ['env:dev', 'nodemon:fixtures']);
 
 	// Debug task.
 	grunt.registerTask('debug', ['lint', 'locales', 'concurrent:debug']);
