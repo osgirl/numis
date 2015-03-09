@@ -11,7 +11,8 @@ var mongoose       = require('mongoose'),
 	l2rPlugin      = require('mongoose-l2r'),
 	path           = require('path'),
 	lwip           = require('lwip'),
-	Schema         = mongoose.Schema;
+	Schema         = mongoose.Schema,
+	Groupbuy       = mongoose.model('Groupbuy');
 
 
 var getPrice = function (num) {
@@ -114,18 +115,9 @@ var ItemSchema = new Schema({
         set: setPrice
 	},
 	currency: {
-        code: {
-            type: String,
-            default: 'EUR',
-            required: 'Please select currency.',
-            trim: true
-        },
-        symbol: {
-		    type: String,
-		    default: '€',
-		    required: 'Please select currency.',
-		    trim: true
-        }
+		type: Schema.ObjectId,
+        ref: 'Currency',
+        required: 'You must specify the currency'
 	},
 	updated: {
 		type: Date
@@ -148,11 +140,24 @@ var ItemSchema = new Schema({
 
 
 /**
- * Add validators to Item schema.
+ * Hook a pre validate method to set the currency as groupbuy provider currency.
  */
-ItemSchema.path('currency.code').validate( function (value) {
-    return value.length === 3;
-}, 'Currency code must containt 3 characters.');
+ItemSchema.pre('validate', function(next) {
+	var _this = this;
+
+	if (!this.currency) {
+		Groupbuy.findById(this.groupbuy).select('currencies').exec(function(err, groupbuy) {
+			if (err) {
+				next(err);
+			} else if (typeof groupbuy.currencies !== 'undefined' && typeof groupbuy.currencies.provider !== 'undefined') {
+				_this.currency = groupbuy.currencies.provider;
+				next();
+			}
+		});
+	} else {
+		next();
+	}
+});
 
 
 /**
@@ -193,6 +198,7 @@ ItemSchema.plugin(filePlugin, {
 
 ItemSchema.set('toJSON', { getters: true, virtuals: false });
 ItemSchema.set('toObject', { getters: true, virtuals: false });
+
 
 
 // Compile a 'Item' model using the ItemSchema as the structure.

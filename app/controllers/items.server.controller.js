@@ -113,11 +113,17 @@ exports.create = function(req, res) {
 	item.user = req.user;
 	item.groupbuy = req.groupbuy;
 
-	item.save(function(err) {
+	item.save(function(err, item) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.status(201).jsonp( formattingItem(item, req) );
+			// Populate currency
+			item.populate({path: 'currency', select: 'id name code symbol'}, function(err2) {
+				if (err2) {
+					return res.status(400).send( errorHandler.prepareErrorResponse (err2) );
+				}
+				res.status(201).jsonp( formattingItem(item, req) );
+			});
 		}
 	});
 };
@@ -178,7 +184,7 @@ exports.list = function(req, res) {
 		} else {
 			res.jsonp( formattingItemList(items, req, {page: page, totalPages: totalPages, numElems: items.length, totalElems: count, selFields: fields}) );
 		}
-	}, { columns: fields, sortBy : sort });
+	}, { columns: fields, sortBy : sort, populate: 'currency' });
 };
 
 
@@ -289,7 +295,7 @@ exports.deleteImage = function(req, res) {
  * Item middleware
  */
 exports.itemByID = function(req, res, next, id) {
-	Item.findById(id).exec(function(err, item) {
+	Item.findById(id).populate('currency', 'id name code symbol').exec(function(err, item) {
 		if (err) return next(err);
 		if (! item) return next(new Error('Failed to load Item ' + id));
 		req.item = item ;

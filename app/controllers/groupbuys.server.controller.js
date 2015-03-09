@@ -218,7 +218,7 @@ exports.list = function(req, res) {
 		} else {
 			res.jsonp( formattingGroupbuyList(groupbuys, req, {page: page, totalPages: totalPages, numElems: groupbuys.length, totalElems: count, selFields: fields}) );
 		}
-	}, { columns: fields, populate: ['user'], sortBy : sort });
+	}, { columns: fields, populate: ['user', 'currency.local', 'currency.provider'], sortBy : sort });
 };
 
 /**
@@ -429,12 +429,16 @@ exports.getManagersList = function(req, res) {
  * Groupbuy middleware
  */
 exports.groupbuyByID = function(req, res, next, id) {
-	Groupbuy.findById(id).populate('user', 'username').exec(function(err, groupbuy) {
-		if (err) return next(err);
-		if (! groupbuy) return next(new Error('Failed to load Groupbuy ' + id));
-		req.groupbuy = groupbuy;
-		next();
-	});
+	Groupbuy.findById(id)
+		.populate('user', 'username')
+		.populate('currencies.local', 'id name code symbol')
+		.populate('currencies.provider', 'id name code symbol')
+		.exec(function(err, groupbuy) {
+			if (err) return next(err);
+			if (! groupbuy) return next(new Error('Failed to load Groupbuy ' + id));
+			req.groupbuy = groupbuy;
+			next();
+		});
 };
 
 

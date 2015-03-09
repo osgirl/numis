@@ -7,7 +7,19 @@ var mongoose       = require('mongoose'),
 	slugPlugin     = require('mongoose-url-slugs'),
 	paginatePlugin = require('mongoose-paginate'),
 	l2rPlugin      = require('mongoose-l2r'),
-	Schema         = mongoose.Schema;
+	Schema         = mongoose.Schema,
+	Currency       = mongoose.model('Currency');
+
+
+var getExchangeRate = function (num) {
+    return (num / 1000000);
+};
+
+
+var setExchangeRate = function (num) {
+    return Math.round(num * 1000000);
+};
+
 
 /**
  * Groupbuy Schema
@@ -42,6 +54,30 @@ var GroupbuySchema = new Schema({
 		type: String,
 		enum: ['new', 'published', 'payments', 'paid', 'shipments', 'closed', 'cancelled', 'deleted'],
 		default: 'new'
+	},
+	currencies: {
+		_id: false,
+		local: {
+			type: Schema.ObjectId,
+	        ref: 'Currency',
+	        required: 'You must specify the local/manager currency.'
+		},
+		provider: {
+			type: Schema.ObjectId,
+	        ref: 'Currency',
+			required: 'You must specify the provider/items currency.'
+		},
+		exchangeRate: {
+			type: Number,
+			min: [0, 'The exchange rate can not be negative.'],
+			default: 1,
+	        get: getExchangeRate,
+	        set: setExchangeRate
+		},
+		multiplier: {
+			type: Number,
+			default: 1
+		}
 	},
 	updates: [{
 		publishDate: {
@@ -174,17 +210,47 @@ GroupbuySchema.methods.checkVisibility = function(user, property) {
 };
 
 
+
 /**
- * Add plugins to Groupbuy schema.
+ * Hook a pre validate method to set the default currency as local currency if not provided.
  */
-// Slug plugin
-GroupbuySchema.plugin(slugPlugin('title', {field: 'name'}));
+GroupbuySchema.pre('validate', function(next) {
+	var _this = this;
 
-// Paginate plugin
-GroupbuySchema.plugin(paginatePlugin);
+	if (!this.currencies.local) {
+		Currency.getDefault( function(err, currency) {
+			if (!err && currency) {
+				if (typeof _this.currencies === 'undefined') {
+					_this.currencies = {
+						local:    currency._id,
+						provider: currency._id
+					};
+				} else {
+					_this.currencies.local = currency._id;
+				}
+			}
 
-// L2r plugin
-GroupbuySchema.plugin(l2rPlugin);
+			next();
+		});
+	} else {
+		next();
+	}
+});
+
+
+/**
+ * Hook a pre validate method to set the provider currency as same as local currency if not provided.
+ */
+GroupbuySchema.pre('validate', function(next) {
+	var _this = this;
+
+	if (!this.currencies.provider && this.currencies.local) {
+		this.currencies.provider = this.currencies.local;
+		this.currencies.exchangeRate = 1.0000;
+		this.currencies.multiplier = 1.0;
+	}
+	next();
+});
 
 
 /**
@@ -215,6 +281,21 @@ GroupbuySchema.pre('save', function(next) {
 
 	next();
 });
+
+
+
+/**
+ * Add plugins to Groupbuy schema.
+ */
+// Slug plugin
+GroupbuySchema.plugin(slugPlugin('title', {field: 'name'}));
+
+// Paginate plugin
+GroupbuySchema.plugin(paginatePlugin);
+
+// L2r plugin
+GroupbuySchema.plugin(l2rPlugin);
+
 
 
 // Compile a 'Groupbuy' model using the GroupbuySchema as the structure.
