@@ -3,29 +3,44 @@
 /**
  * Module dependencies.
  */
-var should = require('should'),
+var should   = require('should'),
 	mongoose = require('mongoose'),
-	User = mongoose.model('User'),
+	User     = mongoose.model('User'),
+	Currency = mongoose.model('Currency'),
 	Groupbuy = mongoose.model('Groupbuy'),
-	Item = mongoose.model('Item'),
-	Order = mongoose.model('Order');
+	Item     = mongoose.model('Item'),
+	Order    = mongoose.model('Order');
 
 /**
  * Globals
  */
-var user, manager, groupbuy, order, item1, item2, item3;
+var user, manager, currency, groupbuy, order, item1, item2, item3;
 
 /**
  * Unit tests
  */
 describe('Order Model Unit Tests:', function() {
-	beforeEach(function(done) {
-		// Remove old previous data
-		Order.remove().exec();
-		Item.remove().exec();
-		Groupbuy.remove().exec();
-		User.remove().exec();
+	before(function(done) {
+		currency = new Currency({
+			name: 'Euro',
+			code: 'EUR',
+			symbol: '€',
+			priority: 100
+		});
 
+		// Remove old previous data
+		Currency.remove().exec(function(err) {
+			if (err) console.error(err);
+
+			currency.save(function(err) {
+				if (err) console.error(err);
+
+				done();
+			});
+		});
+	});
+
+	beforeEach(function(done) {
 		user = new User({
 			firstName: 'Full',
 			lastName: 'Name',
@@ -55,10 +70,7 @@ describe('Order Model Unit Tests:', function() {
 			title: 'Item 1',
 			description: 'Description 1',
 			price: 22.34,
-			currency: {
-				code: 'EUR',
-				symbol: '€'
-			},
+			currency: currency.id,
 			user: user,
 			groupbuy: groupbuy
 		});
@@ -80,32 +92,52 @@ describe('Order Model Unit Tests:', function() {
 			groupbuy: groupbuy
 		});
 
-		user.save(function(err) {
+		// Remove old previous data
+		Order.remove(function(err) {
 			if (err) console.error(err);
 
-			groupbuy.save(function(err) {
+			Item.remove(function(err) {
 				if (err) console.error(err);
 
-				item1.save(function(err) {
+				Groupbuy.remove(function(err) {
 					if (err) console.error(err);
 
-					item2.save(function(err) {
+					User.remove(function(err) {
 						if (err) console.error(err);
 
-						item3.save(function(err) {
+						// Save test data
+						user.save(function(err) {
 							if (err) console.error(err);
 
-							order = new Order({
-								groupbuy: groupbuy,
-								user: user
-							});
+							groupbuy.save(function(err) {
+								if (err) console.error(err);
 
-							done();
+								item1.save(function(err) {
+									if (err) console.error(err);
+
+									item2.save(function(err) {
+										if (err) console.error(err);
+
+										item3.save(function(err) {
+											if (err) console.error(err);
+
+											order = new Order({
+												groupbuy: groupbuy,
+												user: user
+											});
+
+											done();
+										});
+									});
+								});
+							});
 						});
+
 					});
 				});
 			});
 		});
+
 	});
 
 	/*
@@ -115,11 +147,12 @@ describe('Order Model Unit Tests:', function() {
 	 *              1 - Client
 	 *
 	 *          yy) Module:
+	 *              00 - Currencies
 	 *              01 - Users
 	 *              02 - Groupbuys
 	 *              03 - Items
 	 *              04 - Orders
-	 *              05 - Mesenger
+	 *              05 - Messages
 	 *
 	 *          a) Subgroup (in Server side):
 	 *              0 - Mongoose

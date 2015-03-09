@@ -3,21 +3,42 @@
 /**
  * Module dependencies.
  */
-var should = require('should'),
+var should   = require('should'),
 	mongoose = require('mongoose'),
-	User = mongoose.model('User'),
+	User     = mongoose.model('User'),
+	Currency = mongoose.model('Currency'),
 	Groupbuy = mongoose.model('Groupbuy'),
-	Item = mongoose.model('Item');
+	Item     = mongoose.model('Item');
 
 /**
  * Globals
  */
-var user1, groupbuy1, groupbuy2, item1;
+var user1, currency, groupbuy1, groupbuy2, item1;
 
 /**
  * Unit tests
  */
 describe('Item Model Unit Tests:', function(done) {
+	before(function(done) {
+		currency = new Currency({
+			name: 'Euro',
+			code: 'EUR',
+			symbol: '€',
+			priority: 100
+		});
+
+		// Remove old previous data
+		Currency.remove().exec(function(err) {
+			if (err) console.error(err);
+
+			currency.save(function(err) {
+				if (err) console.error(err);
+
+				done();
+			});
+		});
+	});
+
 	beforeEach(function(done) {
 		// Remove old previous data
 		Item.remove().exec();
@@ -59,10 +80,7 @@ describe('Item Model Unit Tests:', function(done) {
 						title: 'Item Title',
 						description: 'Description',
 						price: 100,
-						currency: {
-							code: 'EUR',
-							symbol: '€'
-						},
+						currency: currency.id,
 						groupbuy: groupbuy1,
 						user: user1
 					});
@@ -81,11 +99,12 @@ describe('Item Model Unit Tests:', function(done) {
 	 *              1 - Client
 	 *
 	 *          yy) Module:
+	 *              00 - Currencies
 	 *              01 - Users
 	 *              02 - Groupbuys
 	 *              03 - Items
 	 *              04 - Orders
-	 *              05 - Mesenger
+	 *              05 - Messages
 	 *
 	 *          a) Subgroup (in Server side):
 	 *              0 - Mongoose
@@ -165,54 +184,5 @@ describe('Item Model Unit Tests:', function(done) {
             });
         });
 
-        it('NU_P_G003_E008: should be able to save an item with USD currency with spaces before and after it', function(done) {
-            item1.currency = {
-                code: '  USD ',
-                symbol: '$'
-            };
-
-            return item1.save(function(err) {
-                should.not.exist(err);
-
-                item1.currency.code.should.equal('USD');
-                item1.currency.symbol.should.equal('$');
-
-                done();
-            });
-        });
-
-        it('NU_P_G003_E009: should be able to show an error when try to save an Item with less 3-characters currency code', function(done) {
-            item1.currency = {
-                code: 'US',
-                symbol: '$'
-            };
-
-            return item1.save(function(err) {
-                should.exist(err);
-
-                err.name.should.equal('ValidationError');
-                err.errors.should.have.property('currency.code');
-
-                done();
-            });
-        });
-
-        it('NU_P_G003_E010: should be able to show an error when try to save an Item with more 3-characters currency code', function(done) {
-            item1.currency = {
-                code: 'USDollar',
-                symbol: '$'
-            };
-
-            return item1.save(function(err) {
-                should.exist(err);
-
-                err.name.should.equal('ValidationError');
-                err.errors.should.have.property('currency.code');
-
-                done();
-            });
-        });
-
 	});
-
 });

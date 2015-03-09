@@ -10,13 +10,14 @@ var mongoose = require('mongoose'),
 	_        = require('lodash'),
 	app      = require('../../server'),
 	User     = mongoose.model('User'),
+	Currency = mongoose.model('Currency'),
 	Groupbuy = mongoose.model('Groupbuy'),
 	agent    = request.agent(app);
 
 /**
  * Globals
  */
-var credentialsA, admin, data, user, users = [], groupbuy, groupbuys = [];
+var credentialsA, currency, admin, userData, groupbuyData, user, users = [], groupbuy, groupbuys = [];
 
 /**
  * User routes tests
@@ -24,10 +25,12 @@ var credentialsA, admin, data, user, users = [], groupbuy, groupbuys = [];
 describe('Groupbuy Pagination tests', function() {
 	before(function(done) {
 		var username, managers, members;
-
-		// Remove old previous data
-		Groupbuy.remove().exec();
-		User.remove().exec();
+		currency = new Currency({
+			name: 'Euro',
+			code: 'EUR',
+			symbol: '€',
+			priority: 100
+		});
 
 		// Create user credentials
 		credentialsA = {
@@ -45,72 +48,88 @@ describe('Groupbuy Pagination tests', function() {
 				provider: 'local',
 				roles: ['user', 'admin']
 		});
-		admin.save();
-		users.push(admin);
 
 		// Generate 25 users
-		data = [ { firstName: 'Patience', lastName: 'Anthony' }, { firstName: 'Wanda', lastName: 'Simpson' }, { firstName: 'Christopher', lastName: 'Davidson' }, { firstName: 'Melissa', lastName: 'Hoover' }, { firstName: 'Blair', lastName: 'Miller' }, { firstName: 'Shelby', lastName: 'Odom' }, { firstName: 'Salvador', lastName: 'Singleton' }, { firstName: 'Yolanda', lastName: 'Petersen' }, { firstName: 'Clementine', lastName: 'Webb' }, { firstName: 'Sydnee', lastName: 'Mccarthy' }, { firstName: 'Garrett', lastName: 'Mcintosh' }, { firstName: 'Maite', lastName: 'Spencer' }, { firstName: 'Kaitlin', lastName: 'Delaney' }, { firstName: 'Dane', lastName: 'Booker' }, { firstName: 'Palmer', lastName: 'Barry' }, { firstName: 'Jamal', lastName: 'Best' }, { firstName: 'Vera', lastName: 'Franklin' }, { firstName: 'Portia', lastName: 'Ferrell' }, { firstName: 'Amaya', lastName: 'Downs' }, { firstName: 'Amity', lastName: 'Ewing' }, { firstName: 'Nadine', lastName: 'Church' }, { firstName: 'Libby', lastName: 'Griffith' }, { firstName: 'Laith', lastName: 'Flowers' }, { firstName: 'Trevor', lastName: 'Peters' }, { firstName: 'Graham', lastName: 'Lara' } ];
-
-		// 1st para in async.each() is the array of items
-		// 2nd param is the function that each item is passed to
-		async.each (data, function(data, callback) {
-			username = _.deburr(data.firstName.charAt(0) + data.lastName).toLowerCase();
-
-			user = new User({
-				firstName: data.firstName,
-				lastName: data.lastName,
-				email: username + '@example.net',
-				username: username,
-				password: crypto.randomBytes(16).toString('base64'),
-				provider: 'local',
-				roles: ['user']
-			});
-			user.save(callback);
-
-			users.push(user);
-		},
-		// 3rd param is the function to call when everything's done
-		function(err) {
-			if (err) {
-				console.error(err);
-				done(err);
-			}
-		});
-
-
+		userData = [ { firstName: 'Patience', lastName: 'Anthony' }, { firstName: 'Wanda', lastName: 'Simpson' }, { firstName: 'Christopher', lastName: 'Davidson' }, { firstName: 'Melissa', lastName: 'Hoover' }, { firstName: 'Blair', lastName: 'Miller' }, { firstName: 'Shelby', lastName: 'Odom' }, { firstName: 'Salvador', lastName: 'Singleton' }, { firstName: 'Yolanda', lastName: 'Petersen' }, { firstName: 'Clementine', lastName: 'Webb' }, { firstName: 'Sydnee', lastName: 'Mccarthy' }, { firstName: 'Garrett', lastName: 'Mcintosh' }, { firstName: 'Maite', lastName: 'Spencer' }, { firstName: 'Kaitlin', lastName: 'Delaney' }, { firstName: 'Dane', lastName: 'Booker' }, { firstName: 'Palmer', lastName: 'Barry' }, { firstName: 'Jamal', lastName: 'Best' }, { firstName: 'Vera', lastName: 'Franklin' }, { firstName: 'Portia', lastName: 'Ferrell' }, { firstName: 'Amaya', lastName: 'Downs' }, { firstName: 'Amity', lastName: 'Ewing' }, { firstName: 'Nadine', lastName: 'Church' }, { firstName: 'Libby', lastName: 'Griffith' }, { firstName: 'Laith', lastName: 'Flowers' }, { firstName: 'Trevor', lastName: 'Peters' }, { firstName: 'Graham', lastName: 'Lara' } ];
 		// Generate 5 Groupbuys
-		data = [
+		groupbuyData = [
 			{ title: 'neque venenatis', managers: [23], members: [13, 7], description: 'eu tellus. Phasellus elit pede, malesuada vel, venenatis vel, faucibus id, libero. Donec consectetuer mauris id sapien. Cras dolor dolor, tempus non, lacinia at, iaculis quis, pede. Praesent eu dui. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean eget magna. Suspendisse tristique neque venenatis lacus. Etiam bibendum fermentum metus. Aenean sed pede nec ante blandit viverra. Donec tempus, lorem fringilla ornare placerat, orci lacus vestibulum lorem, sit amet ultricies sem magna nec quam. Curabitur vel lectus. Cum sociis natoque penatibus et magnis'},
 			{ title: 'Cursus et, magna.', managers: [12], members: [2, 4, 6, 8, 10, 14, 16, 18], description: 'tristique neque venenatis lacus. Etiam bibendum fermentum metus. Aenean sed pede nec ante blandit viverra. Donec tempus, lorem fringilla ornare placerat, orci lacus vestibulum lorem, sit amet ultricies sem magna nec quam. Curabitur vel lectus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec dignissim magna a tortor. Nunc commodo auctor' },
 			{ title: 'Dui lectus', managers: [23, 12, 7], members: [0, 2, 3, 4, 5, 6, 9], description: 'ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Phasellus ornare. Fusce mollis. Duis sit amet diam eu dolor egestas rhoncus. Proin nisl sem, consequat nec, mollis vitae, posuere at, velit. Cras lorem lorem, luctus ut, pellentesque eget, dictum placerat, augue. Sed' },
 			{ title: 'Ultrices sit amet, risus.', managers: [23, 7, 8], members: [1], description: 'Praesent eu nulla at sem molestie sodales. Mauris blandit enim consequat purus. Maecenas libero est, congue a, aliquet vel, vulputate eu, odio. Phasellus at augue id ante dictum cursus. Nunc mauris elit, dictum eu, eleifend nec, malesuada ut, sem. Nulla interdum. Curabitur dictum. Phasellus in felis. Nulla tempor augue ac ipsum. Phasellus vitae mauris sit amet lorem semper auctor. Mauris' },
 			{ title: 'Ut, pharetra', managers: [0], members: [], description: 'ultrices a, auctor non, feugiat nec, diam. Duis mi enim, condimentum eget, volutpat ornare, facilisis eget, ipsum. Donec sollicitudin adipiscing ligula. Aenean gravida nunc sed pede. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Proin vel arcu eu odio tristique pharetra. Quisque ac libero nec ligula consectetuer rhoncus. Nullam velit dui, semper et, lacinia vitae, sodales at, velit. Pellentesque ultricies dignissim lacus. Aliquam' }
 		];
-		// 1st para in async.each() is the array of items
-		// 2nd param is the function that each item is passed to
-		async.each (data, function(data, callback) {
-			managers = _.map(data.managers, function(n) {
-				return users[n].id;
-			});
-			members  = _.union(managers, _.map(data.members, function(n) {
-				return users[n].id;
-			}) );
 
-			groupbuy = new Groupbuy({
-				title: data.title,
-				description: data.description,
-				managers: managers,
-				members: members,
-				user: managers[0]
-			});
-			groupbuy.save(callback);
-			groupbuys.push(groupbuy);
-		},
-		// 3rd param is the function to call when everything's done
-		function(err) {
-			if (err) console.error(err);
 
-			done();
+		// Remove old previous data
+		Groupbuy.remove(function(err) {
+			User.remove(function(err) {
+				Currency.remove(function(err) {
+					// Save test data
+					currency.save(function(err) {
+						if (err) console.error(err);
+
+						admin.save(function(err) {
+							if (err) console.error(err);
+
+							users.push(admin);
+
+							// 1st para in async.each() is the array of items
+							// 2nd param is the function that each item is passed to
+							async.each (userData, function(data, callback) {
+								username = _.deburr(data.firstName.charAt(0) + data.lastName).toLowerCase();
+
+								user = new User({
+									firstName: data.firstName,
+									lastName: data.lastName,
+									email: username + '@example.net',
+									username: username,
+									password: crypto.randomBytes(16).toString('base64'),
+									provider: 'local',
+									roles: ['user']
+								});
+								user.save(callback);
+
+								users.push(user);
+							},
+							// 3rd param is the function to call when everything's done
+							function(err) {
+								if (err) {
+									console.error(err);
+									done(err);
+								}
+							});
+
+							// 1st para in async.each() is the array of items
+							// 2nd param is the function that each item is passed to
+							async.each (groupbuyData, function(data, callback) {
+								managers = _.map(data.managers, function(n) {
+									return users[n].id;
+								});
+								members  = _.union(managers, _.map(data.members, function(n) {
+									return users[n].id;
+								}) );
+
+								groupbuy = new Groupbuy({
+									title: data.title,
+									description: data.description,
+									managers: managers,
+									members: members,
+									user: managers[0]
+								});
+								groupbuy.save(callback);
+								groupbuys.push(groupbuy);
+							},
+							// 3rd param is the function to call when everything's done
+							function(err) {
+								if (err) console.error(err);
+
+								done();
+							});
+						});
+					});
+				});
+			});
 		});
 	});
 
@@ -121,11 +140,12 @@ describe('Groupbuy Pagination tests', function() {
 	 *              1 - Client
 	 *
 	 *          yy) Module:
+	 *              00 - Currencies
 	 *              01 - Users
 	 *              02 - Groupbuys
 	 *              03 - Items
 	 *              04 - Orders
-	 *              05 - Mesenger
+	 *              05 - Messages
 	 *
 	 *          a) Subgroup (in Server side):
 	 *              0 - Mongoose

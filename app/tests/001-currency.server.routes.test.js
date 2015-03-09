@@ -87,12 +87,12 @@ describe('Currency CRUD tests', function() {
 	*              1 - Client
 	*
 	*          yy) Module:
+	*              00 - Currencies
 	*              01 - Users
 	*              02 - Groupbuys
 	*              03 - Items
 	*              04 - Orders
 	*              05 - Messages
-	*			   06 - Currencies
 	*
 	*          a) Subgroup (in Server side):
 	*              0 - Mongoose

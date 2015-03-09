@@ -5,6 +5,7 @@ var should   = require('should'),
 	app      = require('../../server'),
 	mongoose = require('mongoose'),
 	User 	 = mongoose.model('User'),
+	Currency = mongoose.model('Currency'),
 	Groupbuy = mongoose.model('Groupbuy'),
 	Item     = mongoose.model('Item'),
 	Order    = mongoose.model('Order'),
@@ -15,20 +16,34 @@ var should   = require('should'),
  */
 var credentialsA, credentials1, credentials2, credentials3;
 var admin, manager1, manager2, member3;
-var groupbuy, order, item1, item2, item3;
+var currency, groupbuy, order, item1, item2, item3;
 var request1, request2, request3;
 
 /**
  * Order routes tests
  */
 describe('Order CRUD tests', function() {
-	beforeEach(function(done) {
-		// Remove old previous data
-		Order.remove().exec();
-		Item.remove().exec();
-		Groupbuy.remove().exec();
-		User.remove().exec();
+	before(function(done) {
+		currency = new Currency({
+			name: 'Euro',
+			code: 'EUR',
+			symbol: '€',
+			priority: 100
+		});
 
+		// Remove old previous data
+		Currency.remove().exec(function(err) {
+			if (err) console.error(err);
+
+			currency.save(function(err) {
+				if (err) console.error(err);
+
+				done();
+			});
+		});
+	});
+
+	beforeEach(function(done) {
 		// Create managers credentials
 		credentialsA = {
 			username: 'admin1',
@@ -92,97 +107,112 @@ describe('Order CRUD tests', function() {
 			provider: 'local'
 		});
 
-		admin.save(function(err) {
+		// Remove old previous data
+		Order.remove(function(err) {
 			if (err) console.error(err);
 
-			manager1.save(function(err) {
+			Item.remove(function(err) {
 				if (err) console.error(err);
 
-				manager2.save(function(err) {
+				Groupbuy.remove(function(err) {
 					if (err) console.error(err);
 
-					// Create groupbuy and items to add on it
-					groupbuy = new Groupbuy({
-						title: 'Groupbuy #1',
-						description: 'Lorem ipsum dolor sit amet...',
-						members: [manager1.id],
-						managers: [manager1.id],
-						user: manager1
-					});
-
-					member3.save(function(err) {
+					User.remove(function(err) {
 						if (err) console.error(err);
 
-						groupbuy.save(function(err) {
+						// Save test data
+						admin.save(function(err) {
 							if (err) console.error(err);
 
-							item1 = new Item({
-								title: 'Item 1',
-								description: 'Description 1',
-								price: 100,
-								currency: {
-									code: 'EUR',
-									symbol: '€'
-								},
-								user: manager1,
-								groupbuy: groupbuy
-							});
-
-							item2 = new Item({
-								title: 'Item 2',
-								description: 'Description 2',
-								price: 10,
-								user: manager1,
-								groupbuy: groupbuy
-							});
-
-							// Create one Item to Groupbuy 2
-							item3 = new Item({
-								title: 'Item 3',
-								description: 'Description 3',
-								price: 1,
-								user: manager2,
-								groupbuy: groupbuy
-							});
-
-							item1.save(function(err) {
+							manager1.save(function(err) {
 								if (err) console.error(err);
 
-								item2.save(function(err) {
+								manager2.save(function(err) {
 									if (err) console.error(err);
 
-									item3.save(function(err) {
+									// Create groupbuy and items to add on it
+									groupbuy = new Groupbuy({
+										title: 'Groupbuy #1',
+										description: 'Lorem ipsum dolor sit amet...',
+										members: [manager1.id],
+										managers: [manager1.id],
+										user: manager1
+									});
+
+									member3.save(function(err) {
 										if (err) console.error(err);
 
-										request1 = {
-											items: [
-												{item: item1.id, quantity: 1},
-												{item: item2.id, quantity: 1}
-											]
-										};
+										groupbuy.save(function(err) {
+											if (err) console.error(err);
 
-										request2 = {
-											items: [
-												{item: item1.id, quantity: 4},
-												{item: item2.id, quantity: 4},
-												{item: item3.id, quantity: 5}
-											]
-										};
+											item1 = new Item({
+												title: 'Item 1',
+												description: 'Description 1',
+												price: 100,
+												currency: currency.id,
+												user: manager1,
+												groupbuy: groupbuy
+											});
 
-										request3 = {
-											items: [
-												{item: item1.id, quantity: -3},
-												{item: item2.id, quantity: -3},
-												{item: item3.id, quantity: -3}
-											]
-										};
+											item2 = new Item({
+												title: 'Item 2',
+												description: 'Description 2',
+												price: 10,
+												user: manager1,
+												groupbuy: groupbuy
+											});
 
-										order = new Order({
-											groupbuy: groupbuy,
-											user: manager1.id
+											// Create one Item to Groupbuy 2
+											item3 = new Item({
+												title: 'Item 3',
+												description: 'Description 3',
+												price: 1,
+												user: manager2,
+												groupbuy: groupbuy
+											});
+
+											item1.save(function(err) {
+												if (err) console.error(err);
+
+												item2.save(function(err) {
+													if (err) console.error(err);
+
+													item3.save(function(err) {
+														if (err) console.error(err);
+
+														request1 = {
+															items: [
+																{item: item1.id, quantity: 1},
+																{item: item2.id, quantity: 1}
+															]
+														};
+
+														request2 = {
+															items: [
+																{item: item1.id, quantity: 4},
+																{item: item2.id, quantity: 4},
+																{item: item3.id, quantity: 5}
+															]
+														};
+
+														request3 = {
+															items: [
+																{item: item1.id, quantity: -3},
+																{item: item2.id, quantity: -3},
+																{item: item3.id, quantity: -3}
+															]
+														};
+
+														order = new Order({
+															groupbuy: groupbuy,
+															user: manager1.id
+														});
+
+														done();
+													});
+												});
+											});
 										});
-
-										done();
 									});
 								});
 							});
@@ -201,11 +231,12 @@ describe('Order CRUD tests', function() {
 	 *              1 - Client
 	 *
 	 *          yy) Module:
+	 *              00 - Currencies
 	 *              01 - Users
 	 *              02 - Groupbuys
 	 *              03 - Items
 	 *              04 - Orders
-	 *              05 - Mesenger
+	 *              05 - Messages
 	 *
 	 *          a) Subgroup (in Server side):
 	 *              0 - Mongoose
@@ -727,10 +758,6 @@ describe('Order CRUD tests', function() {
 			title: 'Item 4',
 			description: 'Description 4',
 			price: 3.88,
-			currency: {
-				code: 'EUR',
-				symbol: '€'
-			},
 			user: manager2,
 			groupbuy: groupbuy2
 		});
@@ -908,10 +935,6 @@ describe('Order CRUD tests', function() {
 			title: 'Item 4',
 			description: 'Description 4',
 			price: 3.88,
-			currency: {
-				code: 'EUR',
-				symbol: '€'
-			},
 			user: manager2,
 			groupbuy: groupbuy2
 		});

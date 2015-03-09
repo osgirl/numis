@@ -3,9 +3,10 @@
 /**
  * Module dependencies.
  */
-var should = require('should'),
+var should   = require('should'),
 	mongoose = require('mongoose'),
-	User = mongoose.model('User'),
+	User     = mongoose.model('User'),
+	Currency = mongoose.model('Currency'),
 	Groupbuy = mongoose.model('Groupbuy');
 
 /**
@@ -17,6 +18,26 @@ var user, groupbuy, groupbuy2;
  * Unit tests
  */
 describe('Groupbuy Model Unit Tests:', function() {
+	before(function(done) {
+		var currency = new Currency({
+			name: 'Euro',
+			code: 'EUR',
+			symbol: '€',
+			priority: 100
+		});
+
+		// Remove old previous data
+		Currency.remove().exec(function(err) {
+			if (err) console.error(err);
+
+			currency.save(function(err) {
+				if (err) console.error(err);
+
+				done();
+			});
+		});
+	});
+
 	beforeEach(function(done) {
 		// Remove old previous data
 		Groupbuy.remove().exec();
@@ -62,11 +83,12 @@ describe('Groupbuy Model Unit Tests:', function() {
 	 *              1 - Client
 	 *
 	 *          yy) Module:
+	 *              00 - Currencies
 	 *              01 - Users
 	 *              02 - Groupbuys
 	 *              03 - Items
 	 *              04 - Orders
-	 *              05 - Mesenger
+	 *              05 - Messages
 	 *
 	 *          a) Subgroup (in Server side):
 	 *              0 - Mongoose

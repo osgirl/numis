@@ -41,12 +41,12 @@ describe('Currency Model Unit Tests:', function() {
 	*              1 - Client
 	*
 	*          yy) Module:
+	*              00 - Currencies
 	*              01 - Users
 	*              02 - Groupbuys
 	*              03 - Items
 	*              04 - Orders
 	*              05 - Messages
-	*			   06 - Currencies
 	*
 	*          a) Subgroup (in Server side):
 	*              0 - Mongoose
@@ -130,6 +130,34 @@ describe('Currency Model Unit Tests:', function() {
 
 					done();
 				});
+			});
+		});
+
+		it('NU_P_G006_E008: should be able to show an error when try to save a Currency with less 3-characters currency code', function(done) {
+			currency.code = 'EU';
+
+			return currency.save(function(err) {
+				should.exist(err);
+				done();
+			});
+		});
+
+
+		it('NU_P_G006_E009: should be able to show an error when try to save a Currency with more 3-characters currency code', function(done) {
+			currency.code = 'EURO';
+
+			return currency.save(function(err) {
+				should.exist(err);
+				done();
+			});
+		});
+
+		it('NU_P_G006_E010: should be able to save a Currency with leading and trailing white spaces', function(done) {
+			currency.code = ' EUR ';
+
+			return currency.save(function(err) {
+				should.not.exist(err);
+				done();
 			});
 		});
 

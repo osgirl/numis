@@ -10,6 +10,7 @@ var mongoose = require('mongoose'),
 	_        = require('lodash'),
 	app      = require('../../server'),
 	User     = mongoose.model('User'),
+	Currency = mongoose.model('Currency'),
 	Groupbuy = mongoose.model('Groupbuy'),
 	Item     = mongoose.model('Item'),
 	agent    = request.agent(app);
@@ -17,7 +18,7 @@ var mongoose = require('mongoose'),
 /**
  * Globals
  */
-var credentialsA, admin, data, user, users = [], groupbuy, item, items = [], itemsURL;
+var credentialsA, currency, admin, userData, itemData, user, users = [], groupbuy, item, items = [], itemsURL;
 
 /**
  * User routes tests
@@ -26,10 +27,12 @@ describe('Item Pagination tests', function() {
 	before(function(done) {
 		var username, managers, members;
 
-		// Remove old previous data
-		Item.remove().exec();
-		Groupbuy.remove().exec();
-		User.remove().exec();
+		currency = new Currency({
+			name: 'Euro',
+			code: 'EUR',
+			symbol: '€',
+			priority: 100
+		});
 
 		// Create user credentials
 		credentialsA = {
@@ -47,89 +50,116 @@ describe('Item Pagination tests', function() {
 				provider: 'local',
 				roles: ['user', 'admin']
 		});
-		admin.save();
-		users.push(admin);
 
 		// Generate 10 users
-		data = [ { firstName: 'Patience', lastName: 'Anthony' }, { firstName: 'Wanda', lastName: 'Simpson' }, { firstName: 'Christopher', lastName: 'Davidson' }, { firstName: 'Melissa', lastName: 'Hoover' }, { firstName: 'Blair', lastName: 'Miller' }, { firstName: 'Shelby', lastName: 'Odom' }, { firstName: 'Salvador', lastName: 'Singleton' }, { firstName: 'Yolanda', lastName: 'Petersen' }, { firstName: 'Clementine', lastName: 'Webb' }, { firstName: 'Sydnee', lastName: 'Mccarthy' } ];
+		userData = [ { firstName: 'Patience', lastName: 'Anthony' }, { firstName: 'Wanda', lastName: 'Simpson' }, { firstName: 'Christopher', lastName: 'Davidson' }, { firstName: 'Melissa', lastName: 'Hoover' }, { firstName: 'Blair', lastName: 'Miller' }, { firstName: 'Shelby', lastName: 'Odom' }, { firstName: 'Salvador', lastName: 'Singleton' }, { firstName: 'Yolanda', lastName: 'Petersen' }, { firstName: 'Clementine', lastName: 'Webb' }, { firstName: 'Sydnee', lastName: 'Mccarthy' } ];
 
-		// 1st para in async.each() is the array of items
-		// 2nd param is the function that each item is passed to
-		async.each (data, function(data, callback) {
-			username = _.deburr(data.firstName.charAt(0) + data.lastName).toLowerCase();
+		// Generate 13 Items
+		itemData = [
+			{title: 'Alemania (1 ceca)' , description: 'St. Andrew\'s Church, Lower Saxony (ceca aleatoria)', price: 2.24},
+			{title: 'Alemania (5 cecas)' , description: 'St. Andrew\'s Church, Lower Saxony', price: 11.2},
+			{title: 'Bélgica 1' , description: '100 años comienzo 1ª Guerra Mundial', price: 2.18},
+			{title: 'Bélgica 2' , description: '150 años de la Cruz Roja (coincard)', price: 8.15},
+			{title: 'Francia 1' , description: '70 aniv del Día D', price:2.54},
+			{title: 'Francia 2' , description: 'Día internacional del SIDA', price: 2.46},
+			{title: 'Eslovaquia' , description: '10 años en la UE', price: 2.32},
+			{title: 'Eslovenia' , description: '600 aniv coronación de Barbara de Celje', price: 2.34},
+			{title: 'España 1' , description: 'Park Güell', price: 2.00},
+			{title: 'España 2' , description: 'Cambio de trono', price: 2.00},
+			{title: 'Finlandia 1' , description: 'Centenario del nacimiento de Tove Jansson', price: 2.43},
+			{title: 'Finlandia 2' , description: 'Centenario del nacimiento de Ilmari Tapiovaara', price: 2.41},
+			{title: 'Letonia' , description: 'Riga, capital europea de la cultura', price: 2.6}
+		];
 
-			user = new User({
-				firstName: data.firstName,
-				lastName: data.lastName,
-				email: username + '@example.net',
-				username: username,
-				password: crypto.randomBytes(16).toString('base64'),
-				provider: 'local',
-				roles: ['user']
-			});
-			user.save(callback);
+		// Remove old previous data
+		Item.remove(function(err) {
+			if (err) console.error(err);
 
-			users.push(user);
-		},
-		// 3rd param is the function to call when everything's done
-		function(err) {
-			if (err) {
-				console.error(err);
-				done(err);
-			}
-		});
-
-
-		// Generate 1 Groupbuy
-		managers = _.map([1, 2], function(n) {
-			return users[n].id;
-		});
-		members  = _.union(managers, _.map([3, 4, 5, 6, 7, 8, 9, 10], function(n) {
-			return users[n].id;
-		}) );
-
-		groupbuy = new Groupbuy({
-			title: 'Compra en grupo 2€ CC 2014',
-			description: 'Compra de lasmonedas de 2€ emitidas durante el año 2014',
-			managers: managers,
-			members: members,
-			user: managers[0]
-		});
-		groupbuy.save(function(err) {
-			// Generate 13 Items
-			data = [
-				{title: 'Alemania (1 ceca)' , description: 'St. Andrew\'s Church, Lower Saxony (ceca aleatoria)', price: 2.24},
-				{title: 'Alemania (5 cecas)' , description: 'St. Andrew\'s Church, Lower Saxony', price: 11.2},
-				{title: 'Bélgica 1' , description: '100 años comienzo 1ª Guerra Mundial', price: 2.18},
-				{title: 'Bélgica 2' , description: '150 años de la Cruz Roja (coincard)', price: 8.15},
-				{title: 'Francia 1' , description: '70 aniv del Día D', price:2.54},
-				{title: 'Francia 2' , description: 'Día internacional del SIDA', price: 2.46},
-				{title: 'Eslovaquia' , description: '10 años en la UE', price: 2.32},
-				{title: 'Eslovenia' , description: '600 aniv coronación de Barbara de Celje', price: 2.34},
-				{title: 'España 1' , description: 'Park Güell', price: 2.00},
-				{title: 'España 2' , description: 'Cambio de trono', price: 2.00},
-				{title: 'Finlandia 1' , description: 'Centenario del nacimiento de Tove Jansson', price: 2.43},
-				{title: 'Finlandia 2' , description: 'Centenario del nacimiento de Ilmari Tapiovaara', price: 2.41},
-				{title: 'Letonia' , description: 'Riga, capital europea de la cultura', price: 2.6}
-			];
-			// 1st para in async.each() is the array of items
-			// 2nd param is the function that each item is passed to
-			async.each (data, function(data, callback) {
-				item = new Item({
-					title: data.title,
-					description: data.description,
-					price: data.price,
-					groupbuy: groupbuy,
-					user: _.sample(managers)
-				});
-				item.save(callback);
-				items.push(item);
-			},
-			// 3rd param is the function to call when everything's done
-			function(err) {
+			Groupbuy.remove(function(err) {
 				if (err) console.error(err);
 
-				done();
+				User.remove(function(err) {
+					if (err) console.error(err);
+
+					Currency.remove(function(err) {
+						if (err) console.error(err);
+
+						// Save test data
+						currency.save(function(err) {
+							if (err) console.error(err);
+
+							admin.save(function(err) {
+								if (err) console.error(err);
+
+								users.push(admin);
+
+								// 1st para in async.each() is the array of items
+								// 2nd param is the function that each item is passed to
+								async.each (userData, function(data, callback) {
+									username = _.deburr(data.firstName.charAt(0) + data.lastName).toLowerCase();
+
+									user = new User({
+										firstName: data.firstName,
+										lastName: data.lastName,
+										email: username + '@example.net',
+										username: username,
+										password: crypto.randomBytes(16).toString('base64'),
+										provider: 'local',
+										roles: ['user']
+									});
+									user.save(callback);
+
+									users.push(user);
+								},
+								// 3rd param is the function to call when everything's done
+								function(err) {
+									if (err) {
+										console.error(err);
+										done(err);
+									}
+								});
+
+								// Generate 1 Groupbuy
+								managers = _.map([1, 2], function(n) {
+									return users[n].id;
+								});
+								members  = _.union(managers, _.map([3, 4, 5, 6, 7, 8, 9, 10], function(n) {
+									return users[n].id;
+								}) );
+
+								groupbuy = new Groupbuy({
+									title: 'Compra en grupo 2€ CC 2014',
+									description: 'Compra de lasmonedas de 2€ emitidas durante el año 2014',
+									managers: managers,
+									members: members,
+									user: managers[0]
+								});
+								groupbuy.save(function(err) {
+
+									// 1st para in async.each() is the array of items
+									// 2nd param is the function that each item is passed to
+									async.each (itemData, function(data, callback) {
+										item = new Item({
+											title:       data.title,
+											description: data.description,
+											price:       data.price,
+											groupbuy:    groupbuy.id,
+											user:        _.sample(managers)
+										});
+										item.save(callback);
+										items.push(item);
+									},
+									// 3rd param is the function to call when everything's done
+									function(err) {
+										if (err) console.error(err);
+
+										done();
+									});
+								});
+							});
+						});
+					});
+				});
 			});
 		});
 
@@ -142,11 +172,12 @@ describe('Item Pagination tests', function() {
 	 *              1 - Client
 	 *
 	 *          yy) Module:
+	 *              00 - Currencies
 	 *              01 - Users
 	 *              02 - Groupbuys
 	 *              03 - Items
 	 *              04 - Orders
-	 *              05 - Mesenger
+	 *              05 - Messages
 	 *
 	 *          a) Subgroup (in Server side):
 	 *              0 - Mongoose

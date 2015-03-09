@@ -24,9 +24,6 @@ describe('User Pagination tests', function() {
 	before(function(done) {
 		var username;
 
-		// Remove old previous data
-		User.remove().exec();
-
 		// Create user credentials
 		credentials = {
 			username: 'username',
@@ -47,7 +44,7 @@ describe('User Pagination tests', function() {
 				password: credentials.password,
 				provider: 'local',
 				roles: ['user']
-		}).save();
+		});
 
 		// Create a new Admin user
 		admin = new User({
@@ -58,32 +55,43 @@ describe('User Pagination tests', function() {
 				password: credentialsA.password,
 				provider: 'local',
 				roles: ['user', 'admin']
-		}).save();
+		});
 
 		// Generate 100 users
 		data = [ { firstName: 'Lacey', lastName: 'Galloway' }, { firstName: 'Patience', lastName: 'Anthony' }, { firstName: 'Wanda', lastName: 'Simpson' }, { firstName: 'Christopher', lastName: 'Davidson' }, { firstName: 'Melissa', lastName: 'Hoover' }, { firstName: 'Blair', lastName: 'Miller' }, { firstName: 'Shelby', lastName: 'Odom' }, { firstName: 'Salvador', lastName: 'Singleton' }, { firstName: 'Yolanda', lastName: 'Petersen' }, { firstName: 'Clementine', lastName: 'Webb' }, { firstName: 'Sydnee', lastName: 'Mccarthy' }, { firstName: 'Garrett', lastName: 'Mcintosh' }, { firstName: 'Maite', lastName: 'Spencer' }, { firstName: 'Kaitlin', lastName: 'Delaney' }, { firstName: 'Dane', lastName: 'Booker' }, { firstName: 'Palmer', lastName: 'Barry' }, { firstName: 'Jamal', lastName: 'Best' }, { firstName: 'Vera', lastName: 'Franklin' }, { firstName: 'Portia', lastName: 'Ferrell' }, { firstName: 'Amaya', lastName: 'Downs' }, { firstName: 'Amity', lastName: 'Ewing' }, { firstName: 'Nadine', lastName: 'Church' }, { firstName: 'Libby', lastName: 'Griffith' }, { firstName: 'Laith', lastName: 'Flowers' }, { firstName: 'Trevor', lastName: 'Peters' }, { firstName: 'Graham', lastName: 'Lara' }, { firstName: 'Kiara', lastName: 'Durham' }, { firstName: 'Chava', lastName: 'Mcclure' }, { firstName: 'Bernard', lastName: 'Blackwell' }, { firstName: 'Heather', lastName: 'Thornton' }, { firstName: 'Rebekah', lastName: 'Mcintosh' }, { firstName: 'Dorian', lastName: 'Chang' }, { firstName: 'Brian', lastName: 'Burt' }, { firstName: 'Judith', lastName: 'Becker' }, { firstName: 'Mariko', lastName: 'Murphy' }, { firstName: 'Wallace', lastName: 'Battle' }, { firstName: 'Preston', lastName: 'Jones' }, { firstName: 'Warren', lastName: 'Alston' }, { firstName: 'Amir', lastName: 'Contreras' }, { firstName: 'Ursula', lastName: 'Sargent' }, { firstName: 'Castor', lastName: 'Hobbs' }, { firstName: 'Noelani', lastName: 'Campbell' }, { firstName: 'Buffy', lastName: 'Warren' }, { firstName: 'Althea', lastName: 'Burnett' }, { firstName: 'Justin', lastName: 'Hopper' }, { firstName: 'Allegra', lastName: 'Randolph' }, { firstName: 'Jolie', lastName: 'Quinn' }, { firstName: 'Abel', lastName: 'Britt' }, { firstName: 'Joel', lastName: 'Carroll' }, { firstName: 'Clarke', lastName: 'Bradley' }, { firstName: 'Abigail', lastName: 'Bernard' }, { firstName: 'Natalie', lastName: 'Dillon' }, { firstName: 'Baxter', lastName: 'Glover' }, { firstName: 'Burton', lastName: 'Wall' }, { firstName: 'Hu', lastName: 'Sellers' }, { firstName: 'Brielle', lastName: 'Farley' }, { firstName: 'Chancellor', lastName: 'Clayton' }, { firstName: 'Kermit', lastName: 'Powers' }, { firstName: 'Otto', lastName: 'Love' }, { firstName: 'Blaine', lastName: 'Palmer' }, { firstName: 'Ignatius', lastName: 'Butler' }, { firstName: 'Teegan', lastName: 'Sweeney' }, { firstName: 'Cruz', lastName: 'Talley' }, { firstName: 'Daphne', lastName: 'Byrd' }, { firstName: 'Jana', lastName: 'Frazier' }, { firstName: 'Cathleen', lastName: 'Benjamin' }, { firstName: 'Kylie', lastName: 'Campos' }, { firstName: 'Cedric', lastName: 'George' }, { firstName: 'Callie', lastName: 'Holmes' }, { firstName: 'Troy', lastName: 'Foreman' }, { firstName: 'Eaton', lastName: 'Snyder' }, { firstName: 'Holmes', lastName: 'Peters' }, { firstName: 'Zoe', lastName: 'Moon' }, { firstName: 'Samson', lastName: 'Nielsen' }, { firstName: 'Avye', lastName: 'Brennan' }, { firstName: 'Vera', lastName: 'Hale' }, { firstName: 'Rina', lastName: 'Lancaster' }, { firstName: 'Vincent', lastName: 'Kane' }, { firstName: 'John', lastName: 'Salas' }, { firstName: 'Orla', lastName: 'Frost' }, { firstName: 'James', lastName: 'Fitzgerald' }, { firstName: 'Uma', lastName: 'Rush' }, { firstName: 'Ria', lastName: 'Austin' }, { firstName: 'Armando', lastName: 'Middleton' }, { firstName: 'Tatiana', lastName: 'Holden' }, { firstName: 'Jenette', lastName: 'Beach' }, { firstName: 'Penelope', lastName: 'Pena' }, { firstName: 'Ashton', lastName: 'Rollins' }, { firstName: 'Otto', lastName: 'Osborn' }, { firstName: 'Charlotte', lastName: 'Horton' }, { firstName: 'Janna', lastName: 'Mendoza' }, { firstName: 'Aaron', lastName: 'Strickland' }, { firstName: 'Nayda', lastName: 'Martinez' }, { firstName: 'Regina', lastName: 'Schwartz' }, { firstName: 'Zahir', lastName: 'Beach' }, { firstName: 'Ramona', lastName: 'Kerr' }, { firstName: 'Hiroko', lastName: 'Hartman' }, { firstName: 'Troy', lastName: 'Hodge' }, { firstName: 'Adria', lastName: 'Brady' }, { firstName: 'Noel', lastName: 'Rollins' } ];
 		numUsers = data.length +2;
 
-		// 1st para in async.each() is the array of items
-		// 2nd param is the function that each item is passed to
-		async.each (data, function(data, callback) {
-			username = _.deburr(data.firstName.charAt(0) + data.lastName).toLowerCase();
-
-			new User({
-				firstName: data.firstName,
-				lastName: data.lastName,
-				email: username + '@example.net',
-				username: username,
-				password: crypto.randomBytes(16).toString('base64'),
-				provider: 'local',
-				roles: ['user']
-			}).save(callback);
-		},
-		// 3rd param is the function to call when everything's done
-		function(err) {
+		// Remove old previous data
+		User.remove(function(err) {
 			if (err) console.error(err);
 
-			done();
+			user.save(function(err) {
+				if (err) console.error(err);
+
+				admin.save(function(err) {
+					// 1st para in async.each() is the array of items
+					// 2nd param is the function that each item is passed to
+					async.each (data, function(data, callback) {
+						username = _.deburr(data.firstName.charAt(0) + data.lastName).toLowerCase();
+
+						new User({
+							firstName: data.firstName,
+							lastName: data.lastName,
+							email: username + '@example.net',
+							username: username,
+							password: crypto.randomBytes(16).toString('base64'),
+							provider: 'local',
+							roles: ['user']
+						}).save(callback);
+					},
+					// 3rd param is the function to call when everything's done
+					function(err) {
+						if (err) console.error(err);
+
+						done();
+					});
+				});
+			});
 		});
 	});
 
@@ -94,11 +102,12 @@ describe('User Pagination tests', function() {
 	 *              1 - Client
 	 *
 	 *          yy) Module:
+	 *              00 - Currencies
 	 *              01 - Users
 	 *              02 - Groupbuys
 	 *              03 - Items
 	 *              04 - Orders
-	 *              05 - Mesenger
+	 *              05 - Messages
 	 *
 	 *          a) Subgroup (in Server side):
 	 *              0 - Mongoose

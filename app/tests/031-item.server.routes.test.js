@@ -5,6 +5,7 @@ var should   = require('should'),
 	app      = require('../../server'),
 	mongoose = require('mongoose'),
 	User 	 = mongoose.model('User'),
+	Currency = mongoose.model('Currency'),
 	Groupbuy = mongoose.model('Groupbuy'),
 	Item     = mongoose.model('Item'),
 	agent    = request.agent(app);
@@ -12,12 +13,32 @@ var should   = require('should'),
 /**
  * Globals
  */
-var credentials, user1, groupbuy1, groupbuy2, item1, item2, item3;
+var credentials, currency, user1, groupbuy1, groupbuy2, item1;
 
 /**
  * Item routes tests
  */
 describe('Item CRUD tests', function() {
+	before(function(done) {
+		currency = new Currency({
+			name: 'Euro',
+			code: 'EUR',
+			symbol: '€',
+			priority: 100
+		});
+
+		// Remove old previous data
+		Currency.remove().exec(function(err) {
+			if (err) console.error(err);
+
+			currency.save(function(err) {
+				if (err) console.error(err);
+
+				done();
+			});
+		});
+	});
+
 	beforeEach(function(done) {
 		// Remove old previous data
 		Item.remove().exec();
@@ -71,27 +92,8 @@ describe('Item CRUD tests', function() {
 						title: 'Item A1',
 						description: 'Description A1',
 						price: 22.34,
-						currency: {
-							code: 'EUR',
-							symbol: '€'
-						},
+						currency: currency.id,
 						user: user1._id
-					};
-
-					item2 = {
-						title: 'Item A2',
-						description: 'Description A2',
-						price: 12.34,
-						user: user1._id
-					};
-
-					// Create one Item to Groupbuy 2
-					item3 = {
-						title: 'Item B1',
-						description: 'Description B1',
-						price: 650,
-						user: user1._id,
-						groupbuy: groupbuy2._id
 					};
 
 					// Call the assertion callback
@@ -108,11 +110,12 @@ describe('Item CRUD tests', function() {
 	 *              1 - Client
 	 *
 	 *          yy) Module:
+	 *              00 - Currencies
 	 *              01 - Users
 	 *              02 - Groupbuys
 	 *              03 - Items
 	 *              04 - Orders
-	 *              05 - Mesenger
+	 *              05 - Messages
 	 *
 	 *          a) Subgroup (in Server side):
 	 *              0 - Mongoose
@@ -146,7 +149,7 @@ describe('Item CRUD tests', function() {
 						(itemSaveRes.body.title).should.match(item1.title);
 						(itemSaveRes.body.description).should.match(item1.description);
 						(itemSaveRes.body.price).should.match(item1.price);
-						(itemSaveRes.body.currency).should.match(item1.currency);
+						(itemSaveRes.body.currency._id).should.match(item1.currency);
 
 						// Get a list of Items
 						agent.get('/api/v1/groupbuys/' + GroupbuyId + '/items')
@@ -163,7 +166,7 @@ describe('Item CRUD tests', function() {
 								(items[0].name).should.match(itemSaveRes.body.name);
 								(items[0].description).should.match(item1.description);
 								(items[0].price).should.match(item1.price);
-								(items[0].currency).should.match(item1.currency);
+								(items[0].currency._id).should.match(item1.currency);
 
 								// Call the assertion callback
 								done();
@@ -247,7 +250,7 @@ describe('Item CRUD tests', function() {
 						(itemSaveRes.body.title).should.match(item1.title);
 						(itemSaveRes.body.description).should.match(item1.description);
 						(itemSaveRes.body.price).should.match(item1.price);
-						(itemSaveRes.body.currency).should.match(item1.currency);
+						(itemSaveRes.body.currency._id).should.match(item1.currency);
 
 						// Update Item name
 						item1.title = 'WHY YOU GOTTA BE SO MEAN?';
@@ -275,9 +278,12 @@ describe('Item CRUD tests', function() {
 	it('NU_P_G003_E105: should not be able to get a list of Items if not signed in', function(done) {
 		// Create new Item model instance
 		var itemObj = new Item(item1);
+		itemObj.groupbuy = groupbuy1.id;
 
 		// Save the Item
-		itemObj.save(function() {
+		itemObj.save(function(err) {
+			if (err) console.error(err);
+
 			// Request Items
 			request(app).get('/api/v1/groupbuys/' + itemObj.groupbuy + '/items')
 				.expect(401)
@@ -296,9 +302,12 @@ describe('Item CRUD tests', function() {
 	it('NU_P_G003_E106: should not be able to get a single Item if not signed in', function(done) {
 		// Create new Item model instance
 		var itemObj = new Item(item1);
+		itemObj.groupbuy = groupbuy1.id;
 
 		// Save the Item
-		itemObj.save(function() {
+		itemObj.save(function(err) {
+			if (err) console.error(err);
+
 			request(app).get('/api/v1/groupbuys/' + itemObj.groupbuy + '/items/' + itemObj._id)
 				.expect(401)
 				.end(function(req, res) {
@@ -320,7 +329,7 @@ describe('Item CRUD tests', function() {
 				// Handle signin error
 				if (signinErr) done(signinErr);
 
-				var GroupbuyId = item1.groupbuy;
+				var GroupbuyId = groupbuy1.id;
 
 				// Save a new Item
 				agent.post('/api/v1/groupbuys/' + GroupbuyId + '/items')
@@ -350,14 +359,15 @@ describe('Item CRUD tests', function() {
 	});
 
 	it('NU_P_G003_E108: should not be able to delete Item instance if not signed in', function(done) {
-		// Set Item user
-		item1.user = user1;
-
 		// Create new Item model instance
 		var itemObj = new Item(item1);
+		itemObj.user = user1;
+		itemObj.groupbuy = groupbuy1.id;
 
 		// Save the Item
-		itemObj.save(function() {
+		itemObj.save(function(err) {
+			if (err) console.error(err);
+
 			// Try deleting Item
 			request(app).delete('/api/v1/groupbuys/' + itemObj.groupbuy + '/items/' + itemObj._id)
 				.expect(401)
