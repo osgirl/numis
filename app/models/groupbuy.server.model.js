@@ -52,7 +52,7 @@ var GroupbuySchema = new Schema({
 	}],
 	status: {
 		type: String,
-		enum: ['new', 'published', 'payments', 'paid', 'shipments', 'closed', 'cancelled', 'deleted'],
+		enum: ['new', 'published', 'acceptance', 'payments', 'paid', 'shipments', 'closed', 'cancelled', 'deleted'],
 		default: 'new'
 	},
 	currencies: {
