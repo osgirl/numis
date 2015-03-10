@@ -13,50 +13,57 @@ var mongoose = require('mongoose'),
 /**
  * Globals
  */
-var credentials, user, user2;
+var credentialsA, credentials2, admin, user2;
 
 /**
  * User routes tests
  */
 describe('User CRUD tests', function() {
 	beforeEach(function(done) {
-		// Remove old previous data
-		User.remove().exec();
-
 		// Create user credentials
-		credentials = {
+		credentialsA = {
 			username: 'username',
 			password: 'password'
 		};
 
+		credentials2 = {
+			username: 'jdoe',
+			password: 'password'
+		};
+
 		// Create a new user
-		user = new User({
+		admin = new User({
 			firstName: 'Full',
 			lastName: 'Name',
 			displayName: 'Full Name',
 			email: 'test@example.net',
-			username: credentials.username,
-			password: credentials.password,
+			username: credentialsA.username,
+			password: credentialsA.password,
 			provider: 'local',
 			roles: ['user', 'admin']
 		});
 
-		// Save a user to the test db and create new User
-		user.save(function(err) {
+		// Remove old previous data
+		User.remove(function(err) {
 			if (err) console.error(err);
 
-			// Define another users
-			user2 = {
-				firstName: 'John',
-				lastName: 'Doe',
-				email: 'jdoe@example.net',
-				username: 'jdoe',
-				password: credentials.password,
-				provider: 'local'
-			};
+			// Save a user to the test db and create new User
+			admin.save(function(err) {
+				if (err) console.error(err);
 
-			done();
-		});
+				// Define another users
+				user2 = {
+					firstName: 'John',
+					lastName: 'Doe',
+					email: 'jdoe@example.net',
+					username: credentials2.username,
+					password: credentials2.password,
+					provider: 'local'
+				};
+
+				done();
+			});
+		});	
 	});
 
 	/*
@@ -85,7 +92,7 @@ describe('User CRUD tests', function() {
 
 	it('NU_P_G001_E101: should be able to save User instance if logged in', function(done) {
 		agent.post('/auth/signin')
-			.send(credentials)
+			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
 				// Handle signin error
@@ -116,8 +123,8 @@ describe('User CRUD tests', function() {
 
 								users._embedded.users.should.be.an.Array.with.lengthOf(2);
 								// The second user is the authenticated user.
-								(users._embedded.users[1].name).should.be.equal(user.name);
-								(users._embedded.users[1].username).should.be.equal(user.username);
+								(users._embedded.users[1].name).should.be.equal(admin.name);
+								(users._embedded.users[1].username).should.be.equal(admin.username);
 
 								// First user is the new user
 								(users._embedded.users[0]).should.have.properties('_id', 'name', 'username');
@@ -153,7 +160,7 @@ describe('User CRUD tests', function() {
 		user2.username = '';
 
 		agent.post('/auth/signin')
-			.send(credentials)
+			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
 				// Handle signin error
@@ -189,7 +196,7 @@ describe('User CRUD tests', function() {
 		user2.email = 'fake email@';
 
 		agent.post('/auth/signin')
-			.send(credentials)
+			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
 				// Handle signin error
@@ -217,10 +224,10 @@ describe('User CRUD tests', function() {
 
 	it('NU_P_G001_E105: should not be able to save User instance if username already exists', function(done) {
 		// Duplicate username field
-		user2.username = user.username;
+		user2.username = admin.username;
 
 		agent.post('/auth/signin')
-			.send(credentials)
+			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
 				// Handle signin error
@@ -254,7 +261,7 @@ describe('User CRUD tests', function() {
 		user2.password = '1234567';
 
 		agent.post('/auth/signin')
-			.send(credentials)
+			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
 				// Handle signin error
@@ -280,40 +287,9 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G001_E107: should be able to save User instance but not save role specification', function(done) {
-		// Duplicate username field
-		user2.roles = ['user', 'admin', 'other'];
-
+	it('NU_P_G001_E107: should be able to update User instance if signed in', function(done) {
 		agent.post('/auth/signin')
-			.send(credentials)
-			.expect(200)
-			.end(function(signinErr, signinRes) {
-				// Handle signin error
-				if (signinErr) done(signinErr);
-
-				// Save a new User
-				agent.post('/api/v1/users')
-					.send(user2)
-					.expect(201)
-					.end(function(userSaveErr, userSaveRes) {
-						// Returns new user info
-
-						// Set assertions
-						(userSaveRes.body).should.be.an.Object.not.be.empty;
-						(userSaveRes.body).should.have.propertyByPath('_links', 'self');
-
-						(userSaveRes.body).should.have.property('name');
-						(userSaveRes.body.username).should.match(user2.username);
-
-						// Handle User save error
-						done(userSaveErr);
-					});
-			});
-	});
-
-	it('NU_P_G001_E108: should be able to update User instance if signed in', function(done) {
-		agent.post('/auth/signin')
-			.send(credentials)
+			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
 				// Handle signin error
@@ -321,24 +297,36 @@ describe('User CRUD tests', function() {
 
 				// Get the userId
 				var userId 		 = signinRes.body._id;
-				var userPassword = user.password;
+				var userPassword = admin.password;
 
 				// Update User name and home address
-				user.firstName = 'Fred';
-				user.lastName = 'Flintstones';
-				user.homeAddress = '301 Cobblestone Way, Bedrock 70777';
-				user.username = 'Flintstones';
+				admin.firstName = 'Fred';
+				admin.lastName = 'Flintstones';
+				admin.homeAddress = '301 Cobblestone Way, Bedrock 70777';
+				admin.username = 'Flintstones';
 
 				// Update existing User
 				agent.put('/api/v1/users/' + userId)
-					.send(user)
-					.expect(204)
+					.send(admin)
+					.expect(200)
 					.end(function(userUpdateErr, userUpdateRes) {
 						// Handle User update error
 						if (userUpdateErr) done(userUpdateErr);
 
 						// Set assertions
-						(userUpdateRes.body).should.be.empty;
+						(userUpdateRes.body).should.be.an.Object.not.be.empty;
+						(userUpdateRes.body).should.have.propertyByPath('_links', 'self', 'href');
+						(userUpdateRes.body).should.have.propertyByPath('_links', 'avatar', 'href');
+						(userUpdateRes.body).should.have.propertyByPath('_links', 'collection', 'href');
+						(userUpdateRes.body).should.have.propertyByPath('_links', 'groupbuys', 'href');
+						(userUpdateRes.body).should.have.propertyByPath('_links', 'password', 'href');
+
+						(userUpdateRes.body).should.have.properties('_id', 'name', 'firstName', 'lastName');
+						(userUpdateRes.body).should.have.properties('homeAddress', 'username', 'email');
+						(userUpdateRes.body.firstName).should.match(admin.firstName);
+						(userUpdateRes.body.lastName).should.match(admin.lastName);
+						(userUpdateRes.body.homeAddress).should.match(admin.homeAddress);
+						(userUpdateRes.body.username).should.match(admin.username);
 
 						// Call the assertion callback
 						done();
@@ -346,9 +334,9 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G001_E109: should not be able to update User instance if not signed in', function(done) {
+	it('NU_P_G001_E108: should not be able to update User instance if not signed in', function(done) {
 		agent.post('/auth/signin')
-			.send(credentials)
+			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
 				// Handle signin error
@@ -364,14 +352,14 @@ describe('User CRUD tests', function() {
 						if (signoutErr) done(signoutErr);
 
 						// Update User name and home address
-						user.firstName = 'Fred';
-						user.lastName = 'Flintstones';
-						user.displayName = 'The Flintstones';
-						user.homeAddress = '301 Cobblestone Way, Bedrock 70777';
+						admin.firstName = 'Fred';
+						admin.lastName = 'Flintstones';
+						admin.displayName = 'The Flintstones';
+						admin.homeAddress = '301 Cobblestone Way, Bedrock 70777';
 
 						// Update existing User
 						agent.put('/api/v1/users/' + userId)
-							.send(user)
+							.send(admin)
 							.expect(401)
 							.end(function(userUpdateErr, userUpdateRes) {
 								// Handle User update error
@@ -390,43 +378,91 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it.skip('NU_P_G001_E110: should be able to update User roles if have admin role', function(done) {
+	it('NU_P_G001_E109: should be able to update User roles if have admin role', function(done) {
+		// Duplicate username field
+		user2.roles = ['user', 'admin', 'other'];
+
 		agent.post('/auth/signin')
-			.send(credentials)
+			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
 				// Handle signin error
 				if (signinErr) done(signinErr);
 
-				// Get the userId
-				var userId = signinRes.body._id;
-
-				// Update User name and home address
-				user.firstName = 'Fred';
-				user.lastName = 'Flintstones';
-				user.displayName = 'The Flintstones';
-
-				// Update existing User
-				agent.put('/api/v1/users/' + userId)
-					.send(user)
-					.expect(204)
-					.end(function(userUpdateErr, userUpdateRes) {
-						// Handle User update error
-						if (userUpdateErr) done(userUpdateErr);
-
+				// Save a new User
+				agent.post('/api/v1/users')
+					.send(user2)
+					.expect(201)
+					.end(function(userSaveErr, userSaveRes) {
 						// Set assertions
-						(userUpdateRes.body).should.be.empty;
+						(userSaveRes.body).should.be.an.Object.not.be.empty;
+						(userSaveRes.body).should.have.propertyByPath('_links', 'self', 'href');
+						(userSaveRes.body).should.have.propertyByPath('_links', 'avatar', 'href');
+						(userSaveRes.body).should.have.propertyByPath('_links', 'collection', 'href');
+						(userSaveRes.body).should.have.propertyByPath('_links', 'groupbuys', 'href');
+						(userSaveRes.body).should.have.propertyByPath('_links', 'password', 'href');
 
-						// Call the assertion callback
-						done();
+						(userSaveRes.body).should.have.property('name');
+						(userSaveRes.body.username).should.match(user2.username);
+						(userSaveRes.body.roles).should.match(user2.roles);
+
+						// Handle User save error
+						done(userSaveErr);
 					});
-
 			});
+	});
+
+	it('NU_P_G001_E110: should not be able to update User roles if have not admin role', function(done) {
+		var userObj = new User(user2);
+
+		// Save the User
+		userObj.save(function(err) {
+			if (err) console.error(err);
+
+			// Login as user2 (without admin role)
+			agent.post('/auth/signin')
+				.send(credentials2)
+				.expect(200)
+				.end(function(signinErr, signinRes) {
+					// Handle signin error
+					if (signinErr) done(signinErr);
+
+					user2.roles = ['user', 'admin', 'other'];
+
+					// Update existing User
+					agent.put('/api/v1/users/' + userObj.id)
+						.send(user2)
+						.expect(200)
+						.end(function(userUpdateErr, userUpdateRes) {
+							// Handle User update error
+							if (userUpdateErr) done(userUpdateErr);
+
+							// Set assertions
+							(userUpdateRes.body).should.be.an.Object.not.be.empty;
+							(userUpdateRes.body).should.have.propertyByPath('_links', 'self', 'href');
+							(userUpdateRes.body).should.have.propertyByPath('_links', 'avatar', 'href');
+							(userUpdateRes.body).should.have.propertyByPath('_links', 'collection', 'href');
+							(userUpdateRes.body).should.have.propertyByPath('_links', 'groupbuys', 'href');
+							(userUpdateRes.body).should.have.propertyByPath('_links', 'password', 'href');
+
+							(userUpdateRes.body).should.have.properties('_id', 'firstName', 'lastName');
+							(userUpdateRes.body).should.have.properties('name', 'username', 'email');
+							(userUpdateRes.body.firstName).should.match(user2.firstName);
+							(userUpdateRes.body.lastName).should.match(user2.lastName);
+							(userUpdateRes.body.username).should.match(user2.username);
+
+							(userUpdateRes.body).should.not.have.property('roles');
+
+							// Call the assertion callback
+							done();
+						});
+				});
+		});
 	});
 
 	it('NU_P_G001_E111: should be able to get a list of Users if signed in', function(done) {
 		agent.post('/auth/signin')
-			.send(credentials)
+			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
 				// Handle signin error
@@ -452,7 +488,7 @@ describe('User CRUD tests', function() {
 						(users._embedded.users[0]).should.have.properties('_id', 'name', 'username', '_links');
 						(users._embedded.users[0]).should.have.propertyByPath('_links', 'self', 'href');
 						(users._embedded.users[0]).should.have.propertyByPath('_links', 'avatar', 'href');
-						(users._embedded.users[0].username).should.be.equal(user.username);
+						(users._embedded.users[0].username).should.be.equal(admin.username);
 
 						// Call the assertion callback
 						done();
@@ -475,41 +511,45 @@ describe('User CRUD tests', function() {
 	});
 
 	it('NU_P_G001_E113: should be able to get a single User if signed in', function(done) {
-		agent.post('/auth/signin')
-			.send(credentials)
-			.expect(200)
-			.end(function(signinErr, signinRes) {
-				// Handle signin error
-				if (signinErr) done(signinErr);
+		var userObj = new User(user2);
 
-				// Get the userId
-				var userId = signinRes.body._id;
+		// Save the User
+		userObj.save(function(err) {
+			if (err) console.error(err);
 
-				// Request Users
-				agent.get('/api/v1/users/' + userId)
-					.expect(200)
-					.end(function(userFetchErr, userFetchRes) {
-						// Set assertion
-						(userFetchRes.body).should.be.an.Object.not.be.empty;
-						(userFetchRes.body).should.have.propertyByPath('_links', 'self', 'href');
+			agent.post('/auth/signin')
+				.send(credentialsA)
+				.expect(200)
+				.end(function(signinErr, signinRes) {
+					// Handle signin error
+					if (signinErr) done(signinErr);
 
-						// First user is the new user
-						(userFetchRes.body).should.have.properties('email', 'firstName', 'lastName', 'name', 'username');
-						(userFetchRes.body.username).should.be.equal(user.username);
-						(userFetchRes.body.firstName).should.be.equal(user.firstName);
-						(userFetchRes.body.lastName).should.be.equal(user.lastName);
-						(userFetchRes.body.email).should.be.equal(user.email);
+					// Request Users
+					agent.get('/api/v1/users/' + userObj.id)
+						.expect(200)
+						.end(function(userFetchErr, userFetchRes) {
+							// Set assertion
+							(userFetchRes.body).should.be.an.Object.not.be.empty;
+							(userFetchRes.body).should.have.propertyByPath('_links', 'self', 'href');
 
-						// Call the assertion callback
-						done();
-					});
+							// First user is the new user
+							(userFetchRes.body).should.have.properties('email', 'firstName', 'lastName', 'name', 'username');
+							(userFetchRes.body.username).should.be.equal(userObj.username);
+							(userFetchRes.body.firstName).should.be.equal(userObj.firstName);
+							(userFetchRes.body.lastName).should.be.equal(userObj.lastName);
+							(userFetchRes.body.email).should.be.equal(userObj.email);
 
-			});
+							// Call the assertion callback
+							done();
+						});
+
+				});
+		});
 	});
 
 	it('NU_P_G001_E114: should not be able to get a single User if not signed in', function(done) {
 		agent.post('/auth/signin')
-			.send(credentials)
+			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
 				// Handle signin error
@@ -541,7 +581,7 @@ describe('User CRUD tests', function() {
 
 	it('NU_P_G001_E115: should not be able to delete User instance if signed in', function(done) {
 		agent.post('/auth/signin')
-			.send(credentials)
+			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
 				// Handle signin error
@@ -557,7 +597,6 @@ describe('User CRUD tests', function() {
 
 						// Delete existing User
 						agent.delete('/api/v1/users/' + userSaveRes.body._id)
-							.send(user)
 							.expect(204)
 							.end(function(userDeleteErr, userDeleteRes) {
 								// Handle User error error
@@ -574,16 +613,15 @@ describe('User CRUD tests', function() {
 	});
 
 	it('NU_P_G001_E116: should not be able to delete User instance if not signed in', function(done) {
-		// Set User user
-		user.user = user;
-
 		// Create new User model instance
-		var userObj = new User(user);
+		var userObj = new User(user2);
 
 		// Save the User
-		userObj.save(function() {
+		userObj.save(function(err) {
+			if (err) console.error(err);
+
 			// Try deleting User
-			agent.delete('/api/v1/users/' + userObj._id)
+			agent.delete('/api/v1/users/' + userObj.id)
 				.expect(401)
 				.end(function(userDeleteErr, userDeleteRes) {
 					// Set message assertion

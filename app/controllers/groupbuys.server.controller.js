@@ -160,11 +160,11 @@ exports.update = function(req, res) {
 	delete req.body.user;
 	groupbuy = _.extend(groupbuy , req.body);
 
-	groupbuy.save(function(err) {
+	groupbuy.save(function(err, groupbuy) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.status(204).end();
+			res.jsonp( formattingGroupbuy(groupbuy, req) );
 		}
 	});
 };

@@ -411,10 +411,26 @@ describe('Order CRUD tests', function() {
 						// Update existing Order
 						agent.put('/api/v1/orders/' + orderSaveRes.body._id)
 							.send(order)
-							.expect(204)
+							.expect(200)
 							.end(function(orderUpdateErr, orderUpdateRes) {
 								// Handle Order update error
 								if (orderUpdateErr) done(orderUpdateErr);
+
+								// Set assertions
+								(orderUpdateRes.body).should.have.propertyByPath('_links', 'self', 'href');
+								(orderUpdateRes.body).should.have.propertyByPath('_links', 'user', 'href');
+								(orderUpdateRes.body).should.have.propertyByPath('_links', 'groupbuy', 'href');
+
+								(orderUpdateRes.body).should.have.properties('_id', '_links', 'subtotal', 'total', 'shippingCost', 'otherCosts');
+								(orderUpdateRes.body._id).should.equal(orderSaveRes.body._id);
+								(orderUpdateRes.body._links.user.href).should.containEql(member3.id);
+								(orderUpdateRes.body._links.groupbuy.href).should.containEql(groupbuy.id);
+								// Non-updatable fields
+								(orderUpdateRes.body.subtotal).should.equal(orderSaveRes.body.subtotal);
+								(orderUpdateRes.body.total).should.equal(orderSaveRes.body.total);
+								// Updtable fields
+								(orderUpdateRes.body.shippingCost).should.equal(order.shippingCost);
+								(orderUpdateRes.body.otherCosts).should.equal(order.otherCosts);
 
 								agent.get('/api/v1/orders/' + orderSaveRes.body._id)
 									.expect(200)
@@ -423,7 +439,11 @@ describe('Order CRUD tests', function() {
 										if (orderGetErr) done(orderGetErr);
 
 										// Set assertions
-										(orderGetRes.body).should.have.properties('_id', '_links');
+										(orderGetRes.body).should.have.propertyByPath('_links', 'self', 'href');
+										(orderGetRes.body).should.have.propertyByPath('_links', 'user', 'href');
+										(orderGetRes.body).should.have.propertyByPath('_links', 'groupbuy', 'href');
+
+										(orderGetRes.body).should.have.properties('_id', '_links', 'subtotal', 'total', 'shippingCost', 'otherCosts');
 										(orderGetRes.body._id).should.equal(orderSaveRes.body._id);
 										(orderGetRes.body._links.user.href).should.containEql(member3.id);
 										(orderGetRes.body._links.groupbuy.href).should.containEql(groupbuy.id);

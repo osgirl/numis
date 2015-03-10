@@ -258,18 +258,29 @@ describe('Item CRUD tests', function() {
 						// Update existing Item
 						agent.put('/api/v1/groupbuys/' + GroupbuyId + '/items/' + itemSaveRes.body._id)
 							.send(item1)
-							.expect(204)
+							.expect(200)
 							.end(function(itemUpdateErr, itemUpdateRes) {
 								// Handle Item update error
-								if (itemUpdateErr) {
-									done(itemUpdateErr);
-								} else {
-									// Set assertions
-									//(itemUpdateRes.body).should.be.empty;
+								if (itemUpdateErr) done(itemUpdateErr);
 
-									// Call the assertion callback
-									done();
-								}
+								// Set assertions
+								//(itemUpdateRes.body).should.be.an.Object.not.be.empty;
+								(itemUpdateRes.body).should.have.propertyByPath('_links', 'self', 'href');
+								(itemUpdateRes.body).should.have.propertyByPath('_links', 'image', 'href');
+								(itemUpdateRes.body).should.have.propertyByPath('_links', 'groupbuy', 'href');
+								(itemUpdateRes.body).should.have.propertyByPath('_links', 'creator', 'href');
+
+								(itemUpdateRes.body).should.have.properties('_id', 'title', 'name', 'description', 'price', 'currency');
+								(itemUpdateRes.body._id).should.match(itemSaveRes.body._id);
+								(itemUpdateRes.body.description).should.match(itemSaveRes.body.description);
+								(itemUpdateRes.body.price).should.match(itemSaveRes.body.price);
+								(itemUpdateRes.body.currency).should.match(itemSaveRes.body.currency);
+
+								(itemUpdateRes.body.title).should.match(item1.title);
+
+								// Call the assertion callback
+								done();
+
 							});
 					});
 			});

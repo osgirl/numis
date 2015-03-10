@@ -146,15 +146,15 @@ exports.update = function(req, res) {
 	}
 
 	if (dirty) {
-		order.save(function(err) {
+		order.save(function(err, order) {
 			if (err) {
 				return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 			} else {
-				res.status(204).end();
+				res.jsonp( formattingOrder(order, req) );
 			}
 		});
 	} else {
-		res.status(400).send({message: 'There is not valid fields to update'});
+		res.status(400).send( {message: 'There is not valid fields to update'} );
 	}
 };
 

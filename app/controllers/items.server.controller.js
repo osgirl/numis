@@ -144,11 +144,17 @@ exports.update = function(req, res) {
 	delete req.body.user;
 	item = _.extend(item , req.body);
 
-	item.save(function(err) {
+	item.save(function(err, item) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.status(204).end();
+			// Populate currency
+			item.populate({path: 'currency', select: 'id name code symbol'}, function(err2) {
+				if (err2) {
+					return res.status(400).send( errorHandler.prepareErrorResponse (err2) );
+				}
+				res.jsonp( formattingItem(item, req) );
+			});
 		}
 	});
 };

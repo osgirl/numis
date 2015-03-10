@@ -137,6 +137,12 @@ describe('Groupbuy CRUD tests', function() {
 						// Handle Groupbuy save error
 						if (groupbuySaveErr) done(groupbuySaveErr);
 
+						(groupbuySaveRes.body).should.have.propertyByPath('_links', 'self', 'href');
+						(groupbuySaveRes.body).should.have.propertyByPath('_links', 'collection', 'href');
+						(groupbuySaveRes.body).should.have.propertyByPath('_links', 'items', 'href');
+						(groupbuySaveRes.body).should.have.propertyByPath('_links', 'managers', 'href');
+						(groupbuySaveRes.body).should.have.propertyByPath('_links', 'members', 'href');
+
 						(groupbuySaveRes.body).should.have.property('_id');
 						(groupbuySaveRes.body.title).should.match(groupbuy.title);
 						(groupbuySaveRes.body.description).should.match(groupbuy.description);
@@ -148,6 +154,8 @@ describe('Groupbuy CRUD tests', function() {
 							.end(function(groupbuysGetErr, groupbuysGetRes) {
 								// Handle Groupbuy save error
 								if (groupbuysGetErr) done(groupbuysGetErr);
+
+								(groupbuysGetRes.body).should.have.propertyByPath('_links', 'self', 'href');
 
 								// Get Groupbuys list
 								var groupbuys = groupbuysGetRes.body._embedded.groupbuys;
@@ -275,13 +283,31 @@ describe('Groupbuy CRUD tests', function() {
 						// Update existing Groupbuy
 						agent.put('/api/v1/groupbuys/' + groupbuySaveRes.body._id)
 							.send(groupbuy)
-							.expect(204)
+							.expect(200)
 							.end(function(groupbuyUpdateErr, groupbuyUpdateRes) {
 								// Handle Groupbuy update error
 								if (groupbuyUpdateErr) done(groupbuyUpdateErr);
 
 								// Set assertions
-								(groupbuyUpdateRes.body).should.be.empty;
+								(groupbuyUpdateRes.body).should.be.an.Object.not.be.empty;
+								(groupbuyUpdateRes.body).should.have.propertyByPath('_links', 'self', 'href');
+								(groupbuyUpdateRes.body).should.have.propertyByPath('_links', 'collection', 'href');
+								(groupbuyUpdateRes.body).should.have.propertyByPath('_links', 'items', 'href');
+								(groupbuyUpdateRes.body).should.have.propertyByPath('_links', 'managers', 'href');
+								(groupbuyUpdateRes.body).should.have.propertyByPath('_links', 'members', 'href');
+
+								(groupbuyUpdateRes.body).should.have.properties('_id', 'title', 'name', 'description', 'status', 'nextState');
+								(groupbuyUpdateRes.body).should.have.properties('managers', 'members', 'updates', 'visibility');
+								(groupbuyUpdateRes.body._id).should.match(groupbuySaveRes.body._id);
+								(groupbuyUpdateRes.body.description).should.match(groupbuySaveRes.body.description);
+								(groupbuyUpdateRes.body.status).should.match(groupbuySaveRes.body.status);
+								(groupbuyUpdateRes.body.nextState).should.match(groupbuySaveRes.body.nextState);
+								(groupbuyUpdateRes.body.managers).should.match(groupbuySaveRes.body.managers);
+								(groupbuyUpdateRes.body.members).should.match(groupbuySaveRes.body.members);
+								(groupbuyUpdateRes.body.updates).should.match(groupbuySaveRes.body.updates);
+								(groupbuyUpdateRes.body.visibility).should.match(groupbuySaveRes.body.visibility);
+
+								(groupbuyUpdateRes.body.title).should.match(groupbuy.title);
 
 								// Call the assertion callback
 								done();

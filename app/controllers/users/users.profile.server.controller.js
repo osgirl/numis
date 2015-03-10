@@ -14,7 +14,7 @@ var _            = require('lodash'),
  * Formatting user details to send
  */
 var formattingUser = exports.formattingUser = function(user, req, reduce) {
-	var isAdmin = (req && req.user && typeof req.user.roles !== 'undefined' && req.user.roles.indexOf('admin') !== -1),
+	var isAdmin = (req && req.user && req.user.isAdmin() ),
 		isMe    = (req && user && user._id.equals(req.user._id) ),
 		result  = {};
 
@@ -124,7 +124,7 @@ exports.create = function(req, res) {
  * Show the current User
  */
 exports.read = function(req, res) {
-	res.jsonp( formattingUser(req.user, req) );
+	res.jsonp( formattingUser(req.profile, req) );
 };
 
 /**
@@ -132,46 +132,41 @@ exports.read = function(req, res) {
  */
 exports.update = function(req, res) {
 	// Init Variables
-	var user = req.user;
+	var user = req.profile;
 
 	// For security measurement we remove the roles from the req.body object
-	delete req.body.roles;
-
-	if (user) {
-    	// Merge existing user
-        user = _.extend(user, req.body);
-        //user.updated = Date.now();	// It'll be done in pre-save hook.
-        user.displayName = user.firstName + ' ' + user.lastName;
-
-        user.save(function(err) {
-        	if (err) {
-				// Bad Request
-        		return res.status(400).send( errorHandler.prepareErrorResponse (err) );
-        	} else {
-        		req.login(user, function(err) {
-        			if (err) {
-						// Bad Request
-						res.status(400).send( errorHandler.prepareErrorResponse (err) );
-        			} else {
-						// OK. No Content
-						res.status(204).end();
-        			}
-        		});
-			}
-		});
-	} else {
-		res.status(401).send({
-			name: 'NotLogged',
-			message: 'User is not logged in',
-		});
+	if (!user.isAdmin()) {
+		delete req.body.roles;
 	}
+
+	// Merge existing user
+    user = _.extend(user, req.body);
+    //user.updated = Date.now();	// It'll be done in pre-save hook.
+    user.displayName = user.firstName + ' ' + user.lastName;
+
+    user.save(function(err, user) {
+    	if (err) {
+			// Bad Request
+    		return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+    	} else {
+    		req.login(user, function(err) {
+    			if (err) {
+					// Bad Request
+					res.status(400).send( errorHandler.prepareErrorResponse (err) );
+    			} else {
+					// OK.
+					res.jsonp( formattingUser(user, req) );
+    			}
+    		});
+		}
+	});
 };
 
 /**
  * Delete an User
  */
 exports.delete = function(req, res) {
-	var user = req.user;
+	var user = req.profile;
 
 	user.remove(function(err) {
 		if (err) {
