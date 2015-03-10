@@ -20,7 +20,7 @@ module.exports = function(app) {
 	app.route('/api/v1/users/:userId')
 		.get(users.requiresLogin, users.hasAuthorization(['user']), users.read)
 		.put(users.requiresLogin, users.hasAuthorization(['self','admin']), users.update)
-		.delete(users.requiresLogin, users.hasAuthorization(['self','admin']), users.delete);
+		.delete(users.requiresLogin, users.hasAuthorization(['admin']), users.delete);
 
 	// Users avatar Routes
 	app.route('/api/v1/users/:userId/avatar')
