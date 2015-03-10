@@ -104,7 +104,7 @@ describe('Currency CRUD tests', function() {
 	*/
 
 
-	it('NU_P_G006_E101: should not be able to get a list of Currencies if not signed in', function(done) {
+	it('NU_P_G000_E101: should not be able to get a list of Currencies if not signed in', function(done) {
 		agent.get('/api/v1/currencies')
 			.expect(401)
 			.end(function(currenciesGetErr, currenciesGetRes) {
@@ -116,7 +116,7 @@ describe('Currency CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G006_E102: should be able to get a list of Currencies if signed in', function(done) {
+	it('NU_P_G000_E102: should be able to get a list of Currencies if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -157,7 +157,7 @@ describe('Currency CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G006_E103: should not be able to get a Currency info if not signed in', function(done) {
+	it('NU_P_G000_E103: should not be able to get a Currency info if not signed in', function(done) {
 		agent.get('/api/v1/currencies/' + currency.id)
 			.expect(401)
 			.end(function(currencyGetErr, currencyGetRes) {
@@ -169,7 +169,7 @@ describe('Currency CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G006_E104: should be able to get a Currency if signed in', function(done) {
+	it('NU_P_G000_E104: should be able to get a Currency if signed in', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -198,7 +198,7 @@ describe('Currency CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G006_E105: should not be able to save Currency instance', function(done) {
+	it('NU_P_G000_E105: should not be able to save Currency instance', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -216,7 +216,7 @@ describe('Currency CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G006_E106: should not be able to update Currency instance', function(done) {
+	it('NU_P_G000_E106: should not be able to update Currency instance', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
@@ -235,7 +235,7 @@ describe('Currency CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G006_E107: should not be able to delete Currency instance', function(done) {
+	it('NU_P_G000_E107: should not be able to delete Currency instance', function(done) {
 		agent.post('/auth/signin')
 			.send(credentials)
 			.expect(200)
