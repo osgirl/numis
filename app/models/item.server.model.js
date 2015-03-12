@@ -172,6 +172,95 @@ ItemSchema.pre('save', function(next) {
 });
 
 
+
+/*
+ *
+ */
+ItemSchema.statics.getAvailability = function(itemId, callback) {
+	var i, j, k,
+		count = 0;
+
+	this.findById(itemId, function(err, item) {
+		if (err) {
+			callback(err);
+
+		} else if (!item) {
+
+			callback( new Error('Failed to load Item ' + itemId) );
+
+		} else {
+			// No max quantity defined in this item
+			if (typeof item.maxQuantity === 'undefined' || item.maxQuantity === 0) {
+				callback(null, '');
+			} else {
+				mongoose.model('Order').find({'groupbuy': item.groupbuy, 'requests.items.item': item.id }).exec(function(err, orders) {
+					if (err) callback(err);
+
+					// There is no requests for this item
+					if (typeof orders === 'undefined') {
+						callback(null, item.maxQuantity);
+					} else {
+						// Sum all requests for this item.
+						for (i = 0; i < orders.length; i++) {
+							for (j = 0; j < orders[i].requests.length; j++) {
+								for (k = 0; k < orders[i].requests[j].items.length; k++) {
+									if (orders[i].requests[j].items[k].item.toString() === item.id) {
+										count += orders[i].requests[j].items[k].quantity;
+									}
+								}
+							}
+						}
+
+						callback(null, item.maxQuantity - count);
+					}
+				});
+			}	
+		}
+	});
+};
+
+
+/*
+ *
+ */
+ItemSchema.methods.getAvailability = function(callback) {
+	var i, j, k,
+		count = 0,
+		groupbuyId = (this.populated('groupbuy') !== undefined) ? this.populated('groupbuy') : this.groupbuy,
+		_this = this;
+
+	// No max quantity defined in this item
+	if (typeof this.maxQuantity === 'undefined' || this.maxQuantity === 0) {
+		callback(null, '');
+	} else {
+		mongoose.model('Order').find({'groupbuy': groupbuyId, 'requests.items.item': this.id }).exec(function(err, orders) {
+			if (err) callback(err);
+
+			// There is no requests for this item
+			if (typeof orders === 'undefined') {
+				callback(null, _this.maxQuantity);
+			} else {
+				// Sum all requests for this item.
+				for (i = 0; i < orders.length; i++) {
+					for (j = 0; j < orders[i].requests.length; j++) {
+						for (k = 0; k < orders[i].requests[j].items.length; k++) {
+							if (orders[i].requests[j].items[k].item.toString() === _this.id) {
+								count += orders[i].requests[j].items[k].quantity;
+							}
+						}
+					}
+				}
+
+				callback(null, _this.maxQuantity - count);
+			}
+		});
+
+
+	}
+};
+
+
+
 /**
  * Add plugins to Item schema.
  */
