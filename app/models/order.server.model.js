@@ -8,6 +8,7 @@ var mongoose       = require('mongoose'),
 	paginatePlugin = require('mongoose-paginate'),
 	l2rPlugin      = require('mongoose-l2r'),
 	_              = require('lodash'),
+	async          = require('async'),
 	Schema         = mongoose.Schema;
 
 
@@ -23,45 +24,52 @@ var setPrice = function (num) {
 /**
  * Function to calculate subtotal and total prices of an order
  */
-var calculatePrices = function(order) {
-	var subtotals = {},
-		summaryGrp;
+var calculatePrices = function(order, callback) {
+	var subtotal = 0;
 
-	if (order.summary && order.summary.length > 0) {
-		// Populate summary items
-		order.populate({path: 'summary.item', select: 'price currency', model: 'Item'}, function (err) {
-			if (err) {
-				throw err;
+	// Set default values for subtotal and total
+	order.subtotal = 0;
+	order.total    = 0;
 
-			} else {
-				// Group item by currencies
-				summaryGrp = _.groupBy(order.summary, function (entry) {
-					return entry.item.currency.code;
-				});
+	// Populate summary items and groupbuy currencies.
+	order.populate([
+		{path: 'groupbuy', select: 'currencies', model: 'Groupbuy'},
+		{path: 'summary.item', select: 'price currency', model: 'Item'}
+	], function (err) {
+		if (err) {
+			return callback(err);
+		}
 
-				// Calculate subtotal price in each currencies.
-				_.forEach(summaryGrp, function(elems, key) {
-					subtotals[key] = _.reduce(elems, function(sum, elem) {
-						return sum + elem.item.price * elem.quantity;
-					}, 0);
-				});
-
-				//console.log('Subtotals:', subtotals);
-
-// TODO: Change to support multiple currencies
-				order.subtotal = _.reduce(subtotals, function(sum, n) { return sum + n; });
-				order.total = order.subtotal + order.shippingCost + order.otherCosts;
-
-				//console.log('Subtotal:', order.subtotal, ' - total:', order.total);
+		try {
+			// Calculate subtotal in provider currency
+			for (var i = 0; i < order.summary.length; i++) {
+				if (order.summary[i].item.currency.id === order.groupbuy.currencies.provider.id) {
+					subtotal += order.summary[i].item.price * order.summary[i].quantity;
+				} else {
+					subtotal = NaN;
+				}
 			}
-		});
 
-	} else {
-		order.subtotal = 0;
-		order.total = order.subtotal + order.shippingCost + order.otherCosts;
+			if (!isNaN(subtotal) ) {
+				// Calculate subtotal in local currency
+				if (order.groupbuy.currencies.local !== order.groupbuy.currencies.provider) {
+					subtotal = (subtotal / order.groupbuy.currencies.exchangeRate * order.groupbuy.currencies.multiplier);
+				}
+				// Set values to document.
+				order.subtotal = subtotal;
+				order.total = order.subtotal + order.shippingCost + order.otherCosts;
+			}
+			callback();
 
-		//console.log('Subtotal:', order.subtotal, ' - total:', order.total);
-	}
+		} catch (ex) {
+			order.subtotal = 0;
+			order.total    = 0;
+
+			callback(err);
+		}
+
+	});
+
 };
 
 /**
@@ -153,18 +161,28 @@ var OrderSchema = new Schema({
 
 
 /**
+ * Hook a pre save method to check that the user haven't another Order in the same groupbuy
+ */
+OrderSchema.pre('save', function(next) {
+	this.constructor.count({groupbuy: this.groupbuy, user: this.user, _id: {$ne: this.id} }, function(err, count) {
+		if (err)
+			next(err);
+		else if (count > 0)
+			next( new Error('The user already have a order for this groupbuy.') );
+		else
+			next();
+	});
+});
+
+/**
  * Hook a pre save method to re-calculate summary and subtotal.
  */
 OrderSchema.pre('save', function(next) {
 	if (this.summary && this.summary.length > 0) {
-		try {
-			calculatePrices(this);
-		} catch (ex) {
-			return next(ex);
-		}
+		calculatePrices(this, next);
+	} else {
+		next();
 	}
-
-	next();
 });
 
 /**
@@ -179,6 +197,34 @@ OrderSchema.pre('save', function(next) {
 });
 
 
+
+/*
+ *
+ */
+var validateRequest = function(request, callback) {
+	var Item = mongoose.model('Item');
+
+	async.each(request.items,
+		function(elem, callback) {
+			if (typeof elem.quantity !== 'number') {
+				callback (new Error ('The quantity of the element request is invalid.') );
+			}
+
+			Item.getAvailability(elem.item, function(err, available) {
+				if (available !== '' && elem.quantity > available) {
+					callback ( new Error ('There isn\'t enough products to satisfy the request.') );
+					
+				} else {
+					callback();
+				}
+			});
+		},
+		function(err) {
+			callback(err);
+		});
+};
+
+
 /**
  * Create instance method for adding new request
  */
@@ -187,22 +233,29 @@ OrderSchema.methods.addRequest = function(request, user, callback) {
 
 	// Set the request date
 	request.requestDate = new Date();
-
 	// If user is specified, set this user. Otherwise, set the order user as request user.
 	request.user = (user && typeof user !== 'undefined') ? user: this.user;
 
-	// Add the request to requests list in the order
-	if (this.requests && this.requests.length > 0) {
-		this.requests.push(request);
-	} else {
-		this.requests = request;
-	}
+	// Check the availability of the requested items.
+	validateRequest(request, function(err) {
+		if (err) {
+			callback(err);
+		} else {
+			// Add the request to requests list in the order
+			if (_this.requests && _this.requests.length > 0) {
+				_this.requests.push(request);
+			} else {
+				_this.requests = request;
+			}
 
-	if (this.summary && this.summary.length > 0) {
-		this.calculateSummary(callback);
-	} else {
-		this.save(callback);
-	}
+			if (_this.summary && _this.summary.length > 0) {
+				_this.calculateSummary(callback);
+			} else {
+				_this.save(callback);
+			}
+		}
+	});
+
 };
 
 /**

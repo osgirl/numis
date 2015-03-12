@@ -14,7 +14,7 @@ var should   = require('should'),
 /**
  * Globals
  */
-var user, manager, currency, groupbuy, order, item1, item2, item3;
+var user, currency, groupbuy, order, item1, item2, item3;
 
 /**
  * Unit tests
@@ -51,15 +51,6 @@ describe('Order Model Unit Tests:', function() {
 			provider: 'local'
 		});
 
-		manager = new User({
-			firstName: 'John',
-			lastName: 'Doe',
-			email: 'jdoe@test.com',
-			username: 'jdoe',
-			password: 'password',
-			provider: 'local'
-		});
-
 		groupbuy = new Groupbuy({
 			title: 'Groupbuy #1',
 			description: 'Lorem ipsum dolor sit amet...',
@@ -70,6 +61,7 @@ describe('Order Model Unit Tests:', function() {
 			title: 'Item 1',
 			description: 'Description 1',
 			price: 22.34,
+			maxQuantity: 10,
 			currency: currency.id,
 			user: user,
 			groupbuy: groupbuy
@@ -79,6 +71,7 @@ describe('Order Model Unit Tests:', function() {
 			title: 'Item 2',
 			description: 'Description 2',
 			price: 12.34,
+			maxQuantity: 9,
 			user: user,
 			groupbuy: groupbuy
 		});
@@ -487,7 +480,7 @@ describe('Order Model Unit Tests:', function() {
 						should.not.exist(err);
 
 						// Calculate summary
-						order.calculateSummary(function(err) {
+						order.calculateSummary(function(err, order) {
 							should.not.exist(err);
 
 							(order).should.have.properties('_id', 'user', 'requests', 'summary');
@@ -497,7 +490,7 @@ describe('Order Model Unit Tests:', function() {
 							(order.summary[0].quantity).should.match(2);
 							(order.summary[1].quantity).should.match(2);
 							(order.summary[2].quantity).should.match(2);
-							(order.subtotal).should.match( 2 * (item1.price + item2.price + item3.price) );
+							//(order.subtotal).should.match( 2 * (item1.price + item2.price + item3.price) );
 							(order.total).should.match(order.subtotal);
 
 							// Remove request 2
@@ -513,6 +506,8 @@ describe('Order Model Unit Tests:', function() {
 
 								// Remove request 3
 								order.removeRequest (order.requests[1]._id, function(err) {
+									should.not.exist(err);
+
 									(order.requests).should.be.an.Array.with.lengthOf(1);
 									(order.summary).should.be.an.Array.with.lengthOf(2);
 
@@ -529,6 +524,476 @@ describe('Order Model Unit Tests:', function() {
 				});
 			});
 		});
+
+		it('NU_P_G004_E012: should be able to manage multiple orders by many members', function(done) {
+			var order1, order2, order3;
+			var manager, member1, member2;
+			var request1, request2, request3;
+
+			manager = user;
+
+			member1 = new User({
+				firstName: 'John',
+				lastName: 'Doe',
+				email: 'jdoe@test.com',
+				username: 'jdoe',
+				password: 'password',
+				provider: 'local'
+			});
+
+			member2 = new User({
+				firstName: 'Juan',
+				lastName: 'Sánchez',
+				email: 'jsanchez@test.com',
+				username: 'jsanchez',
+				password: 'password',
+				provider: 'local'
+			});
+
+			member1.save(function(err) {
+				if (err) console.error(err);
+
+				member2.save(function(err) {
+					if (err) console.error(err);
+
+					order1 = new Order({
+						groupbuy: groupbuy.id,
+						user: manager.id
+					});
+					order2 = new Order({
+						groupbuy: groupbuy.id,
+						user: member1.id
+					});
+					order3 = new Order({
+						groupbuy: groupbuy.id,
+						user: member2.id
+					});
+
+					// manager
+					request1 = {
+						items: [
+							{item: item1.id, quantity: 1},
+							{item: item2.id, quantity: 1}
+						]
+					};
+
+					// member1
+					request2 = {
+						items: [
+							{item: item1.id, quantity: 4},
+							{item: item2.id, quantity: 4},
+							{item: item3.id, quantity: 4}
+						]
+					};
+
+					// member2
+					request3 = {
+						items: [
+							{item: item1.id, quantity: 4},
+							{item: item2.id, quantity: 4},
+							{item: item3.id, quantity: 4}
+						]
+					};
+
+					// Save the Order 1
+					order1.addRequest (request1, user, function(err) {
+						should.not.exist(err);
+
+						// Save the Order 2
+						order2.addRequest (request2, member1, function(err) {
+							should.not.exist(err);
+
+							// Save the Order 3
+							order3.addRequest (request3, member2, function(err) {
+								should.not.exist(err);
+
+								// Check groupbuy orders
+								Order.count({groupbuy: groupbuy.id}, function(err, count) {
+									should.not.exist(err);
+
+									count.should.match(3);
+
+									Order.count({user: member1.id}, function(err, count) {
+										should.not.exist(err);
+
+										count.should.match(1);
+
+										done();
+									});
+								});
+							});
+						});
+					});
+
+
+				});
+			});
+		});
+
+		it('NU_P_G004_E013: should not be able to do multiple orders by one members', function(done) {
+			var order1, order2, order3;
+			var manager, member1;
+			var request1, request2, request3;
+
+			manager = user;
+
+			member1 = new User({
+				firstName: 'John',
+				lastName: 'Doe',
+				email: 'jdoe@test.com',
+				username: 'jdoe',
+				password: 'password',
+				provider: 'local'
+			});
+
+			member1.save(function(err) {
+				if (err) console.error(err);
+
+				order1 = new Order({
+					groupbuy: groupbuy.id,
+					user: manager.id
+				});
+				order2 = new Order({
+					groupbuy: groupbuy.id,
+					user: member1.id
+				});
+				order3 = new Order({
+					groupbuy: groupbuy.id,
+					user: member1.id
+				});
+
+				// manager
+				request1 = {
+					items: [
+						{item: item1.id, quantity: 1},
+						{item: item2.id, quantity: 1}
+					]
+				};
+
+				// member1
+				request2 = {
+					items: [
+						{item: item1.id, quantity: 4},
+						{item: item2.id, quantity: 4},
+						{item: item3.id, quantity: 4}
+					]
+				};
+
+				// member2
+				request3 = {
+					items: [
+						{item: item1.id, quantity: 1},
+						{item: item2.id, quantity: 1},
+						{item: item3.id, quantity: 1}
+					]
+				};
+
+				// Save the Order 1
+				order1.addRequest (request1, user, function(err) {
+					should.not.exist(err);
+
+					// Save the Order 2
+					order2.addRequest (request2, member1, function(err) {
+						should.not.exist(err);
+
+						// Save the Order 3
+						order3.addRequest (request3, member1, function(err) {
+							should.exist(err);
+
+							// Check groupbuy orders
+							Order.count({groupbuy: groupbuy.id}, function(err, count) {
+								should.not.exist(err);
+
+								count.should.match(2);
+
+								Order.count({user: member1.id}, function(err, count) {
+									should.not.exist(err);
+
+									count.should.match(1);
+
+									done();
+								});
+							});
+						});
+					});
+				});
+			});
+		});
+
+		it('NU_P_G004_E014: should be able to do multiple orders, one per groupbuy', function(done) {
+			var groupbuy2, item4, order1, order2, request1, request2;
+
+			groupbuy2 = new Groupbuy({
+				title: 'Groupbuy #2',
+				description: 'Lorem ipsum dolor sit amet...',
+				user: user
+			});
+
+			item4 = new Item({
+				title: 'Item 4',
+				description: 'Description 4',
+				price: 12.34,
+				user: user,
+				groupbuy: groupbuy2
+			});
+
+			groupbuy2.save(function(err) {
+				should.not.exist(err);
+
+				item4.save(function(err) {
+					should.not.exist(err);
+
+					// order 1
+					order1 = new Order({
+						groupbuy: groupbuy.id,
+						user: user.id
+					});
+					request1 = {
+						items: [
+							{item: item1.id, quantity: 1},
+							{item: item2.id, quantity: 1}
+						]
+					};
+
+					// order 2
+					order2 = new Order({
+						groupbuy: groupbuy2.id,
+						user: user.id
+					});
+					request2 = {
+						items: [
+							{item: item4.id, quantity: 4}
+						]
+					};
+
+					// Save the Order 1
+					order1.addRequest (request1, user, function(err) {
+						should.not.exist(err);
+
+						// Save the Order 2
+						order2.addRequest (request2, user, function(err) {
+							should.not.exist(err);
+
+							// Check groupbuy1 orders
+							Order.count({groupbuy: groupbuy.id}, function(err, count) {
+								should.not.exist(err);
+
+								count.should.match(1);
+
+								// Check groupbuy2 orders
+								Order.count({groupbuy: groupbuy2.id}, function(err, count) {
+									should.not.exist(err);
+
+									count.should.match(1);
+
+									Order.count({user: user.id}, function(err, count) {
+										should.not.exist(err);
+
+										count.should.match(2);
+
+										done();
+									});
+								});
+							});
+						});
+					});
+				});
+			});
+		});
+
+		it('NU_P_G004_E015: should be able to get available quantity of items in a groupbuy', function(done) {
+			var member1, member2, item4;
+			var order1, order2, order3;
+			var request1, request2, request3;
+
+			member1 = new User({
+				firstName: 'John',
+				lastName: 'Doe',
+				email: 'jdoe@test.com',
+				username: 'jdoe',
+				password: 'password',
+				provider: 'local'
+			});
+
+			member2 = new User({
+				firstName: 'Juan',
+				lastName: 'Sánchez',
+				email: 'jsanchez@test.com',
+				username: 'jsanchez',
+				password: 'password',
+				provider: 'local'
+			});
+
+			member1.save(function(err) {
+				if (err) console.error(err);
+
+				member2.save(function(err) {
+					if (err) console.error(err);
+
+					// Order 1 (manager)
+					order1 = new Order({
+						groupbuy: groupbuy.id,
+						user: user.id
+					});
+					request1 = {
+						items: [
+							{item: item2.id, quantity: 1}
+						]
+					};
+
+					// Order 2
+					order2 = new Order({
+						groupbuy: groupbuy.id,
+						user: member1.id
+					});
+					request2 = {
+						items: [
+							{item: item1.id, quantity: 4},
+							{item: item2.id, quantity: 4},
+							{item: item3.id, quantity: 4}
+						]
+					};
+
+					// Order 3
+					order3 = new Order({
+						groupbuy: groupbuy.id,
+						user: member2.id
+					});
+					request3 = {
+						items: [
+							{item: item1.id, quantity: 2},
+							{item: item2.id, quantity: 2},
+							{item: item3.id, quantity: 2}
+						]
+					};
+
+					// Save the Order 1
+					order1.addRequest (request1, user, function(err) {
+						should.not.exist(err);
+
+						// Save the Order 2
+						order2.addRequest (request2, member1, function(err) {
+							should.not.exist(err);
+
+							// Save the Order 3
+							order3.addRequest (request3, member2, function(err) {
+								should.not.exist(err);
+
+								item1.getAvailability(function(err, num) {
+									num.should.match(4);
+								});
+								item2.getAvailability(function(err, num) {
+									num.should.match(2);
+								});
+								item3.getAvailability(function(err, num) {
+									num.should.match('');
+								});
+
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+
+		it('NU_P_G004_E016: should not be able to make a request if there is no availabitiy of an item', function(done) {
+			var member1, member2, item4;
+			var order1, order2, order3;
+			var request1, request2, request3;
+
+			member1 = new User({
+				firstName: 'John',
+				lastName: 'Doe',
+				email: 'jdoe@test.com',
+				username: 'jdoe',
+				password: 'password',
+				provider: 'local'
+			});
+
+			member2 = new User({
+				firstName: 'Juan',
+				lastName: 'Sánchez',
+				email: 'jsanchez@test.com',
+				username: 'jsanchez',
+				password: 'password',
+				provider: 'local'
+			});
+
+			member1.save(function(err) {
+				if (err) console.error(err);
+
+				member2.save(function(err) {
+					if (err) console.error(err);
+
+					// Order 1 (manager)
+					order1 = new Order({
+						groupbuy: groupbuy.id,
+						user: user.id
+					});
+					request1 = {
+						items: [
+							{item: item2.id, quantity: 1}
+						]
+					};
+
+					// Order 2
+					order2 = new Order({
+						groupbuy: groupbuy.id,
+						user: member1.id
+					});
+					request2 = {
+						items: [
+							{item: item1.id, quantity: 4},
+							{item: item2.id, quantity: 4},
+							{item: item3.id, quantity: 4}
+						]
+					};
+
+					// Order 3
+					order3 = new Order({
+						groupbuy: groupbuy.id,
+						user: member2.id
+					});
+					request3 = {
+						items: [
+							{item: item1.id, quantity: 5},
+							{item: item2.id, quantity: 5},
+							{item: item3.id, quantity: 5}
+						]
+					};
+
+					// Save the Order 1
+					order1.addRequest (request1, user, function(err) {
+						should.not.exist(err);
+
+						// Save the Order 2
+						order2.addRequest (request2, member1, function(err) {
+							should.not.exist(err);
+
+							// Save the Order 3
+							order3.addRequest (request3, member2, function(err) {
+								should.exist(err);
+
+								item1.getAvailability(function(err, num) {
+									num.should.match(6);
+								});
+								item2.getAvailability(function(err, num) {
+									num.should.match(4);
+								});
+								item3.getAvailability(function(err, num) {
+									num.should.match('');
+								});
+
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+
+
 	});
 
 });

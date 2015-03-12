@@ -136,7 +136,7 @@ describe('Order CRUD tests', function() {
 										description: 'Lorem ipsum dolor sit amet...',
 										members: [manager1.id],
 										managers: [manager1.id],
-										user: manager1
+										user: manager1.id
 									});
 
 									member3.save(function(err) {
@@ -149,17 +149,19 @@ describe('Order CRUD tests', function() {
 												title: 'Item 1',
 												description: 'Description 1',
 												price: 100,
+												maxQuantity: 10,
 												currency: currency.id,
-												user: manager1,
-												groupbuy: groupbuy
+												user: manager1.id,
+												groupbuy: groupbuy.id
 											});
 
 											item2 = new Item({
 												title: 'Item 2',
 												description: 'Description 2',
 												price: 10,
-												user: manager1,
-												groupbuy: groupbuy
+												maxQuantity: 9,
+												user: manager1.id,
+												groupbuy: groupbuy.id
 											});
 
 											// Create one Item to Groupbuy 2
@@ -167,8 +169,8 @@ describe('Order CRUD tests', function() {
 												title: 'Item 3',
 												description: 'Description 3',
 												price: 1,
-												user: manager2,
-												groupbuy: groupbuy
+												user: manager2.id,
+												groupbuy: groupbuy.id
 											});
 
 											item1.save(function(err) {
@@ -203,10 +205,10 @@ describe('Order CRUD tests', function() {
 															]
 														};
 
-														order = new Order({
-															groupbuy: groupbuy,
+														order = {
+															groupbuy: groupbuy.id,
 															user: manager1.id
-														});
+														};
 
 														done();
 													});
@@ -463,8 +465,10 @@ describe('Order CRUD tests', function() {
 	});
 
 	it('NU_P_G004_E106: should not be able to get a list of Orders if not signed in', function(done) {
+		var orderObj = new Order(order);
+
 		// Save the Order
-		order.save(function() {
+		orderObj.save(function() {
 			// Request Orders
 			request(app).get('/api/v1/orders')
 				.expect(401)
@@ -480,9 +484,11 @@ describe('Order CRUD tests', function() {
 	});
 
 	it('NU_P_G004_E107: should not be able to get a single Order if not signed in', function(done) {
+		var orderObj = new Order(order);
+
 		// Save the Order
-		order.save(function() {
-			request(app).get('/api/v1/orders/' + order._id)
+		orderObj.save(function() {
+			request(app).get('/api/v1/orders/' + orderObj._id)
 				.expect(401)
 				.end(function(req, res) {
 					// Set assertion
@@ -588,13 +594,14 @@ describe('Order CRUD tests', function() {
 	});
 
 	it('NU_P_G004_E110: should not be able to delete Order instance if not signed in', function(done) {
-		// Set Order user
-		order.user = member3;
+		var orderObj = new Order(order);
 
+		// Set Order user
+		orderObj.user = member3;
 		// Save the Order
-		order.save(function() {
+		orderObj.save(function() {
 			// Try deleting Order
-			request(app).delete('/api/v1/orders/' + order._id)
+			request(app).delete('/api/v1/orders/' + orderObj._id)
 				.expect(401)
 				.end(function(orderDeleteErr, orderDeleteRes) {
 					// Set message assertion
@@ -608,8 +615,10 @@ describe('Order CRUD tests', function() {
 	});
 
 	it('NU_P_G004_E111: should be able to add a request to an Order instance', function(done) {
+		var orderObj = new Order(order);
+
 		// Save the Order
-		order.save(function() {
+		orderObj.save(function() {
 			agent.post('/auth/signin')
 				.send(credentials1)
 				.expect(200)
@@ -618,7 +627,7 @@ describe('Order CRUD tests', function() {
 					if (signinErr) done(signinErr);
 
 					// Add a request
-					agent.post('/api/v1/orders/' + order.id + '/add-request')
+					agent.post('/api/v1/orders/' + orderObj.id + '/add-request')
 						.send(request1)
 						.expect(200)
 						.end(function(addRequestErr, addRequestRes) {
@@ -655,8 +664,10 @@ describe('Order CRUD tests', function() {
 	});
 
 	it('NU_P_G004_E112: should be able to add some requests to an Order instance and calculate summary and subtotal', function(done) {
+		var orderObj = new Order(order);
+
 		// Save the Order
-		order.save(function(err) {
+		orderObj.save(function(err) {
 			agent.post('/auth/signin')
 				.send(credentials1)
 				.expect(200)
@@ -665,7 +676,7 @@ describe('Order CRUD tests', function() {
 					if (signinErr) done(signinErr);
 
 					// Add the first request
-					agent.post('/api/v1/orders/' + order.id + '/add-request')
+					agent.post('/api/v1/orders/' + orderObj.id + '/add-request')
 						.send(request1)
 						.expect(200)
 						.end(function(addRequestErr, addRequestRes) {
@@ -673,7 +684,7 @@ describe('Order CRUD tests', function() {
 							if (addRequestErr) done(addRequestErr);
 
 							// Save a new Order
-							agent.post('/api/v1/orders/' + order.id + '/add-request')
+							agent.post('/api/v1/orders/' + orderObj.id + '/add-request')
 								.send(request2)
 								.expect(200)
 								.end(function(addRequestErr, addRequestRes) {
@@ -782,6 +793,8 @@ describe('Order CRUD tests', function() {
 			groupbuy: groupbuy2
 		});
 
+		var order1 = new Order(order);
+
 		var order2 = new Order({
 			groupbuy: groupbuy,
 			user: manager2.id
@@ -818,7 +831,7 @@ describe('Order CRUD tests', function() {
 			item4.save(function(err) {
 				if (err) console.error(err);
 
-				order.save(function(err) {
+				order1.save(function(err) {
 					if (err) console.error(err);
 
 					order2.save(function(err) {
@@ -830,7 +843,7 @@ describe('Order CRUD tests', function() {
 							order4.save(function(err) {
 								if (err) console.error(err);
 
-								order.addRequest (request1, null, function(err) {
+								order1.addRequest (request1, null, function(err) {
 									if (err) console.error(err);
 
 									order2.addRequest (request2, null, function(err) {
@@ -877,6 +890,8 @@ describe('Order CRUD tests', function() {
 	});
 
 	it('NU_P_G004_E114: should be able to list orders filtering by groupbuy that user is manager', function(done) {
+		var order1 = new Order(order);
+
 		var order2 = new Order({
 			groupbuy: groupbuy,
 			user: manager2.id
@@ -896,7 +911,7 @@ describe('Order CRUD tests', function() {
 		// Groupbuy1 have Items: 1, 2 & 3
 		// Order (1) is made by manager1 to groupbuy (1)
 
-		order.save(function(err) {
+		order1.save(function(err) {
 			if (err) console.error(err);
 
 			order2.save(function(err) {
@@ -905,7 +920,7 @@ describe('Order CRUD tests', function() {
 				order4.save(function(err) {
 					if (err) console.error(err);
 
-					order.addRequest (request1, null, function(err) {
+					order1.addRequest (request1, null, function(err) {
 						if (err) console.error(err);
 
 						order2.addRequest (request2, null, function(err) {
@@ -959,6 +974,8 @@ describe('Order CRUD tests', function() {
 			groupbuy: groupbuy2
 		});
 
+		var order1 = new Order(order);
+
 		var order2 = new Order({
 			groupbuy: groupbuy,
 			user: manager2.id
@@ -995,7 +1012,7 @@ describe('Order CRUD tests', function() {
 			item4.save(function(err) {
 				if (err) console.error(err);
 
-				order.save(function(err) {
+				order1.save(function(err) {
 					if (err) console.error(err);
 
 					order2.save(function(err) {
@@ -1007,7 +1024,7 @@ describe('Order CRUD tests', function() {
 							order4.save(function(err) {
 								if (err) console.error(err);
 
-								order.addRequest (request1, null, function(err) {
+								order1.addRequest (request1, null, function(err) {
 									if (err) console.error(err);
 
 									order2.addRequest (request2, null, function(err) {
@@ -1055,11 +1072,14 @@ describe('Order CRUD tests', function() {
 
 	it('NU_P_G004_E116: should not be able to list orders made by another user', function(done) {
 		// Groupbuy1 have Items: 1, 2 & 3
-		// Order (1) is made by manager1 to groupbuy (1)
-		order.save(function(err) {
+		// Order is made by manager1 to groupbuy (1)
+		var orderObj = new Order(order);
+
+		// Save the Order
+		orderObj.save(function(err) {
 			if (err) console.error(err);
 
-			order.addRequest (request1, null, function(err) {
+			orderObj.addRequest (request1, null, function(err) {
 				if (err) console.error(err);
 
 				agent.post('/auth/signin')
@@ -1084,10 +1104,12 @@ describe('Order CRUD tests', function() {
 	it('NU_P_G004_E117: should be able to list orders made by another user if I am an admin', function(done) {
 		// Groupbuy1 have Items: 1, 2 & 3
 		// Order (1) is made by manager1 to groupbuy (1)
-		order.save(function(err) {
+		var orderObj = new Order(order);
+
+		orderObj.save(function(err) {
 			if (err) console.error(err);
 
-			order.addRequest (request1, null, function(err) {
+			orderObj.addRequest (request1, null, function(err) {
 				if (err) console.error(err);
 
 				agent.post('/auth/signin')
