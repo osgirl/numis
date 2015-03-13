@@ -298,6 +298,18 @@ ItemSchema.plugin(filePlugin, {
 });
 
 
+
+/**
+ * Set schema indexes
+ */
+// Set index to make unique title in the same groupbuy.
+ItemSchema.index({title: true, groupbuy: true}, {unique: true});
+
+
+
+/**
+ * Set schema options
+ */
 ItemSchema.set('toJSON', { getters: true, virtuals: false });
 ItemSchema.set('toObject', { getters: true, virtuals: false });
 

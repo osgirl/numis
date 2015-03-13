@@ -124,7 +124,7 @@ describe('Item Model Unit Tests:', function(done) {
 			});
 		});
 
-		it('NU_P_G003_E002: should be able to show an error when try to save an Item without name', function(done) {
+		it('NU_P_G003_E002: should be able to show an error when try to save an Item without title', function(done) {
 			item1.title = '';
 
 			return item1.save(function(err) {
@@ -181,6 +181,46 @@ describe('Item Model Unit Tests:', function(done) {
                 item1.price.should.equal(4.57);
 
                 done();
+            });
+        });
+
+		it('NU_P_G003_E008: should not be able to save two items with same title in the same groupbuy', function(done) {
+			var item2 = new Item({
+				title: 'Item Title',
+				description: 'Description 2',
+				price: 1,
+				groupbuy: groupbuy1,
+				user: user1
+			});
+
+            item1.save(function(err) {
+                should.not.exist(err);
+
+				return item2.save(function(err) {
+					should.exist(err);
+
+                	done();
+				});
+            });
+        });
+
+		it('NU_P_G003_E009: should be able to save two items with same title in diferent groupbuys', function(done) {
+			var item2 = new Item({
+				title: 'Item Title',
+				description: 'Description 2',
+				price: 1,
+				groupbuy: groupbuy2,
+				user: user1
+			});
+
+            item1.save(function(err) {
+                should.not.exist(err);
+
+				return item2.save(function(err) {
+					should.not.exist(err);
+
+                	done();
+				});
             });
         });
 
