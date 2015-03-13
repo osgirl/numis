@@ -8,6 +8,7 @@ var mongoose     = require('mongoose'),
 	errorHandler = require('./errors.server.controller'),
 	path         = require('path'),
 	_            = require('lodash'),
+	async        = require('async'),
 	Item         = mongoose.model('Item');
 
 
@@ -21,9 +22,10 @@ var formattingItem = exports.formattingItem = function(item, req, reduce) {
 		parentURL = '',
 		creatorURL = '',
 		groupbuyURL = '',
+		groupbuy = req.groupbuy,
 		result = {};
 
-	if (item && item._id) {
+	if (groupbuy && item && item._id) {
 		try {
 			var rels = item.relationsToLink(['user', 'groupbuy']);
 
@@ -38,6 +40,17 @@ var formattingItem = exports.formattingItem = function(item, req, reduce) {
 
 		// Duplicate object item
 		result = item.toJSON();
+
+		// Calculate price and local price for item in groupbuy
+		result.prettyPrice = item.price + ' ' + item.currency.symbol;
+
+		if (groupbuy.currencies.local.id !== groupbuy.currencies.provider.id) {
+			result.localPrice = item.price / groupbuy.currencies.exchangeRate * groupbuy.currencies.multiplier;
+			result.prettyLocalPrice = result.localPrice + ' ' + groupbuy.currencies.local.symbol;
+		} else {
+			result.localPrice = result.price;
+			result.prettyLocalPrice = result.prettyPrice;
+		}
 
 		// Add links to response
 		result._links = {
@@ -118,10 +131,12 @@ exports.create = function(req, res) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
 			// Populate currency
-			item.populate({path: 'currency', select: 'id name code symbol'}, function(err2) {
-				if (err2) {
-					return res.status(400).send( errorHandler.prepareErrorResponse (err2) );
+			item.populate({path: 'currency', select: 'id name code symbol'}, function(err) {
+				if (err) {
+					return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 				}
+				item.available = item.maxQuantity;
+
 				res.status(201).jsonp( formattingItem(item, req) );
 			});
 		}
@@ -132,7 +147,13 @@ exports.create = function(req, res) {
  * Show the current Item
  */
 exports.read = function(req, res) {
-	res.jsonp( formattingItem(req.item, req) );
+	res.item.getAvailability(function(err, available) {
+		if (err) {
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+		}
+		req.item.available = available;
+		res.jsonp( formattingItem(req.item, req) );
+	});
 };
 
 /**
@@ -149,11 +170,18 @@ exports.update = function(req, res) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
 			// Populate currency
-			item.populate({path: 'currency', select: 'id name code symbol'}, function(err2) {
-				if (err2) {
-					return res.status(400).send( errorHandler.prepareErrorResponse (err2) );
+			item.populate({path: 'currency', select: 'id name code symbol'}, function(err) {
+				if (err) {
+					return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 				}
-				res.jsonp( formattingItem(item, req) );
+				item.getAvailability(function(err, available) {
+					if (err) {
+						return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+					}
+					item.available = available;
+					res.jsonp( formattingItem(item, req) );
+				});
+
 			});
 		}
 	});
@@ -188,7 +216,21 @@ exports.list = function(req, res) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
-			res.jsonp( formattingItemList(items, req, {page: page, totalPages: totalPages, numElems: items.length, totalElems: count, selFields: fields}) );
+			async.each(items,
+			    function(item, callback) {
+			        item.getAvailability(function(err, available) {
+			            item.available = available;
+
+			            callback();
+			        });
+			    },
+			    function(err) {
+			        if (err) {
+			            return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+			        }
+			        res.jsonp( formattingItemList(items, req, {page: page, totalPages: totalPages, numElems: items.length, totalElems: count, selFields: fields}) );
+			    }
+			);
 		}
 	}, { columns: fields, sortBy : sort, populate: 'currency' });
 };

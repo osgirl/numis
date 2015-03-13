@@ -107,6 +107,10 @@ var ItemSchema = new Schema({
 		default: 0,
 		min: [0, 'The maximum amount can not be negative. Specify 0 for no set maximum amount']
 	},
+	available: {
+		type: Number,
+		default: 0
+	},
 	price: {
 		type: Number,
 		min: [0, 'The price can not be less than ({MIN}).'],
@@ -138,6 +142,15 @@ var ItemSchema = new Schema({
 	}
 });
 
+
+/**
+ * Hook a pre validate method to set available to 0.
+ */
+ItemSchema.pre('validate', function(next) {
+	this.available = 0;
+
+	next();
+});
 
 /**
  * Hook a pre validate method to set the currency as groupbuy provider currency.
@@ -214,7 +227,7 @@ ItemSchema.statics.getAvailability = function(itemId, callback) {
 						callback(null, item.maxQuantity - count);
 					}
 				});
-			}	
+			}
 		}
 	});
 };

@@ -92,6 +92,7 @@ describe('Item CRUD tests', function() {
 						title: 'Item A1',
 						description: 'Description A1',
 						price: 22.34,
+						maxQuantity: 10,
 						currency: currency.id,
 						user: user1._id
 					};
@@ -150,6 +151,8 @@ describe('Item CRUD tests', function() {
 						(itemSaveRes.body.description).should.match(item1.description);
 						(itemSaveRes.body.price).should.match(item1.price);
 						(itemSaveRes.body.currency._id).should.match(item1.currency);
+						(itemSaveRes.body.maxQuantity).should.match(item1.maxQuantity);
+						(itemSaveRes.body.available).should.match(item1.maxQuantity);
 
 						// Get a list of Items
 						agent.get('/api/v1/groupbuys/' + GroupbuyId + '/items')
@@ -167,6 +170,8 @@ describe('Item CRUD tests', function() {
 								(items[0].description).should.match(item1.description);
 								(items[0].price).should.match(item1.price);
 								(items[0].currency._id).should.match(item1.currency);
+								(items[0].maxQuantity).should.match(item1.maxQuantity);
+								(items[0].available).should.match(item1.maxQuantity);
 
 								// Call the assertion callback
 								done();
@@ -254,6 +259,7 @@ describe('Item CRUD tests', function() {
 
 						// Update Item name
 						item1.title = 'WHY YOU GOTTA BE SO MEAN?';
+						item1.maxQuantity = 5;
 
 						// Update existing Item
 						agent.put('/api/v1/groupbuys/' + GroupbuyId + '/items/' + itemSaveRes.body._id)
@@ -276,6 +282,8 @@ describe('Item CRUD tests', function() {
 								(itemUpdateRes.body.price).should.match(itemSaveRes.body.price);
 								(itemUpdateRes.body.currency).should.match(itemSaveRes.body.currency);
 
+								(itemUpdateRes.body.maxQuantity).should.match(item1.maxQuantity);
+								(itemUpdateRes.body.available).should.match(item1.maxQuantity);
 								(itemUpdateRes.body.title).should.match(item1.title);
 
 								// Call the assertion callback
