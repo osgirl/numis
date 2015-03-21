@@ -45,8 +45,8 @@ var formattingItem = exports.formattingItem = function(item, req, reduce) {
 		result.prettyPrice = item.price + ' ' + item.currency.symbol;
 
 		if (groupbuy.currencies.local.id !== groupbuy.currencies.provider.id) {
-			result.localPrice = item.price / groupbuy.currencies.exchangeRate * groupbuy.currencies.multiplier;
-			result.prettyLocalPrice = result.localPrice + ' ' + groupbuy.currencies.local.symbol;
+			result.localPrice = item.price * groupbuy.currencies.multiplier / groupbuy.currencies.exchangeRate;
+			result.prettyLocalPrice = Math.ceil(100 * result.localPrice) / 100 + ' ' + groupbuy.currencies.local.symbol;
 		} else {
 			result.localPrice = result.price;
 			result.prettyLocalPrice = result.prettyPrice;

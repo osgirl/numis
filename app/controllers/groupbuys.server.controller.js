@@ -49,11 +49,17 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, re
 				managers:   { href: selfURL + '/managers', title: 'Manage managers' },
 				items:      { href: selfURL + '/items',    title: 'Items list' }
 			},
-			_id: 		 groupbuy._id,
-			name: 		 groupbuy.name,
-			title: 		 groupbuy.title,
+			_id:         groupbuy._id,
+			name:        groupbuy.name,
+			title: 	     groupbuy.title,
 			description: groupbuy.description,
-			status: 	 groupbuy.status
+			status: 	 groupbuy.status,
+			currencies: {
+				local:        groupbuy.currencies.local,
+				provider:     groupbuy.currencies.provider,
+				exchangeRate: groupbuy.currencies.exchangeRate,
+				multiplier:   groupbuy.currencies.multiplier
+			}
 		};
 
 		// Add next state property
@@ -138,9 +144,18 @@ exports.create = function(req, res) {
 	groupbuy.addManager(groupbuy.user, function(err) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
-		} else {
-			res.status(201).jsonp( formattingGroupbuy(groupbuy, req) );
 		}
+		// Populate currencies
+		groupbuy.populate([
+				{path: 'currencies.local', select: 'id name code symbol'},
+				{path: 'currencies.provider', select: 'id name code symbol'}
+		], function(err) {
+			if (err) {
+				return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+			}
+
+			res.status(201).jsonp( formattingGroupbuy(groupbuy, req) );
+		});
 	});
 };
 
@@ -163,9 +178,17 @@ exports.update = function(req, res) {
 	groupbuy.save(function(err, groupbuy) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
-		} else {
-			res.jsonp( formattingGroupbuy(groupbuy, req) );
 		}
+		// Populate currencies
+		groupbuy.populate([
+				{path: 'currencies.local', select: 'id name code symbol'},
+				{path: 'currencies.provider', select: 'id name code symbol'}
+		], function(err) {
+			if (err) {
+				return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+			}
+			res.jsonp( formattingGroupbuy(groupbuy, req) );
+		});
 	});
 };
 
