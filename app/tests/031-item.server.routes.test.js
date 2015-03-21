@@ -13,7 +13,7 @@ var should   = require('should'),
 /**
  * Globals
  */
-var credentials, currency, user1, groupbuy1, groupbuy2, item1;
+var credentials, currency, currency2, user1, groupbuy1, groupbuy2, item1;
 
 /**
  * Item routes tests
@@ -27,14 +27,24 @@ describe('Item CRUD tests', function() {
 			priority: 100
 		});
 
+		currency2 = new Currency({
+			name: 'Japanese Yen',
+			code: 'JPY',
+			symbol: '¥'
+		});
+
 		// Remove old previous data
 		Currency.remove().exec(function(err) {
 			if (err) console.error(err);
 
+			// Save new currencies
 			currency.save(function(err) {
 				if (err) console.error(err);
+				currency2.save(function(err) {
+					if (err) console.error(err);
 
-				done();
+					done();
+				});
 			});
 		});
 	});
@@ -400,5 +410,183 @@ describe('Item CRUD tests', function() {
 
 		});
 	});
+
+	it('NU_P_G003_E109: should be able to get prices in local al provider currencies', function(done) {
+		var yGroupbuy, yItem1, yItem2, yItem3, yItem4, yItem5, yItem6;
+
+		yGroupbuy = new Groupbuy({
+			title: '500 yenes - Serie Prefecturas',
+			description: 'Compra de la serie monedas de 500 yen sobre las 47 prefecturas de Japón',
+			currencies: {
+				local: currency.id,
+				provider: currency2.id,
+				exchangeRate: 130.12,
+				multiplier: 1.05
+			},
+			user: user1.id
+		});
+
+		yGroupbuy.save(function(err) {
+			if (err) console.error(err);
+
+			yItem1 = new Item({
+				title: '35 Mie',
+				description: 'Moneda bimetálica de 500 yenes, 2014.',
+				price: 680,
+				currency: currency2.id,
+				user: user1.id,
+				groupbuy: yGroupbuy.id
+			});
+
+			yItem2 = new Item({
+				title: '34 - Yamagata',
+				description: 'Moneda bimetálica de 500 yenes, 2014.',
+				price: 700,
+				currency: currency2.id,
+				user: user1.id,
+				groupbuy: yGroupbuy.id
+			});
+
+			yItem3 = new Item({
+				title: '33 - Ehime',
+				description: 'Moneda bimetálica de 500 yenes, 2014.',
+				price: 650,
+				currency: currency2.id,
+				user: user1.id,
+				groupbuy: yGroupbuy.id
+			});
+
+			yItem4 = new Item({
+				title: '32 - Kagoshima',
+				description: 'Moneda bimetálica de 500 yenes, 2013.',
+				price: 700,
+				currency: currency2.id,
+				user: user1.id,
+				groupbuy: yGroupbuy.id
+			});
+
+			yItem5 = new Item({
+				title: '31 - Yamanashi',
+				description: 'Moneda bimetálica de 500 yenes, 2013.',
+				price: 650,
+				currency: currency2.id,
+				user: user1.id,
+				groupbuy: yGroupbuy.id
+			});
+
+			yItem6 = new Item({
+				title: '30 - Shizuoka',
+				description: 'Moneda bimetálica de 500 yenes, 2013.',
+				price: 650,
+				currency: currency2.id,
+				user: user1.id,
+				groupbuy: yGroupbuy.id
+			});
+
+			yItem1.save(function(err) {
+				if (err) console.error(err);
+
+				yItem2.save(function(err) {
+					if (err) console.error(err);
+
+					yItem3.save(function(err) {
+						if (err) console.error(err);
+
+						yItem4.save(function(err) {
+							if (err) console.error(err);
+
+							yItem5.save(function(err) {
+								if (err) console.error(err);
+
+								yItem6.save(function(err) {
+									if (err) console.error(err);
+
+									agent.post('/auth/signin')
+										.send(credentials)
+										.expect(200)
+										.end(function(signinErr, signinRes) {
+											// Handle signin error
+											if (signinErr) done(signinErr);
+
+											// Get groupbuy info
+											agent.get('/api/v1/groupbuys/' + yGroupbuy.id)
+												.expect(200)
+												.end(function(groupbuyGetErr, groupbuyGetRes) {
+													// Handle Order save error
+													if (groupbuyGetErr) done(groupbuyGetErr);
+
+													(groupbuyGetRes.body.currencies.multiplier).should.match(yGroupbuy.currencies.multiplier);
+													(groupbuyGetRes.body.currencies.exchangeRate).should.match(yGroupbuy.currencies.exchangeRate);
+													(groupbuyGetRes.body.currencies.local._id).should.match(currency.id);
+													(groupbuyGetRes.body.currencies.provider._id).should.match(currency2.id);
+
+													// Get items info
+													agent.get('/api/v1/groupbuys/' + yGroupbuy.id + '/items')
+														.expect(200)
+														.end(function(itemsGetErr, itemsGetRes) {
+															// Handle Order save error
+															if (itemsGetErr) done(itemsGetErr);
+
+															(itemsGetRes.body.numElems).should.match(6);
+															(itemsGetRes.body.totalElems).should.match(6);
+
+															// Get Orders list
+															var items = itemsGetRes.body._embedded.items;
+
+															(items[0].title).should.match(yItem6.title);
+															(items[0].currency.symbol).should.match(currency2.symbol);
+															(items[0].price).should.match(yItem6.price);
+															(items[0].prettyPrice).should.match(yItem6.price + ' ' + currency2.symbol);
+															(items[0].localPrice).should.match(yItem6.price * yGroupbuy.currencies.multiplier / yGroupbuy.currencies.exchangeRate);
+															(items[0].prettyLocalPrice).should.match('5.25 €');
+
+															(items[1].title).should.match(yItem5.title);
+															(items[1].currency.symbol).should.match(currency2.symbol);
+															(items[1].price).should.match(yItem5.price);
+															(items[1].prettyPrice).should.match(yItem5.price + ' ' + currency2.symbol);
+															(items[1].localPrice).should.match(yItem5.price * yGroupbuy.currencies.multiplier / yGroupbuy.currencies.exchangeRate);
+															(items[1].prettyLocalPrice).should.match('5.25 €');
+
+															(items[2].title).should.match(yItem4.title);
+															(items[2].currency.symbol).should.match(currency2.symbol);
+															(items[2].price).should.match(yItem4.price);
+															(items[2].prettyPrice).should.match(yItem4.price + ' ' + currency2.symbol);
+															(items[2].localPrice).should.match(yItem4.price * yGroupbuy.currencies.multiplier / yGroupbuy.currencies.exchangeRate);
+															(items[2].prettyLocalPrice).should.match('5.65 €');
+
+															(items[3].title).should.match(yItem3.title);
+															(items[3].currency.symbol).should.match(currency2.symbol);
+															(items[3].price).should.match(yItem3.price);
+															(items[3].prettyPrice).should.match(yItem3.price + ' ' + currency2.symbol);
+															(items[3].localPrice).should.match(yItem3.price * yGroupbuy.currencies.multiplier / yGroupbuy.currencies.exchangeRate);
+															(items[3].prettyLocalPrice).should.match('5.25 €');
+
+															(items[4].title).should.match(yItem2.title);
+															(items[4].currency.symbol).should.match(currency2.symbol);
+															(items[4].price).should.match(yItem2.price);
+															(items[4].prettyPrice).should.match(yItem2.price + ' ' + currency2.symbol);
+															(items[4].localPrice).should.match(yItem2.price * yGroupbuy.currencies.multiplier / yGroupbuy.currencies.exchangeRate);
+															(items[4].prettyLocalPrice).should.match('5.65 €');
+
+															(items[5].title).should.match(yItem1.title);
+															(items[5].currency.symbol).should.match(currency2.symbol);
+															(items[5].price).should.match(yItem1.price);
+															(items[5].prettyPrice).should.match(yItem1.price + ' ' + currency2.symbol);
+															(items[5].localPrice).should.match(yItem1.price * yGroupbuy.currencies.multiplier / yGroupbuy.currencies.exchangeRate);
+															(items[5].prettyLocalPrice).should.match('5.49 €');
+
+															done();
+														});
+												});
+										});
+								});
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+
 
 });

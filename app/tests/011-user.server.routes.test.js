@@ -63,7 +63,7 @@ describe('User CRUD tests', function() {
 
 				done();
 			});
-		});	
+		});
 	});
 
 	/*
@@ -90,7 +90,7 @@ describe('User CRUD tests', function() {
 	 */
 
 
-	it('NU_P_G001_E101: should be able to save User instance if logged in', function(done) {
+	it('NU_P_G001_E101: should be able to save User instance if have admin role', function(done) {
 		agent.post('/auth/signin')
 			.send(credentialsA)
 			.expect(200)

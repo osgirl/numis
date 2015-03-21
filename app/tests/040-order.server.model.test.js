@@ -14,7 +14,7 @@ var should   = require('should'),
 /**
  * Globals
  */
-var user, currency, groupbuy, order, item1, item2, item3;
+var user, currency, currency2, groupbuy, order, item1, item2, item3;
 
 /**
  * Unit tests
@@ -28,14 +28,24 @@ describe('Order Model Unit Tests:', function() {
 			priority: 100
 		});
 
+		currency2 = new Currency({
+			name: 'Japanese Yen',
+	        code: 'JPY',
+	        symbol: '¥'
+		});
+
 		// Remove old previous data
 		Currency.remove().exec(function(err) {
 			if (err) console.error(err);
 
+			// Save new currencies
 			currency.save(function(err) {
 				if (err) console.error(err);
+				currency2.save(function(err) {
+					if (err) console.error(err);
 
-				done();
+					done();
+				});
 			});
 		});
 	});
@@ -986,6 +996,191 @@ describe('Order Model Unit Tests:', function() {
 								});
 
 								done();
+							});
+						});
+					});
+				});
+			});
+		});
+
+		it('NU_P_G004_E017: should be able to use diferent currencies for local and provider', function(done) {
+			var yGroupbuy, yItem1, yItem2, yItem3, yItem4, yItem5, yItem6;
+			var member1, member2;
+			var order1, order2;
+			var request1, request2;
+
+			yGroupbuy = new Groupbuy({
+				title: '500 yenes - Serie Prefecturas',
+				description: 'Compra de la serie monedas de 500 yen sobre las 47 prefecturas de Japón',
+				currencies: {
+					local: currency.id,
+					provider: currency2.id,
+					exchangeRate: 130.12,
+					multiplier: 1.05
+				},
+				user: user
+			});
+
+			member1 = new User({
+				firstName: 'John',
+				lastName: 'Doe',
+				email: 'jdoe@test.com',
+				username: 'jdoe',
+				password: 'password',
+				provider: 'local'
+			});
+
+			member2 = new User({
+				firstName: 'Juan',
+				lastName: 'Sánchez',
+				email: 'jsanchez@test.com',
+				username: 'jsanchez',
+				password: 'password',
+				provider: 'local'
+			});
+
+			member1.save(function(err) {
+				if (err) console.error(err);
+
+				member2.save(function(err) {
+					if (err) console.error(err);
+
+					yGroupbuy.save(function(err) {
+						if (err) console.error(err);
+
+						yItem1 = new Item({
+							title: '35 Mie',
+							description: 'Moneda bimetálica de 500 yenes, 2014.',
+							price: 680,
+							currency: currency2.id,
+							maxQuantity: 30,
+							user: user,
+							groupbuy: yGroupbuy.id
+						});
+
+						yItem2 = new Item({
+							title: '34 - Yamagata',
+							description: 'Moneda bimetálica de 500 yenes, 2014.',
+							price: 700,
+							currency: currency2.id,
+							maxQuantity: 30,
+							user: user,
+							groupbuy: yGroupbuy.id
+						});
+
+						yItem3 = new Item({
+							title: '33 - Ehime',
+							description: 'Moneda bimetálica de 500 yenes, 2014.',
+							price: 650,
+							currency: currency2.id,
+							maxQuantity: 30,
+							user: user,
+							groupbuy: yGroupbuy.id
+						});
+
+						yItem4 = new Item({
+							title: '32 - Kagoshima',
+							description: 'Moneda bimetálica de 500 yenes, 2013.',
+							price: 700,
+							currency: currency2.id,
+							maxQuantity: 30,
+							user: user,
+							groupbuy: yGroupbuy.id
+						});
+
+						yItem5 = new Item({
+							title: '31 - Yamanashi',
+							description: 'Moneda bimetálica de 500 yenes, 2013.',
+							price: 650,
+							currency: currency2.id,
+							maxQuantity: 30,
+							user: user,
+							groupbuy: yGroupbuy.id
+						});
+
+						yItem6 = new Item({
+							title: '30 - Shizuoka',
+							description: 'Moneda bimetálica de 500 yenes, 2013.',
+							price: 650,
+							currency: currency2.id,
+							maxQuantity: 22,
+							user: user,
+							groupbuy: yGroupbuy.id
+						});
+
+						yItem1.save(function(err) {
+							if (err) console.error(err);
+
+							yItem2.save(function(err) {
+								if (err) console.error(err);
+
+								yItem3.save(function(err) {
+									if (err) console.error(err);
+
+									yItem4.save(function(err) {
+										if (err) console.error(err);
+
+										yItem5.save(function(err) {
+											if (err) console.error(err);
+
+											yItem6.save(function(err) {
+												if (err) console.error(err);
+
+												order1 = new Order({
+													groupbuy: yGroupbuy.id,
+													user: member1.id
+												});
+												request1 = {
+													items: [
+														{item: yItem1.id, quantity: 1},
+														{item: yItem2.id, quantity: 1},
+														{item: yItem3.id, quantity: 1}
+													]
+												};
+
+												// Order 2
+												order2 = new Order({
+													groupbuy: yGroupbuy.id,
+													user: member2.id
+												});
+												request2 = {
+													items: [
+														{item: yItem1.id, quantity: 1},
+														{item: yItem2.id, quantity: 1},
+														{item: yItem3.id, quantity: 1},
+														{item: yItem4.id, quantity: 1},
+														{item: yItem5.id, quantity: 1},
+														{item: yItem6.id, quantity: 1}
+													]
+												};
+
+												// Save the Order 1
+												order1.addRequest (request1, member1, function(err) {
+													should.not.exist(err);
+
+													// Save the Order 2
+													order2.addRequest (request2, member2, function(err) {
+														should.not.exist(err);
+
+														yItem1.getAvailability(function(err, num) {
+															num.should.match(28);
+														});
+														yItem4.getAvailability(function(err, num) {
+															num.should.match(29);
+														});
+														yItem6.getAvailability(function(err, num) {
+															num.should.match(21);
+														});
+
+														done();
+
+													});
+												});
+
+											});
+										});
+									});
+								});
 							});
 						});
 					});

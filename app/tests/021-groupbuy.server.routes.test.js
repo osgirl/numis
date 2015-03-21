@@ -15,30 +15,40 @@ var should   = require('should'),
  * Globals
  */
 var credentials, credentialsA, user, admin, groupbuy;
+var currency, currency2;
 
 /**
  * Groupbuy routes tests
  */
 describe('Groupbuy CRUD tests', function() {
 	before(function(done) {
-		var currency = new Currency({
+		currency = new Currency({
 			name: 'Euro',
 			code: 'EUR',
 			symbol: '€',
 			priority: 100
 		});
 
+		currency2 = new Currency({
+			name: 'Japanese Yen',
+			code: 'JPY',
+			symbol: '¥'
+		});
+
 		// Remove old previous data
 		Currency.remove().exec(function(err) {
 			if (err) console.error(err);
 
+			// Save new currencies
 			currency.save(function(err) {
 				if (err) console.error(err);
+				currency2.save(function(err) {
+					if (err) console.error(err);
 
-				done();
+					done();
+				});
 			});
 		});
-
 	});
 
 	beforeEach(function(done) {
@@ -502,5 +512,60 @@ describe('Groupbuy CRUD tests', function() {
 	        });
 	    });
 	});
+
+	it('NU_P_G002_E112: should be able to save Groupbuy with diferent local and provider currencies', function(done) {
+		var groupbuy2 = {
+			title: '500 yenes - Serie Prefecturas',
+			description: 'Compra de la serie monedas de 500 yen sobre las 47 prefecturas de Japón',
+			currencies: {
+				local: currency.id,
+				provider: currency2.id,
+				exchangeRate: 130.123456789,
+				multiplier: 1.23456789
+			}
+		};
+		var exchangeRate = 130.123457;
+
+		agent.post('/auth/signin')
+			.send(credentials)
+			.expect(200)
+			.end(function(signinErr, signinRes) {
+				// Handle signin error
+				if (signinErr) done(signinErr);
+
+				// Save a new Groupbuy
+				agent.post('/api/v1/groupbuys')
+					.send(groupbuy2)
+					.expect(201)
+					.end(function(groupbuySaveErr, groupbuySaveRes) {
+						// Handle Groupbuy save error
+						if (groupbuySaveErr) done(groupbuySaveErr);
+
+						(groupbuySaveRes.body.currencies.multiplier).should.match(groupbuy2.currencies.multiplier);
+						(groupbuySaveRes.body.currencies.exchangeRate).should.match(exchangeRate);
+
+						// Get groupbuy info
+						agent.get('/api/v1/groupbuys/' + groupbuySaveRes.body._id)
+							.expect(200)
+							.end(function(groupbuyGetErr, groupbuyGetRes) {
+								// Handle Order save error
+								if (groupbuyGetErr) done(groupbuyGetErr);
+
+								(groupbuyGetRes.body.currencies.multiplier).should.match(groupbuySaveRes.body.currencies.multiplier);
+								(groupbuyGetRes.body.currencies.exchangeRate).should.match(groupbuySaveRes.body.currencies.exchangeRate);
+
+								(groupbuyGetRes.body.currencies.local._id).should.match(currency.id);
+								(groupbuyGetRes.body.currencies.local.name).should.match(currency.name);
+								(groupbuyGetRes.body.currencies.local.symbol).should.match(currency.symbol);
+								(groupbuyGetRes.body.currencies.provider._id).should.match(currency2.id);
+								(groupbuyGetRes.body.currencies.provider.name).should.match(currency2.name);
+								(groupbuyGetRes.body.currencies.provider.symbol).should.match(currency2.symbol);
+
+								done();
+							});
+					});
+			});
+	});
+
 
 });
