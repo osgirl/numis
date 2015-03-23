@@ -150,6 +150,47 @@ var OrderSchema = new Schema({
         get: getPrice,
         set: setPrice
 	},
+	payment: {
+	    _id: false,
+	    date: {
+	        type: Date
+	    },
+	    info: {
+	        type: String,
+	        default: '',
+	        trim: true
+	    },
+	    confirmedBy: {
+	        type: Schema.ObjectId,
+	        ref: 'User'
+	    },
+	    confirmationDate: {
+	        type: Date
+	    }
+	},
+	shipping: {
+	    _id: false,
+	    address: {
+	        type: String,
+	        default: '',
+	        trim: true
+	    },
+	    date: {
+	        type: Date
+	    },
+	    shippedBy: {
+	        type: Schema.ObjectId,
+	        ref: 'User'
+	    },
+	    info: {
+	        type: String,
+	        default: '',
+	        trim: true
+	    },
+	    confirmationDate: {
+	        type: Date
+	    }
+	},
 	created: {
 		type: Date,
 		default: Date.now
@@ -213,7 +254,7 @@ var validateRequest = function(request, callback) {
 			Item.getAvailability(elem.item, function(err, available) {
 				if (available !== '' && elem.quantity > available) {
 					callback ( new Error ('There isn\'t enough products to satisfy the request.') );
-					
+
 				} else {
 					callback();
 				}

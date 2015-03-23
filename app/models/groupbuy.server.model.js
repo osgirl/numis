@@ -15,9 +15,17 @@ var getExchangeRate = function (num) {
     return (num / 1000000);
 };
 
-
 var setExchangeRate = function (num) {
     return Math.round(num * 1000000);
+};
+
+
+var getPrice = function (num) {
+	return (num / 100);
+};
+
+var setPrice = function (num) {
+	return Math.round(num * 100);
 };
 
 
@@ -78,6 +86,20 @@ var GroupbuySchema = new Schema({
 			type: Number,
 			default: 1
 		}
+	},
+	shippingCost: {
+		type: Number,
+		min: [0, 'The shipping cost can not be negative.'],
+		default: 0,
+		get: getPrice,
+		set: setPrice
+	},
+	otherCosts: {
+		type: Number,
+		min: [0, 'The other costs can not be negative.'],
+		default: 0,
+		get: getPrice,
+		set: setPrice
 	},
 	updates: [{
 		publishDate: {

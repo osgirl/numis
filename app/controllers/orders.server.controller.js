@@ -32,7 +32,7 @@ var formattingOrder = function(order, req, reduce) {
 
 		if(!reduce) {
 			try {
-				var rels = order.relationsToLink(['user', 'groupbuy']);
+				var rels = order.relationsToLink(['user', 'groupbuy'], ['user', 'groupbuy']);
 
 				if (order.populated('user') !== undefined) {
 					creatorURL  = '/api/v1' + order.idToLink(order.user.id, 'User', [], {});
