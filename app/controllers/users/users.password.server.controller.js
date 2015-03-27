@@ -32,8 +32,14 @@ exports.forgot = function(req, res, next) {
 					username: req.body.username
 				}, '-salt -password', function(err, user) {
 					if (!user) {
+						/*
 						return res.status(400).send({
 							message: 'No account with that username has been found'
+						});
+						*/
+						// Send fake message to user
+						return res.send({
+							message: 'An email has been sent to your email account with further instructions.'
 						});
 					} else if (user.provider !== 'local') {
 						return res.status(400).send({
@@ -58,7 +64,7 @@ exports.forgot = function(req, res, next) {
 			res.render('templates/reset-password-email', {
 				name: user.displayName,
 				appName: config.app.title,
-				url: 'http://' + req.headers.host + '/auth/reset/' + token
+				url: 'http://' + req.headers.host + '/api/v1/auth/reset/' + token
 			}, function(err, emailHTML) {
 				done(err, emailHTML, user);
 			});
@@ -75,11 +81,22 @@ exports.forgot = function(req, res, next) {
 			smtpTransport.sendMail(mailOptions, function(err) {
 				if (!err) {
 					res.send({
-						message: 'An email has been sent to ' + user.email + ' with further instructions.'
+						message: 'An email has been sent to your email account with further instructions.'
 					});
-				}
 
-				done(err);
+					done();
+
+				} else if (err.code === 'ECONNREFUSED') {
+					res.status(400).send({
+						name: 'UnexpectedError',
+						message: 'Error sending the email. Please contact to an administrator.'
+					});
+
+					done(err);
+
+				} else {
+					done(err);
+				}
 			});
 		}
 	], function(err) {
