@@ -129,7 +129,7 @@ describe('Groupbuy CRUD tests', function() {
 
 
 	it('NU_P_G002_E101: should be able to save Groupbuy instance if logged in', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentials)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -186,22 +186,15 @@ describe('Groupbuy CRUD tests', function() {
 	});
 
 	it('NU_P_G002_E102: should not be able to save Groupbuy instance if not logged in', function(done) {
-		agent.get('/auth/signout')
-			.expect(302)	// Redirect to '/'
-			.end(function(signoutErr, signoutRes) {
-				// Handle signin error
-				if (signoutErr) done(signoutErr);
+		agent.post('/api/v1/groupbuys')
+			.send(groupbuy)
+			.expect(401)
+			.end(function(groupbuySaveErr, groupbuySaveRes) {
+				// Set message assertion
+				(groupbuySaveRes.body.name).should.match('NotLogged');
 
-				agent.post('/api/v1/groupbuys')
-					.send(groupbuy)
-					.expect(401)
-					.end(function(groupbuySaveErr, groupbuySaveRes) {
-						// Set message assertion
-						(groupbuySaveRes.body.name).should.match('NotLogged');
-
-						// Call the assertion callback
-						done(groupbuySaveErr);
-					});
+				// Call the assertion callback
+				done(groupbuySaveErr);
 			});
 	});
 
@@ -210,7 +203,7 @@ describe('Groupbuy CRUD tests', function() {
 		groupbuy.title = '';
 		groupbuy.name = '_';
 
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentials)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -241,7 +234,7 @@ describe('Groupbuy CRUD tests', function() {
 		// Invalidate name field
 		groupbuy.description = '';
 
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentials)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -269,7 +262,7 @@ describe('Groupbuy CRUD tests', function() {
 	});
 
 	it('NU_P_G002_E105: should be able to update Groupbuy instance if signed in', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentials)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -331,7 +324,9 @@ describe('Groupbuy CRUD tests', function() {
 		var groupbuyObj = new Groupbuy(groupbuy);
 
 		// Save the Groupbuy
-		groupbuyObj.save(function() {
+		groupbuyObj.save(function(err) {
+			if (err) console.error(err);
+
 			// Request Groupbuys
 			request(app).get('/api/v1/groupbuys')
 				.expect(401)
@@ -352,7 +347,9 @@ describe('Groupbuy CRUD tests', function() {
 		var groupbuyObj = new Groupbuy(groupbuy);
 
 		// Save the Groupbuy
-		groupbuyObj.save(function() {
+		groupbuyObj.save(function(err) {
+			if (err) console.error(err);
+
 			request(app).get('/api/v1/groupbuys/' + groupbuyObj._id)
 				.expect(401)
 				.end(function(req, res) {
@@ -370,7 +367,7 @@ describe('Groupbuy CRUD tests', function() {
 		admin.save(function(err) {
 			if (err) console.error(err);
 
-			agent.post('/auth/signin')
+			agent.post('/api/v1/auth/signin')
 				.send(credentialsA)
 				.expect(200)
 				.end(function(signinErr, signinRes) {
@@ -408,7 +405,7 @@ describe('Groupbuy CRUD tests', function() {
 	});
 
 	it('NU_P_G002_E109: should not be able to delete Groupbuy instance if the user is not a platform admin', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentials)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -448,7 +445,9 @@ describe('Groupbuy CRUD tests', function() {
 		var groupbuyObj = new Groupbuy(groupbuy);
 
 		// Save the Groupbuy
-		groupbuyObj.save(function() {
+		groupbuyObj.save(function(err) {
+			if (err) console.error(err);
+
 			// Try deleting Groupbuy
 			request(app).delete('/api/v1/groupbuys/' + groupbuyObj._id)
 			.expect(401)
@@ -464,18 +463,17 @@ describe('Groupbuy CRUD tests', function() {
 	});
 
 	it('NU_P_G002_E111: should be able to get a list of Groupbuys that an user belong to if signed in', function(done) {
-	    admin.save(function(err) {
-	        if (err) console.error(err);
-
-	        // Set Groupbuy user
-	        //groupbuy.user = user;
+		admin.save(function(err) {
+			if (err) console.error(err);
 
 	        // Create new Groupbuy model instance
 	        var groupbuyObj = new Groupbuy(groupbuy);
 
 	        // Add a manager and save the Groupbuy
-	        groupbuyObj.addManager(user._id, function(err) {
-	            agent.post('/auth/signin')
+	        groupbuyObj.addManager(user.id, function(err) {
+				if (err) console.error(err);
+
+	            agent.post('/api/v1/auth/signin')
 	                .send(credentialsA)
 	                .set('Accept', 'application/json')
 	                .expect('Content-Type', /json/)
@@ -488,7 +486,7 @@ describe('Groupbuy CRUD tests', function() {
 	                    var userId = user.id;
 
 	                    // Get groupbuys that users belong to
-	                    agent.get('/api/v1/users/'+ userId + '/groupbuys')
+						agent.get('/api/v1/users/'+ userId + '/groupbuys')
 	                        .expect(200)
 	                        .end(function(groupbuysGetErr, groupbuysGetRes) {
 	                            // Handle Groupbuy save error
@@ -509,8 +507,8 @@ describe('Groupbuy CRUD tests', function() {
 	                        });
 
 	                });
-	        });
-	    });
+			});
+		});
 	});
 
 	it('NU_P_G002_E112: should be able to save Groupbuy with diferent local and provider currencies', function(done) {
@@ -526,7 +524,7 @@ describe('Groupbuy CRUD tests', function() {
 		};
 		var exchangeRate = 130.123457;
 
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentials)
 			.expect(200)
 			.end(function(signinErr, signinRes) {

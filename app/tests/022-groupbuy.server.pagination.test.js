@@ -158,7 +158,7 @@ describe('Groupbuy Pagination tests', function() {
 
 
 	it('NU_P_G002_E201: should be able to get the first page of the list of Groupbuys', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -208,7 +208,7 @@ describe('Groupbuy Pagination tests', function() {
 	});
 
 	it('NU_P_G002_E202: should be able to select the first page of the list of Groupbuys', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -257,7 +257,7 @@ describe('Groupbuy Pagination tests', function() {
 	});
 
 	it('NU_P_G002_E203: should be able to select the second and last page of the list of Groupbuys', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -307,7 +307,7 @@ describe('Groupbuy Pagination tests', function() {
 	});
 
 	it('NU_P_G002_E204: should be able to order the list by title (case-sensitive)', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -354,7 +354,7 @@ describe('Groupbuy Pagination tests', function() {
 	});
 
 	it('NU_P_G002_E205: should be able to order the list by name (slug) ', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -401,7 +401,7 @@ describe('Groupbuy Pagination tests', function() {
 	});
 
 	it('NU_P_G002_E206: should be able to select the second page of the descending sorted list of Groupbuys', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -448,7 +448,7 @@ describe('Groupbuy Pagination tests', function() {
 	});
 
 	it('NU_P_G002_E207: should be able to filter and sort the list of Groupbuys by title', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -488,7 +488,7 @@ describe('Groupbuy Pagination tests', function() {
 	});
 
 	it('NU_P_G002_E208: should be able to paginate the list of members of a Groupbuy', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -569,7 +569,7 @@ describe('Groupbuy Pagination tests', function() {
 	});
 
 	it('NU_P_G002_E209: should be able to paginate the list of managers of a Groupbuy', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -645,7 +645,7 @@ describe('Groupbuy Pagination tests', function() {
 
 
 	afterEach(function(done) {
-		agent.get('/auth/signout')
+		agent.get('/api/v1/auth/signout')
 			.expect(302)
 			.end(done);
 	});

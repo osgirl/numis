@@ -139,7 +139,7 @@ describe('Item CRUD tests', function() {
 
 
 	it('NU_P_G003_E101: should be able to save Item instance if logged in', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentials)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -193,23 +193,16 @@ describe('Item CRUD tests', function() {
 	it('NU_P_G003_E102: should not be able to save Item instance if not logged in', function(done) {
 		var GroupbuyId = groupbuy1._id;
 
-		agent.get('/auth/signout')
-			.expect(302)	// Redirect to '/'
-			.end(function(signoutErr, signoutRes) {
-				// Handle signin error
-				if (signoutErr) done(signoutErr);
+		// Save a new Item
+		agent.post('/api/v1/groupbuys/' + GroupbuyId + '/items')
+			.send(item1)
+			.expect(401)
+			.end(function(itemSaveErr, itemSaveRes) {
+				// Set message assertion
+				(itemSaveRes.body.name).should.match('NotLogged');
 
-				// Save a new Item
-				agent.post('/api/v1/groupbuys/' + GroupbuyId + '/items')
-					.send(item1)
-					.expect(401)
-					.end(function(itemSaveErr, itemSaveRes) {
-						// Set message assertion
-						(itemSaveRes.body.name).should.match('NotLogged');
-
-						// Call the assertion callback
-						done(itemSaveErr);
-					});
+				// Call the assertion callback
+				done(itemSaveErr);
 			});
 	});
 
@@ -219,7 +212,7 @@ describe('Item CRUD tests', function() {
 		// Invalidate name field
 		item1.title = '';
 
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentials)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -244,7 +237,7 @@ describe('Item CRUD tests', function() {
 	});
 
 	it('NU_P_G003_E104: should be able to update Item instance if signed in', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentials)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -351,7 +344,7 @@ describe('Item CRUD tests', function() {
 	});
 
 	it('NU_P_G003_E107: should be able to delete Item instance if signed in', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentials)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -501,7 +494,7 @@ describe('Item CRUD tests', function() {
 								yItem6.save(function(err) {
 									if (err) console.error(err);
 
-									agent.post('/auth/signin')
+									agent.post('/api/v1/auth/signin')
 										.send(credentials)
 										.expect(200)
 										.end(function(signinErr, signinRes) {
@@ -588,5 +581,8 @@ describe('Item CRUD tests', function() {
 		});
 	});
 
-
+	afterEach(function(done) {
+		agent.get('/api/v1/auth/signout')
+			.end(done);
+	});
 });

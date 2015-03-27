@@ -190,7 +190,7 @@ describe('Item Pagination tests', function() {
 
 
 	it('NU_P_G003_E201: should be able to get the first page of the list of Groupbuys', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -254,7 +254,7 @@ describe('Item Pagination tests', function() {
 	});
 
 	it('NU_P_G003_E202: should be able to filter items in a Groupbuy', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -293,7 +293,7 @@ describe('Item Pagination tests', function() {
 	});
 
 	it('NU_P_G003_E203: should be able to paginate and sort the list of items in a Groupbuy', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -365,7 +365,7 @@ describe('Item Pagination tests', function() {
 	});
 
 	it('NU_P_G003_E204: should be able to sort the list of items by title in descending order', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -410,7 +410,7 @@ describe('Item Pagination tests', function() {
 	});
 
 	it('NU_P_G003_E205: should be able to sort the list of items by price in descending order', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -464,7 +464,7 @@ describe('Item Pagination tests', function() {
 	});
 
 	it('NU_P_G003_E206: should be able to sort the list of items by price and title', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -512,7 +512,7 @@ describe('Item Pagination tests', function() {
 	});
 
 	it('NU_P_G003_E207: should be able to sort the list of items by price (ASC) and title (DESC)', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -561,7 +561,7 @@ describe('Item Pagination tests', function() {
 
 
 	afterEach(function(done) {
-		agent.get('/auth/signout')
+		agent.get('/api/v1/auth/signout')
 			.expect(302)
 			.end(done);
 	});

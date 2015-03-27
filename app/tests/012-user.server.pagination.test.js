@@ -120,7 +120,7 @@ describe('User Pagination tests', function() {
 
 
 	it('NU_P_G001_E201: should be able to get the first page of the list of Users', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -161,7 +161,7 @@ describe('User Pagination tests', function() {
 	});
 
 	it('NU_P_G001_E202: should be able to select the first page of the list of Users', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -210,7 +210,7 @@ describe('User Pagination tests', function() {
 	});
 
 	it('NU_P_G001_E203: should be able to select the second page of the list of Users', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -261,7 +261,7 @@ describe('User Pagination tests', function() {
 	});
 
 	it('NU_P_G001_E204: should be able to navigate to the last page of the list of Users', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -324,7 +324,7 @@ describe('User Pagination tests', function() {
 	});
 
 	it('NU_P_G001_E205: should be able to order the list by username', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -373,7 +373,7 @@ describe('User Pagination tests', function() {
 	});
 
 	it('NU_P_G001_E206: should be able to order the list by username in descending order', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -422,7 +422,7 @@ describe('User Pagination tests', function() {
 	});
 
 	it('NU_P_G001_E207: should be able to select the second page of the sorted list of Users', function(done) {
-		agent.post('/auth/signin')
+		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
 			.end(function(signinErr, signinRes) {
@@ -475,7 +475,7 @@ describe('User Pagination tests', function() {
 	});
 
 	afterEach(function(done) {
-		agent.get('/auth/signout')
+		agent.get('/api/v1/auth/signout')
 			.expect(302)
 			.end(done);
 	});
