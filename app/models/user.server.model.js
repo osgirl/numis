@@ -152,9 +152,9 @@ var UserSchema = new Schema({
 	roles: {
 		type: [{
 			type: String,
-			enum: ['user', 'premium', 'admin']
+			enum: ['user', 'premium', 'admin', 'request-suspend']
 		}],
-		default: ['user'],
+		default: [],
 		select: true
 	},
 	updated: {

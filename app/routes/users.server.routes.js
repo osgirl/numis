@@ -22,6 +22,19 @@ module.exports = function(app) {
 		.put(users.requiresLogin, users.hasAuthorization(['self','admin']), users.update)
 		.delete(users.requiresLogin, users.hasAuthorization(['admin']), users.delete);
 
+	// Approve and suspend users account
+	app.route('/api/v1/users/:userId/approve')
+		.post(users.requiresLogin, users.hasAuthorization(['admin']), users.approve);
+	app.route('/api/v1/users/:userId/suspend')
+		.post(users.requiresLogin, users.hasAuthorization(['admin']), users.suspend);
+	app.route('/api/v1/users/:userId/request-suspend')
+		.post(users.requiresLogin, users.hasAuthorization(['self']), users.requestSuspend);
+
+	// Grant or revoke admin priviledge
+	app.route('/api/v1/users/:userId/admin')
+		.put(users.requiresLogin, users.hasAuthorization(['admin']), users.grantAdmin)
+		.delete(users.requiresLogin, users.hasAuthorization(['admin']), users.revokeAdmin);
+
 	// Users avatar Routes
 	app.route('/api/v1/users/:userId/avatar')
 		.get(users.requiresLogin, users.hasAuthorization(['user']), users.getAvatar)
@@ -31,6 +44,20 @@ module.exports = function(app) {
 //	app.route('/api/v1/users/accounts').delete(users.removeOAuthProvider);
 	// Setting up the users password api
 	app.route('/api/v1/users/password').post(users.requiresLogin, users.hasAuthorization(['user']), users.changePassword);
+
+	// Autenthication routes
+	app.route('/api/v1/auth/forgot').post(users.forgot);
+	app.route('/api/v1/auth/reset/:token')
+		.get(users.validateResetToken)
+		.post(users.reset);
+
+	// Setting up the users authentication api
+	app.route('/api/v1/auth/signup').post(users.signup);
+	app.route('/api/v1/auth/signin').post(users.signin);
+	app.route('/api/v1/auth/signout').get(users.requiresLogin, users.signout);
+
+
+	// Deprecated autenthication routes
 	app.route('/auth/forgot').post(users.forgot);
 	app.route('/auth/reset/:token').get(users.validateResetToken);
 	app.route('/auth/reset/:token').post(users.reset);

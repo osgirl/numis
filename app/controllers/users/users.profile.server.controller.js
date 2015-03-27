@@ -51,10 +51,8 @@ var formattingUser = exports.formattingUser = function(user, req, reduce) {
 				result.firstName 	= user.firstName;
 				result.homeAddress	= user.homeAddress;
 				result.email 		= user.email;
-			}
-			if (isAdmin) {
-				result.provider = user.provider;
-				result.roles 	= user.roles;
+				result.provider     = user.provider;
+				result.roles     	= user.roles;
 			}
 		}
 	}
@@ -135,9 +133,7 @@ exports.update = function(req, res) {
 	var user = req.profile;
 
 	// For security measurement we remove the roles from the req.body object
-	if (!user.isAdmin()) {
-		delete req.body.roles;
-	}
+	delete req.body.roles;
 
 	// Merge existing user
     user = _.extend(user, req.body);
