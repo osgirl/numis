@@ -282,6 +282,7 @@ describe('Groupbuy CRUD tests', function() {
 
 						// Update Groupbuy name
 						groupbuy.title = 'WHY YOU GOTTA BE SO MEAN?';
+						groupbuy.description = 'New description';
 
 						// Update existing Groupbuy
 						agent.put('/api/v1/groupbuys/' + groupbuySaveRes.body._id)
@@ -298,11 +299,11 @@ describe('Groupbuy CRUD tests', function() {
 								(groupbuyUpdateRes.body).should.have.propertyByPath('_links', 'items', 'href');
 								(groupbuyUpdateRes.body).should.have.propertyByPath('_links', 'managers', 'href');
 								(groupbuyUpdateRes.body).should.have.propertyByPath('_links', 'members', 'href');
-
 								(groupbuyUpdateRes.body).should.have.properties('_id', 'title', 'name', 'description', 'status', 'nextState');
 								(groupbuyUpdateRes.body).should.have.properties('managers', 'members', 'updates', 'visibility');
+
+								// Not changed
 								(groupbuyUpdateRes.body._id).should.match(groupbuySaveRes.body._id);
-								(groupbuyUpdateRes.body.description).should.match(groupbuySaveRes.body.description);
 								(groupbuyUpdateRes.body.status).should.match(groupbuySaveRes.body.status);
 								(groupbuyUpdateRes.body.nextState).should.match(groupbuySaveRes.body.nextState);
 								(groupbuyUpdateRes.body.managers).should.match(groupbuySaveRes.body.managers);
@@ -310,7 +311,9 @@ describe('Groupbuy CRUD tests', function() {
 								(groupbuyUpdateRes.body.updates).should.match(groupbuySaveRes.body.updates);
 								(groupbuyUpdateRes.body.visibility).should.match(groupbuySaveRes.body.visibility);
 
+								// Changed
 								(groupbuyUpdateRes.body.title).should.match(groupbuy.title);
+								(groupbuyUpdateRes.body.description).should.match(groupbuy.description);
 
 								// Call the assertion callback
 								done();
@@ -565,5 +568,128 @@ describe('Groupbuy CRUD tests', function() {
 			});
 	});
 
+	it('NU_P_G002_E113: should be able to get a list of new groupbuys if signed it', function(done) {
+		var groupbuy2 = {
+			title: 'Groupbuy 2',
+			description: 'Groupbuy Description',
+			user: user.id,
+			status: 'published'
+		};
 
+        // Create new Groupbuy model instance
+        var groupbuyObj = new Groupbuy(groupbuy),
+			groupbuyObj2 = new Groupbuy(groupbuy2);
+
+        // Add a manager and save the Groupbuy
+		groupbuyObj2.save(function(err) {
+			if (err) console.error(err);
+
+	        groupbuyObj.addManager(user.id, function(err) {
+				if (err) console.error(err);
+
+	            agent.post('/api/v1/auth/signin')
+	                .send(credentials)
+					.set('Accept', 'application/json')
+					.expect('Content-Type', /json/)
+	                .expect(200)
+	                .end(function(signinErr, signinRes) {
+	                    // Handle signin error
+	                    if (signinErr) done(signinErr);
+
+	                    // Get the userId
+	                    var userId = user.id;
+
+	                    // Get groupbuys that users belong to
+	                    agent.get('/api/v1/groupbuys')
+							.query({ filter: {status: 'new'} })
+							.set('Accept', 'application/json')
+			                .expect('Content-Type', /json/)
+	                        .expect(200)
+	                        .end(function(groupbuysGetErr, groupbuysGetRes) {
+	                            // Handle Groupbuy save error
+	                            if (groupbuysGetErr) done(groupbuysGetErr);
+
+	                            // Get Groupbuys list
+	                            var groupbuys = groupbuysGetRes.body._embedded.groupbuys;
+
+	                            // Set assertions
+	                            groupbuys.should.be.an.Array.with.lengthOf(1);
+
+	                            (groupbuys[0].title).should.match(groupbuyObj.title);
+	                            (groupbuys[0].description).should.match(groupbuyObj.description);
+	                            (groupbuys[0].status).should.match(groupbuyObj.status);
+
+	                            // Handle Groupbuy error error
+	                            done();
+	                        });
+
+	                });
+			});
+        });
+	});
+
+	it('NU_P_G002_E114: should be able to get a list of published groupbuys if signed it', function(done) {
+		var groupbuy2 = {
+			title: 'Groupbuy 2',
+			description: 'Groupbuy Description',
+			user: user.id,
+			status: 'published'
+		};
+
+        // Create new Groupbuy model instance
+        var groupbuyObj = new Groupbuy(groupbuy),
+			groupbuyObj2 = new Groupbuy(groupbuy2);
+
+        // Add a manager and save the Groupbuy
+		groupbuyObj2.save(function(err) {
+			if (err) console.error(err);
+
+	        groupbuyObj.addManager(user.id, function(err) {
+				if (err) console.error(err);
+
+	            agent.post('/api/v1/auth/signin')
+	                .send(credentials)
+					.set('Accept', 'application/json')
+					.expect('Content-Type', /json/)
+	                .expect(200)
+	                .end(function(signinErr, signinRes) {
+	                    // Handle signin error
+	                    if (signinErr) done(signinErr);
+
+	                    // Get the userId
+	                    var userId = user.id;
+
+	                    // Get groupbuys that users belong to
+	                    agent.get('/api/v1/groupbuys')
+							.query({ filter: {status: 'published'} })
+							.set('Accept', 'application/json')
+			                .expect('Content-Type', /json/)
+	                        .expect(200)
+	                        .end(function(groupbuysGetErr, groupbuysGetRes) {
+	                            // Handle Groupbuy save error
+	                            if (groupbuysGetErr) done(groupbuysGetErr);
+
+	                            // Get Groupbuys list
+	                            var groupbuys = groupbuysGetRes.body._embedded.groupbuys;
+
+	                            // Set assertions
+	                            groupbuys.should.be.an.Array.with.lengthOf(1);
+
+	                            (groupbuys[0].title).should.match(groupbuyObj2.title);
+	                            (groupbuys[0].description).should.match(groupbuyObj2.description);
+	                            (groupbuys[0].status).should.match(groupbuyObj2.status);
+
+	                            // Handle Groupbuy error error
+	                            done();
+	                        });
+
+	                });
+			});
+        });
+	});
+
+	afterEach(function(done) {
+		agent.get('/api/v1/auth/signout')
+			.end(done);
+	});
 });
