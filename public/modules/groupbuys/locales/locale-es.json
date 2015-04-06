@@ -53,6 +53,15 @@
         "Payments_Status": "Estado de los pagos",
         "Shipments_Status": "Estado de los envios",
         "Information_Not_Available": "Información no disponible",
-        "Last_manager_cannot_be_deleted": "No se puede eliminar el ultimo gestor"
+        "Last_manager_cannot_be_deleted": "No se puede eliminar el ultimo gestor",
+        "Groupbuy_currency": "Divisa de la compra",
+        "Currency_note": "Al tratarse de precios en {{groupbuy.currency.name}} se aplica a efectos del pago la siguente tasa de cambio y multiplicador",
+        "Currency_note_manager": "En caso de ser una compra en una divisa distinta al Euro, rellenar esta parte y el precio en divisa de los items",
+        "Currency_name": "Nombre de la divisa",
+        "Exchange_rate": "Tasa de cambio",
+        "Multiplier": "Multiplicador",
+        "Note": "Nota",
+        "Multiplier_note": "El multiplicador tiene la función de evitar realizar segundos pagos debido a la fluctiación de las divisas",
+        "Remember_note_currencies_manager": "Recordar incluir los gastos de envio desde los proveedores hasta los gestores en el precio de los items, o en la pestaña de pagos"
     }
 }
