@@ -185,7 +185,7 @@ var loadGroupbuys = function(groupbuysCallback) {
                     if (err) {
                         console.log(chalk.red(err));
                     } else {
-                        idGroupbuys[groupbuys.name] = groupbuys.id;
+                        idGroupbuys[groupbuy.name] = groupbuy.id;
                         console.log ('    ' + groupbuy.title);
                     }
 
