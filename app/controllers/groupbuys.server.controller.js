@@ -180,9 +180,22 @@ exports.read = function(req, res) {
  * Update a Groupbuy
  */
 exports.update = function(req, res) {
-	var groupbuy = req.groupbuy ;
+	var groupbuy = req.groupbuy;
 
+	// Filter data to be updated
+	delete req.body.status;
+	delete req.body.items;
+	delete req.body.managers;
+	delete req.body.members;
 	delete req.body.user;
+
+	if (typeof groupbuy.currencies.local._id !== 'undefined') {
+		groupbuy.currencies.local = groupbuy.currencies.local._id;
+	}
+	if (typeof groupbuy.currencies.provider._id !== 'undefined') {
+		groupbuy.currencies.provider = groupbuy.currencies.provider._id;
+	}
+
 	groupbuy = _.extend(groupbuy , req.body);
 
 	groupbuy.save(function(err, groupbuy) {
