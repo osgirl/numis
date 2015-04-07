@@ -40,6 +40,12 @@ var formattingItem = exports.formattingItem = function(item, req, reduce) {
 
 		// Duplicate object item
 		result = item.toJSON();
+		result.currency = {
+			_id: 	item.currency._id,
+			name: 	item.currency.name,
+			code: 	item.currency.code,
+			symbol: item.currency.symbol
+		};
 
 		// Calculate price and local price for item in groupbuy
 		result.prettyPrice = item.price + ' ' + item.currency.symbol;
@@ -206,15 +212,19 @@ exports.delete = function(req, res) {
  * List of Items
  */
 exports.list = function(req, res) {
-	var query  = req.query.filter || null,
+	var query  = req.query.filter || {},
 		sort   = req.query.sort || 'title',
 		limit  = req.query.limit || 25,
 		page   = req.query.page || 1,
 		fields = req.query.fields || {};
 
+	// Filter items by groupbuy
+	query.groupbuy = req.groupbuy;
+
 	Item.paginate(query, page, limit, function(err, totalPages, items, count) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+
 		} else {
 			async.each(items,
 			    function(item, callback) {
