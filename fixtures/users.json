@@ -1,0 +1,74 @@
+[
+    {
+        "firstName": "Admin",
+        "lastName":  "Istrator",
+        "email":     "admin@example.net",
+        "username":  "administrator",
+        "password":  "password",
+        "provider":  "local",
+        "roles":     ["user", "admin"]
+    },
+    {
+        "firstName": "Pedro",
+        "lastName":  "Picapiedra",
+        "email":     "ppicapiedra@example.net",
+        "username":  "ppicapiedra",
+        "password":  "password",
+        "provider":  "local",
+        "roles":     ["user"]
+    },
+    {
+        "firstName": "Pablo",
+        "lastName":  "Marmol",
+        "email":     "pmarmol@example.net",
+        "username":  "pmarmol",
+        "password":  "password",
+        "provider":  "local",
+        "roles":     ["user"]
+    },
+    {
+        "firstName": "Lucky",
+        "lastName":  "Luck",
+        "email":     "lluck@example.net",
+        "username":  "lluck",
+        "password":  "password",
+        "provider":  "local",
+        "roles":     []
+    },
+    {
+        "firstName": "Akira",
+        "lastName":  "Toriyama",
+        "email":     "atori@example.net",
+        "username":  "atoriyama",
+        "password":  "password",
+        "provider":  "local",
+        "roles":     ["user"]
+    },
+    {
+        "firstName": "Georges",
+        "lastName":  "Remi",
+        "email":     "herge@example.net",
+        "username":  "gremi",
+        "password":  "password",
+        "provider":  "local",
+        "roles":     ["user"]
+    },
+    {
+        "firstName": "Tsugumi",
+        "lastName":  "Ōba",
+        "email":     "toba@example.net",
+        "username":  "toba",
+        "password":  "password",
+        "provider":  "local",
+        "roles":     ["user"]
+    },
+    {
+        "firstName": "Takeshi",
+        "lastName":  "Obata",
+        "email":     "takeshio@example.net",
+        "username":  "tobata",
+        "password":  "password",
+        "provider":  "local",
+        "roles":     ["user"]
+    }
+]
