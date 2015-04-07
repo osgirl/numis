@@ -1,0 +1,41 @@
+[
+    {
+        "title":       "Groupbuy B",
+        "name":        "groupbuy-b",
+        "description": "Buscar información en <a href=\"https://www.google.es/\">Google</a>",
+        "status":      "new",
+        "currencies": {
+            "local": "EUR"
+        },
+        "managers":     ["ppicapiedra"],
+        "members":      ["ppicapiedra", "pmarmol"],
+        "user":        "ppicapiedra"
+    },
+    {
+        "title":       "Japón 500 yenes - Serie prefecturas (Septiembre 2014)",
+        "name":        "jap-n-500-yenes-serie-prefecturas-septiembre-2014",
+        "description": "Serie de monedas conmemorativas de las 47 prefecturas",
+        "status":      "new",
+        "currencies": {
+            "local": "EUR",
+            "provider": "JPY",
+            "multiplier": "1.05",
+            "exchangeRate": "130"
+        },
+        "managers":     ["tobata"],
+        "members":      ["tobata", "atoriyama", "toba"],
+        "user":        "tobata"
+    },
+    {
+        "title":       "Astérix y los Valores de la República Francesa",
+        "name":        "ast-rix-y-los-valores-de-la-rep-blica-francesa",
+        "description": "La Monnaie de Paris pone a la venta desde mañana 30 de marzo una serie de trece monedas, doce con faciales de 10€ y una de 5o€, en las que se ensalza los valores de la República Francesa “libertad, igualdad y fraternidad”. Uno de sus personajes del cómic más universal, Astérix, junto a sus amigos, serán los encargados de mostrarnos ejemplos de estos emblemáticos símbolos para el pueblo francés, mediante viñetas aparecidas en alguno de sus 35 álbumes editados hasta el día de hoy.<br/>La serie se divide en dos partes, las que se emiten el 30 de marzo y las que lo harán en la segunda parte del año formada por otras doce de 10€, una de 50€ y una última pieza de 500€. Todas las monedas se podrán adquirir a su valor facial en la tienda online de la Monnaie de Paris en su presentación básica (dentro de una bolsita). También serán distribuidas en algunas oficinas de correos y estancos, pero aquí se venderán a un precio superior a su facial pues estas vendrán presentadas en unos blister.",
+        "status":      "new",
+        "currencies": {
+            "local": "EUR"
+        },
+        "managers":     ["administrator", "gremi"],
+        "members":      ["administrator", "gremi", "atoriyama", "toba", "ppicapiedra"],
+        "user":        "administrator"
+    }
+]

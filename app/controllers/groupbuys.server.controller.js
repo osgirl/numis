@@ -55,8 +55,18 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, re
 			description: groupbuy.description,
 			status: 	 groupbuy.status,
 			currencies: {
-				local:        groupbuy.currencies.local,
-				provider:     groupbuy.currencies.provider,
+				local: {
+					_id: 	groupbuy.currencies.local._id,
+					name: 	groupbuy.currencies.local.name,
+					code: 	groupbuy.currencies.local.code,
+					symbol: groupbuy.currencies.local.symbol
+				},
+				provider: {
+					_id: 	groupbuy.currencies.provider._id,
+					name: 	groupbuy.currencies.provider.name,
+					code: 	groupbuy.currencies.provider.code,
+					symbol: groupbuy.currencies.provider.symbol
+				},
 				exchangeRate: groupbuy.currencies.exchangeRate,
 				multiplier:   groupbuy.currencies.multiplier
 			}
@@ -215,7 +225,7 @@ exports.list = function(req, res) {
 		sort,
 		limit  = req.query.limit || 25,
 		page   = req.query.page || 1,
-		fields = req.query.fields || '_id title name description status members manager user';
+		fields = req.query.fields || '_id title name description status members manager currencies user';
 
 	// Add query filters and default sorting
 	if (!req.profile && typeof req.profile === 'undefined') {
@@ -241,7 +251,7 @@ exports.list = function(req, res) {
 		} else {
 			res.jsonp( formattingGroupbuyList(groupbuys, req, {page: page, totalPages: totalPages, numElems: groupbuys.length, totalElems: count, selFields: fields}) );
 		}
-	}, { columns: fields, populate: ['user', 'currency.local', 'currency.provider'], sortBy : sort });
+	}, { columns: fields, populate: ['user', 'currencies.local', 'currencies.provider'], sortBy : sort });
 };
 
 /**
