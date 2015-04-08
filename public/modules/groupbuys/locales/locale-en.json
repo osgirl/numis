@@ -63,6 +63,16 @@
         "Multiplier": "Multiplier",
         "Note": "Note",
         "Multiplier_note": "The multiplier is used to avoid currency fluctuations, in order to avoid second payments",
-        "Remember_note_currencies_manager": "Remember to add the shippment costs from the providers to the managers in the item price or in payment tab"
+        "Remember_note_currencies_manager": "Remember to add the shippment costs from the providers to the managers in the item price or in payment tab",
+        "Price": "Price",
+        "Max_Quantity": "Max quantity",
+        "Add_New_Item": "Add new item",
+        "Add_New_Item_To_The_Groupbuy": "Add new item to the groupbuy",
+        "Edit_Item": "Editar item",
+        "0_No_Limit": "0 = no limit",
+        "Price_In_Groupbuys_Currency": "Price in groupbuy's currency",
+        "Image": "Image",
+        "Save": "Save",
+        "Cancel": "Cancelar"
     }
 }

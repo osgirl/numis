@@ -63,6 +63,16 @@
         "Multiplier": "Multiplicador",
         "Note": "Nota",
         "Multiplier_note": "El multiplicador tiene la función de evitar realizar segundos pagos debido a la fluctiación de las divisas",
-        "Remember_note_currencies_manager": "Recordar incluir los gastos de envio desde los proveedores hasta los gestores en el precio de los items, o en la pestaña de pagos"
+        "Remember_note_currencies_manager": "Recordar incluir los gastos de envio desde los proveedores hasta los gestores en el precio de los items, o en la pestaña de pagos",
+        "Price": "Precio",
+        "Max_Quantity": "Máximo disponible",
+        "Add_New_Item": "Añadir item nuevo",
+        "Add_New_Item_To_The_Groupbuy": "Añadir nuevo item a la compra",
+        "Edit_Item": "Editar item",
+        "0_No_Limit": "0 = sin límite",
+        "Price_In_Groupbuys_Currency": "Precio en divisa de la compra",
+        "Image": "Imagen",
+        "Save": "Guardar",
+        "Cancel": "Cancelar"
     }
 }
