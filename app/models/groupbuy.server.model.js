@@ -319,6 +319,13 @@ GroupbuySchema.plugin(paginatePlugin);
 GroupbuySchema.plugin(l2rPlugin);
 
 
+/**
+ * Set schema options
+ */
+GroupbuySchema.set('toJSON', { getters: true, virtuals: false });
+GroupbuySchema.set('toObject', { getters: true, virtuals: false });
+
+
 
 // Compile a 'Groupbuy' model using the GroupbuySchema as the structure.
 // Mongoose also creates a MongoDB collection called 'groupbuys' for these documents.
