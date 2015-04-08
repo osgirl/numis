@@ -352,8 +352,7 @@ exports.deleteMember = function(req, res) {
 					message: errorHandler.getErrorMessage(err)
 				});
 			} else {
-				res.set('Content-Type', 'application/vnd.hal+json');
-				res.jsonp(groupbuy);
+				res.status(204).end();
 			}
 		});
 	} else {
@@ -454,8 +453,7 @@ exports.deleteManager = function(req, res) {
 						message: errorHandler.getErrorMessage(err)
 					});
 				} else {
-					res.set('Content-Type', 'application/vnd.hal+json');
-					res.jsonp(groupbuy);
+					res.status(204).end();
 				}
 			});
 		} else {
