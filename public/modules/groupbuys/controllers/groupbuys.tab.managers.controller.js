@@ -190,28 +190,5 @@ angular.module('groupbuys').controller('GroupbuysTabManagersController', ['$scop
 
     // ----------------
 
-    /*
-    @ngdoc method
-    * @name groupbuys.controller:GroupbuysTabManagersController.findPosition
-    * @methodOf groupbuys.controller:GroupbuysTabManagersController
-
-    @description
-    * Finds the first appearance of an element that cointains an _id property with the value provided.
-    * Otherwise returns -1
-    */
-    $scope.findPosition = function(value, list) {
-        var position = -1;
-        if (value !== '' && list !== '' ) {
-            for (var i = 0 ; i < list.length ; i++){
-                if (list[i]._id === value) {
-                    position = i;
-                    break;
-                }
-            }
-        }
-        return position;
-    };
-
-    // --------------
  }
 ]);

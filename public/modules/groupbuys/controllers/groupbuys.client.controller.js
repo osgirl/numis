@@ -165,16 +165,6 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 			}
 
-
-			// Load items
-			console.log('load members');
-			var itemsData = Restangular.all('groupbuys',$stateParams.groupbuyId,'items').getList();
-
-			itemsData.then(function(data) {
-
-				// Cargar los items
-
-			}
 			*/
 
 			$scope.userRole = $scope.userRole();
@@ -393,6 +383,29 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 	// ----------------------
 
+	/*
+    @ngdoc method
+    * @name groupbuys.controller:GroupbuysController.findPosition
+    * @methodOf groupbuys.controller:GroupbuysController
+
+    @description
+    * Finds the first appearance of an element that cointains an _id property with the value provided.
+    * Otherwise returns -1
+    */
+    $scope.findPosition = function(value, list) {
+        var position = -1;
+        if (value !== '' && list !== '' ) {
+            for (var i = 0 ; i < list.length ; i++){
+                if (list[i]._id === value) {
+                    position = i;
+                    break;
+                }
+            }
+        }
+        return position;
+    };
+
+    // ----------------------
 
 // from the top of the file
 }
