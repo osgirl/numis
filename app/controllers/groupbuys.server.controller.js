@@ -198,7 +198,7 @@ exports.update = function(req, res) {
 		}
 		if (typeof req.body.currencies.provider !== 'undefined' && typeof req.body.currencies.provider._id !== 'undefined') {
 			req.body.currencies.provider = req.body.currencies.provider._id;
-	}
+		}
 	}
 
 	groupbuy = _.extend(groupbuy , req.body);
@@ -266,7 +266,7 @@ exports.list = function(req, res) {
 				],
 				status: {$ne: 'deleted'}
 		};
-		sort  = req.query.sort || 'title';
+		sort = req.query.sort || 'title';
 
 	} else {
 		// Invalid
@@ -518,8 +518,10 @@ exports.groupbuyByID = function(req, res, next, id) {
 		.populate('currencies.local', 'id name code symbol')
 		.populate('currencies.provider', 'id name code symbol')
 		.exec(function(err, groupbuy) {
-			if (err) return next(err);
-			if (! groupbuy) return next(new Error('Failed to load Groupbuy ' + id));
+			if (err) return res.status(400).send( errorHandler.prepareErrorResponse(err) );
+			if (!groupbuy)
+				return res.status(400).send( errorHandler.prepareErrorResponse( new Error('Failed to load Groupbuy ' + req.groupbuy.id) ));
+
 			req.groupbuy = groupbuy;
 			next();
 		});
