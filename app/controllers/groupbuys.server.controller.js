@@ -189,11 +189,13 @@ exports.update = function(req, res) {
 	delete req.body.members;
 	delete req.body.user;
 
-	if (typeof groupbuy.currencies.local._id !== 'undefined') {
-		groupbuy.currencies.local = groupbuy.currencies.local._id;
+	if (typeof req.body.currencies !== 'undefined') {
+		if (typeof req.body.currencies.local !== 'undefined' && typeof req.body.currencies.local._id !== 'undefined') {
+			req.body.currencies.local = req.body.currencies.local._id;
+		}
+		if (typeof req.body.currencies.provider !== 'undefined' && typeof req.body.currencies.provider._id !== 'undefined') {
+			req.body.currencies.provider = req.body.currencies.provider._id;
 	}
-	if (typeof groupbuy.currencies.provider._id !== 'undefined') {
-		groupbuy.currencies.provider = groupbuy.currencies.provider._id;
 	}
 
 	groupbuy = _.extend(groupbuy , req.body);
