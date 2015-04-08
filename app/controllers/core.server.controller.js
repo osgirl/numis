@@ -110,7 +110,7 @@ exports.prepareQueryParams = function(req, res, next) {
 			var query = {};
 
 			_.forEach(req.query.filter, function(value, key) {
-				query[key] = new RegExp(value, 'i');
+				query[key] = value.toLowerCase();
 			});
 			req.query.filter = query;
 
