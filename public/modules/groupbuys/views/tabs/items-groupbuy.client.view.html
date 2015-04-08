@@ -8,103 +8,135 @@
             </div>
             <!-- END error area-->
 
-            <!-- Vista de participante -->
-            <div data-ng-show="(userRole !== 'manager')">
-                <form data-ng-submit="joinGroupbuy()" name="memberManagerForm" novalidate>
+            <!-- Divisas -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{'groupbuys.Groupbuy_currency' | translate}}</h3>
+                </div>
+                <div class="panel-body">
+                    <!-- Vista de participante -->
+                    <div data-ng-show="(userRole !== 'manager')">
+                        <p>
+                            {{'groupbuys.Currency_note_1' | translate}} {{groupbuy.currencies.provider.name}}{{'groupbuys.Currency_note_2' | translate}}.<br />
+                            {{'groupbuys.Exchange_rate' | translate}}: {{groupbuy.currencies.exchangeRate}} {{groupbuy.currencies.provider.symbol}} = 1€<br />
+                            {{'groupbuys.Multiplier' | translate}}: {{groupbuy.currencies.multiplier}}<br />
+                            <strong>{{'groupbuys.Note' | translate}}:</strong> {{'groupbuys.Multiplier_note' | translate}}
+                        </p>
+                    </div>
+                    <!-- FIN Vista de participante -->
+                    <!-- Vista de gestor -->
+                    <div data-ng-show="(userRole == 'manager')">
+                        <p>
+                            {{'groupbuys.Currency_note_manager' | translate}}.
+                        </p>
+                        <form data-ng-submit="changeCurrency()" novalidate>
 
-                    <!-- Items -->
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Items</h3>
-                        </div>
-                        <div class="panel-body">
+                            {{'groupbuys.Currency_name' | translate}}:
+                            <select ng-options="currency.name for currency in groupbuy.currenciesList track by currency._id"
+                                    ng-model="groupbuy.currencies.provider" novalidate >
+                            </select><br />
+                            {{'groupbuys.Exchange_rate' | translate}}: <input type="text" ng-model="groupbuy.currencies.exchangeRate" novalidate />  {{groupbuy.currencies.provider.symbol}} = 1€<br />
+                            {{'groupbuys.Multiplier' | translate}}: <input type="text" ng-model="groupbuy.currencies.multiplier" novalidate /><br />
+                            <strong>{{'groupbuys.Note' | translate}}:</strong> {{'groupbuys.Remember_note_currencies_manager' | translate}}.
+                            <br />
+                            <input type="submit" value="{{'groupbuys.Update' | translate}}" class="btn btn-default">
+                        </form>
+                    </div>
+                    <!-- FIN Vista de gestor -->
+                </div>
+            </div>
+            <!-- FIN divisas -->
+
+            <!-- Items -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{'groupbuys.Items' | translate}}</h3>
+                </div>
+                <div class="panel-body">
+
+                    <!-- Vista de participante -->
+                    <div data-ng-show="(userRole !== 'manager')">
+                        <form data-ng-submit="joinGroupbuy()" name="memberManagerForm" novalidate>
 
                             <div data-ng-repeat="item in groupbuy.items track by $index">
-                                <img ng-src="{{item._links.image.href}}?size=sm" /><br />
+                                <img ng-src="{{item._links.image.href}}?size=sm"  fb-src="['/modules/items/img/no-image-sm.jpg']" /><br />
                                 <strong>{{item.title}}</strong><br />
-                                <span>{{item.description}}</span><br />
-                                Precio: <span>{{item.price}} {{item.currency.symbol}}</span><br />
+                                <span data-ng-bind-html="item.description"></span></span><br />
+                                {{'groupbuys.Price' | translate}}: <span>{{item.price}} {{item.currency.symbol}}</span><br />
+                                {{'groupbuys.Max_Quantity' | translate}}: <span>{{item.maxQuantity}}</span><br />
                                 <div data-ng-hide="$last">
                                     <hr />
                                 </div>
                             </div>
 
-                        </div>
+                        </form>
                     </div>
-                    <!-- FIN Items-->
+                    <!-- FIN Vista de participante -->
 
-                </form>
+
+                    <!-- Vista de gestor -->
+                    <div data-ng-show="(userRole == 'manager')">
+                        <form data-ng-submit="joinGroupbuy()" name="memberManagerForm" novalidate>
+
+
+                            <div data-ng-repeat="item in groupbuy.items track by $index">
+                                <img ng-src="{{item._links.image.href}}?size=sm"  fb-src="['/modules/items/img/no-image-sm.jpg']" /><br />
+                                <strong>{{item.title}}</strong><br />
+                                <span data-ng-bind-html="item.description"></span></span><br />
+                                {{'groupbuys.Price' | translate}}: <span>{{item.price}} {{groupbuy.currencies.provider.symbol}}</span><br />
+                                {{'groupbuys.Max_Quantity' | translate}}: <span>{{item.maxQuantity}}</span><br />
+                                <button type="button" class="btn btn-danger" aria-label="" data-ng-click="deleteItem(item);">
+                                    <span class="glyphicon glyphicon-minus-sign" aria-hidden="true"></span>
+                                </button>
+                                <button type="button" class="btn btn-warning" aria-label="" data-ng-click="editItem(item);">
+                                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                </button>
+                                <div data-ng-hide="$last">
+                                    <hr />
+                                </div>
+                            </div>
+
+                            <br />
+                            <!-- añadir items -->
+                            <hr>
+                            <a role="button" data-ng-show="addNewItemHide" class="btn btn-info" ng-click="addNewItemToogle()">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true">{{'groupbuys.Add_New_Item' | translate}}</span>
+                            </a>
+                            <div data-ng-hide="addNewItemHide">
+                                <form>
+                                        <strong data-ng-show="(groupbuy.items.newItem._id == '')"  >{{'groupbuys.Add_New_Item_To_The_Groupbuy' | translate}}:</strong><br />
+                                        <strong data-ng-show="(groupbuy.items.newItem._id !== '')" >{{'groupbuys.Edit_Item' | translate}}:</strong><br />
+
+                                        <input type="hidden" data-ng-model="groupbuy.items.newItem._id"><br />
+                                        {{'groupbuys.Name' | translate}}:
+                                        <input type="text" data-ng-model="groupbuy.items.newItem.title"><br />
+                                        {{'groupbuys.Max_Quantity' | translate}} ({{'groupbuys.0_No_Limit' | translate}})
+                                        <input type="text" data-ng-model="groupbuy.items.newItem.maxQuantity"><br />
+                                        {{'groupbuys.Price_In_Groupbuys_Currency' | translate}}:
+                                        <input type="text" data-ng-model="groupbuy.items.newItem.price"><br />
+                                        {{'groupbuys.Description' | translate}}:<br />
+                                        <textarea id="item_description" name="item_description" class="form-control" data-ng-model="groupbuy.items.newItem.description" rows="5" placeholder="descripcion" ui-tinymce="tinymceOptions"></textarea>
+
+                                        {{'groupbuys.Image' | translate}}:
+                                        <br />
+                                        <a role="button" class="btn btn-success" ng-click="saveItem()">
+                                            <span class="glyphicon glyphicon-ok" aria-hidden="true">{{'groupbuys.Save' | translate}}</span>
+                                        </a>
+                                        <a role="button" class="btn btn-danger" ng-click="cancelEdit()">
+                                            <span class="glyphicon glyphicon-remove" aria-hidden="true">{{'groupbuys.Cancel' | translate}}</span>
+                                        </a>
+
+                                </form>
+                            </div>
+                            <!-- FIN añadir items -->
+
+                        </form>
+                    </div>
+                    <!-- FIN Vista de gestor -->
+
+                </div>
             </div>
-            <!-- FIN Vista de participante -->
-
-
-            <!-- Vista de gestor -->
-            <div data-ng-show="(userRole == 'manager')">
-                <form data-ng-submit="joinGroupbuy()" name="memberManagerForm" novalidate>
-
-                    <!-- Divisas -->
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Divisa de la compra</h3>
-                        </div>
-                        <div class="panel-body">
-                            <p>
-                                En caso de ser una compra en una divisa distinta al Euro, rellenar esta parte y el precio en divisa de los items.
-                            </p>
-                            <form>
-                                Nombre de la divisa: <input type="text"><br />
-                                Tasa de cambio: <input type="text"><br />
-                                Multiplicador: <input type="text"><br />
-
-                                <strong>NOTA: </strong> Recordar incluir los gastos de envio desde los proveedores hasta los gestores en el precio de los items, o en la pestaña de pagos.
-                                <br />
-                                <input type="submit" value="{{'groupbuys.Update' | translate}}" class="btn btn-default">
-                            </form>
-
-                        </div>
-                    </div>
-                    <!-- FIN divisas -->
-
-                    <!-- Items -->
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Items</h3>
-                        </div>
-                        <div class="panel-body">
-                            <form>
-                                Nombre<br />
-
-                                Cantidad maxima (0 = sin límite)<br />
-
-                                Precio Euro<br />
-
-                                Precio Divisa<br />
-
-                                Url Info<br />
-
-                                Descripción<br />
-
-                                Imagen<br />
-
-                                <input type="submit" value="{{'groupbuys.Update' | translate}}" class="btn btn-default">
-                            </form>
-
-
-                        </div>
-                    </div>
-                    <!-- FIN Items-->
-
-                </form>
-
-
-
-
-
-            </div>
-            <!-- FIN Vista de gestor -->
-
-          </div>
+        <!--  FIN Panel de la pestaña -->
+        </div>
     </div>
-<!--  FIN Panel de la pestaña -->
-
 </section>

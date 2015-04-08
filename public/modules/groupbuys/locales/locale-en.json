@@ -53,6 +53,26 @@
         "Payments_Status": "Payments status",
         "Shipments_Status": "Shipments status",
         "Information_Not_Available": "Information not available",
-        "Last_manager_cannot_be_deleted": "Last manager can not be deleted"
+        "Last_manager_cannot_be_deleted": "Last manager can not be deleted",
+        "Groupbuy_currency": "Groupbuy's currency",
+        "Currency_note_1": "As the prices are in",
+        "Currency_note_2": ", the following exchange rate and multiplier applies",
+        "Currency_note_manager": "In case of a groupbuy with currency different than Euro, fill this area and the currency price in the items",
+        "Currency_name": "Name of the currency",
+        "Exchange_rate": "Exchange rate",
+        "Multiplier": "Multiplier",
+        "Note": "Note",
+        "Multiplier_note": "The multiplier is used to avoid currency fluctuations, in order to avoid second payments",
+        "Remember_note_currencies_manager": "Remember to add the shippment costs from the providers to the managers in the item price or in payment tab",
+        "Price": "Price",
+        "Max_Quantity": "Max quantity",
+        "Add_New_Item": "Add new item",
+        "Add_New_Item_To_The_Groupbuy": "Add new item to the groupbuy",
+        "Edit_Item": "Editar item",
+        "0_No_Limit": "0 = no limit",
+        "Price_In_Groupbuys_Currency": "Price in groupbuy's currency",
+        "Image": "Image",
+        "Save": "Save",
+        "Cancel": "Cancelar"
     }
 }
