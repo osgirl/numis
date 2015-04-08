@@ -173,6 +173,9 @@ exports.create = function(req, res) {
  * Show the current Groupbuy
  */
 exports.read = function(req, res) {
+	if (req.groupbuy.status === 'deleted')
+		return res.status(400).send( errorHandler.prepareErrorResponse( new Error('Failed to load Groupbuy ' + req.groupbuy.id) ));
+
 	res.jsonp( formattingGroupbuy(req.groupbuy, req) );
 };
 
@@ -223,7 +226,8 @@ exports.update = function(req, res) {
 exports.delete = function(req, res) {
 	var groupbuy = req.groupbuy;
 
-	groupbuy.remove(function(err) {
+	// Soft / logical delete
+	groupbuy.update({status: 'deleted'}, function(err) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		} else {
@@ -259,7 +263,9 @@ exports.list = function(req, res) {
 		query = {$or: [
 				    { members:  req.profile._id },
 				    { managers: req.profile._id }
-				] };
+				],
+				status: {$ne: 'deleted'}
+		};
 		sort  = req.query.sort || 'title';
 
 	} else {
