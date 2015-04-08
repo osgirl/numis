@@ -584,11 +584,6 @@ exports.stateParam = function(req, res, next, state) {
  */
 exports.hasAuthorization = function(roles) {
 	return function(req, res, next) {
-		return next();
-
-	/*
-	console.log(req.groupbuy);
-
 		if (_.intersection(req.groupbuy.getRoles(req.user), roles).length) {
 			return next();
 		} else {
@@ -597,7 +592,6 @@ exports.hasAuthorization = function(roles) {
 				message: 'User is not authorized'
 			});
 		}
-		*/
 	};
 };
 
