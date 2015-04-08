@@ -73,7 +73,9 @@
                         <div data-ng-repeat="updateElement in groupbuy.updates.slice().reverse() track by $index">
                             <span data-ng-bind-html="updateElement.textInfo"></span><br>
                             <span>{{'groupbuys.Written_on' | translate}}: {{updateElement.publishDate | date : 'd/M/yyyy H:mm:ss'}}</span><br>
-                            <hr>
+                            <div data-ng-hide="$last">
+                                <hr />
+                            </div>
                         </div>
                     </div>
 
