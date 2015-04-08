@@ -9,9 +9,10 @@ var mongoose 	 = require('mongoose'),
 	users 		 = require('./users.server.controller'),
 	_ 			 = require('lodash'),
 	User 		 = mongoose.model('User'),
-	Groupbuy 	 = mongoose.model('Groupbuy');
-
-
+	Groupbuy 	 = mongoose.model('Groupbuy'),
+	allStates    = ['new', 'published', 'acceptance', 'payments', 'paid', 'shipments', 'closed', 'cancelled', 'deleted'],
+	cicleOfLife  = _.dropRight(allStates, 2), // All states except cancelled and deleted
+	goToStates   = _.dropRight(_.drop(allStates)); // All states except new and deleted
 
 /**
  * Formatting groupbuy details to send
@@ -76,8 +77,7 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, re
 		if (groupbuy.status === 'cancelled' || groupbuy.status === 'deleted'  || groupbuy.status === 'closed') {
 			result.nextState = groupbuy.status;
 		} else {
-			var cicleOfLife = ['new', 'published', 'payments', 'paid', 'shipments', 'closed'],
-				pos = cicleOfLife.indexOf(groupbuy.status);
+			var pos = cicleOfLife.indexOf(groupbuy.status);
 
 			if (pos > -1 && pos < cicleOfLife.length -1) {
 				result.nextState = cicleOfLife[pos+1];
@@ -236,11 +236,18 @@ exports.delete = function(req, res) {
  * List of Groupbuys
  */
 exports.list = function(req, res) {
-	var query  = req.query.filter || null,
+	var query  = req.query.filter || {},
 		sort,
 		limit  = req.query.limit || 25,
 		page   = req.query.page || 1,
 		fields = req.query.fields || '_id title name description status members manager currencies user';
+
+	// Filter deleted groupbuys
+	if (!query || typeof query.status === 'undefined') {
+		query.status = { $ne: 'deleted' };
+	} else {
+		query = { $and: [query, {status: {$ne: 'deleted'}} ] };
+	}
 
 	// Add query filters and default sorting
 	if (!req.profile && typeof req.profile === 'undefined') {
@@ -268,6 +275,31 @@ exports.list = function(req, res) {
 		}
 	}, { columns: fields, populate: ['user', 'currencies.local', 'currencies.provider'], sortBy : sort });
 };
+
+/**
+ * Change the state in a Groupbuy
+ */
+exports.changeState = function(req, res) {
+	var groupbuy = req.groupbuy;
+
+	groupbuy.update({status: req.state}, function(err) {
+		if (err) {
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+		}
+		// Populate currencies
+		groupbuy.populate([
+				{path: 'currencies.local', select: 'id name code symbol'},
+				{path: 'currencies.provider', select: 'id name code symbol'}
+		], function(err) {
+			if (err)
+				return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+
+			groupbuy.status = req.state;
+			res.jsonp( formattingGroupbuy(groupbuy, req) );
+		});
+	});
+};
+
 
 /**
  * Add a member to an existing groupbuy
@@ -487,6 +519,59 @@ exports.groupbuyByID = function(req, res, next, id) {
 			req.groupbuy = groupbuy;
 			next();
 		});
+};
+
+exports.stateParam = function(req, res, next, state) {
+	// Check the state param is valid
+	if (!state || goToStates.indexOf(state) === -1) {
+		return res.status(400).send({
+			name: 'ValidationError',
+			message: 'Invalid state ' + state
+		});
+	}
+
+	// If actual state is cancelled, deleted or closed the user must be admin
+	if (['cancelled', 'deleted', 'closed'].indexOf(req.groupbuy.status) !== -1) {
+		if(!req.user.isAdmin()) {
+			return res.status(403).send({
+				name: 'NotAuthorized',
+				message: 'User is not authorized'
+			});
+		}
+	} else {
+		if (state === 'cancelled') {
+			// To change to cancelled state, the actual state mustn't be new, published nor closed.
+			if (['new', 'published', 'closed'].indexOf(req.groupbuy.status) !== -1) {
+				return res.status(400).send({
+					name: 'ValidationError',
+					message: 'Invalid change state. The groupbuy isn\'t suitable to be cancelled.'
+				});
+			}
+
+		} else if (state === 'deleted') {
+			// To change to deleted state, the actual state must be be new or published.
+			if (['new', 'published'].indexOf(req.groupbuy.status) === -1) {
+				return res.status(400).send({
+					name: 'ValidationError',
+					message: 'Invalid change state. The groupbuy isn\'t suitable to be deleted.'
+				});
+			}
+		} else {
+			// Normal change state, the new state must be the next in the groupbuy cicle of life.
+			var actualPos = allStates.indexOf(req.groupbuy.status),
+				newPos    = allStates.indexOf(state);
+
+			if (actualPos === -1 || newPos === -1 || newPos - actualPos !== 1) {
+				return res.status(400).send({
+					name: 'ValidationError',
+					message: 'Invalid change state. Valid destination state is ' + allStates[actualPos+1]
+				});
+			}
+		}
+	}
+
+	req.state = state;
+	next();
 };
 
 

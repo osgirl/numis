@@ -15,6 +15,10 @@ module.exports = function(app) {
 		.put(users.requiresLogin, groupbuys.hasAuthorization(['manager']), groupbuys.update)
 		.delete(users.requiresLogin, users.hasAuthorization(['admin']), groupbuys.delete);
 
+	// Change state of a groupbuy
+	app.route('/api/v1/groupbuys/:groupbuyId/go-to/:state')
+		.post(users.requiresLogin, groupbuys.hasAuthorization(['manager']), groupbuys.changeState);
+
 	// Groupbuy Members Routes
 	app.route('/api/v1/groupbuys/:groupbuyId/members')
 		.get(users.requiresLogin, groupbuys.hasVisibility('members'), core.prepareQueryParams, groupbuys.getMembersList)
@@ -40,5 +44,6 @@ module.exports = function(app) {
 	// Finish by binding the Item middleware
 	app.param('userId', users.userByID);
 	app.param('groupbuyId', groupbuys.groupbuyByID);
+	app.param('state', groupbuys.stateParam);
 
 };
