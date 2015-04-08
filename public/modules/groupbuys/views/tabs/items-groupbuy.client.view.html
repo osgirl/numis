@@ -8,9 +8,44 @@
             </div>
             <!-- END error area-->
 
-            <!-- Vista de participante -->
-            <div data-ng-show="(userRole !== 'manager')">
-                <form data-ng-submit="joinGroupbuy()" name="memberManagerForm" novalidate>
+            <!-- Divisas -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{'groupbuys.Groupbuy_currency' | translate}}</h3>
+                </div>
+                <div class="panel-body">
+                    <!-- Vista de participante -->
+                    <div data-ng-show="(userRole !== 'manager')">
+                        <p>
+                            {{'groupbuys.Currency_note_1' | translate}} {{groupbuy.currencies.provider.name}}{{'groupbuys.Currency_note_2' | translate}}.<br />
+                            {{'groupbuys.Exchange_rate' | translate}}: {{groupbuy.currencies.exchangeRate}} {{groupbuy.currencies.provider.symbol}} = 1€<br />
+                            {{'groupbuys.Multiplier' | translate}}: {{groupbuy.currencies.multiplier}}<br />
+                            <strong>{{'groupbuys.Note' | translate}}:</strong> {{'groupbuys.Multiplier_note' | translate}}
+                        </p>
+                    </div>
+                    <!-- FIN Vista de participante -->
+                    <!-- Vista de gestor -->
+                    <div data-ng-show="(userRole == 'manager')">
+                        <p>
+                            {{'groupbuys.Currency_note_manager' | translate}}.
+                        </p>
+                        <form data-ng-submit="changeCurrency()" novalidate>
+
+                            {{'groupbuys.Currency_name' | translate}}:
+                            <select ng-options="currency.name for currency in groupbuy.currenciesList track by currency._id"
+                                    ng-model="groupbuy.currencies.provider" novalidate >
+                            </select><br />
+                            {{'groupbuys.Exchange_rate' | translate}}: <input type="text" ng-model="groupbuy.currencies.exchangeRate" novalidate />  {{groupbuy.currencies.provider.symbol}} = 1€<br />
+                            {{'groupbuys.Multiplier' | translate}}: <input type="text" ng-model="groupbuy.currencies.multiplier" novalidate /><br />
+                            <strong>{{'groupbuys.Note' | translate}}:</strong> {{'groupbuys.Remember_note_currencies_manager' | translate}}.
+                            <br />
+                            <input type="submit" value="{{'groupbuys.Update' | translate}}" class="btn btn-default">
+                        </form>
+                    </div>
+                    <!-- FIN Vista de gestor -->
+                </div>
+            </div>
+            <!-- FIN divisas -->
 
                     <!-- Items -->
                     <div class="panel panel-default">

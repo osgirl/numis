@@ -17,7 +17,19 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
     */
     $scope.loadItemsData = function() {
 
-        // Tasa de cambio
+        // Otras variables
+        $scope.addNewItemHide = true;
+
+        // Currencies
+        Restangular.all('currencies').getList().then(function(data) {
+
+                $scope.groupbuy.currenciesList = data;
+
+        }, function errorCallback() {
+            console.log('error aqui');
+            $scope.error = $translate.instant('core.Error_connecting_server');
+        });
+
 
         // Items de la compra
         Restangular.one('groupbuys',$stateParams.groupbuyId).all('items').getList().then(function(data) {
@@ -32,7 +44,20 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
 
     };
 
-    // ----------------------
+    // ----------------
+
+    /*
+    @ngdoc method
+    * @name groupbuys.controller:GroupbuysTabItemsController.changeCurrency
+    * @methodOf groupbuys.controller:GroupbuysTabItemsController
+
+    @description
+    * Saves the currency of a groupbuy.
+    */
+    $scope.changeCurrency = function() {
+        $scope.update();
+    };
+
 
 //        if ($scope.userRole === 'manager'){
 
