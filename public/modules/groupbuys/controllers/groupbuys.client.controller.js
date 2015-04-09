@@ -154,24 +154,11 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 		groupbuyData.then(function(data) {
 			$scope.groupbuy = data;
-			/*
-			// Load members
-			console.log('load items');
-			var membersData = Restangular.all('groupbuys',$stateParams.groupbuyId,'members').getList();
-
-			membersData.then(function(data) {
-
-				// Cargar los members
-
-			}
-
-			*/
 
 			$scope.userRole = $scope.userRole();
 			$scope.loadTabs();
 
-			// Create the visibility options list
-			$scope.visibility = [];
+			$scope.loadConfig();
 
 		}, function errorCallback() {
 			// TODO translate this key and don't use alert
@@ -406,6 +393,87 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
     };
 
     // ----------------------
+
+    /**
+    * @ngdoc method
+    * @name groupbuys.controller:GroupbuysController.loadConfig
+    * @methodOf groupbuys.controller:GroupbuysController
+    *
+    * @description
+    * Loads the visibility options of a Groupbuy.
+    */
+    $scope.loadConfig = function() {
+
+		// Create the visibility options list
+		$scope.visibility = [];
+		
+        // members
+        $scope.visibility.members_public = false;
+        $scope.visibility.members_restricted = false;
+        $scope.visibility.members_private = false;
+
+        switch( $scope.groupbuy.visibility.members ) {
+            case 'public':
+                $scope.visibility.members_public = true;
+                break;
+            case 'restricted':
+                $scope.visibility.members_restricted = true;
+                break;
+            case 'private':
+                $scope.visibility.members_private = true;
+                break;
+            default:
+        }
+
+        // itemsByMember
+        $scope.visibility.itemsByMember_public = false;
+        $scope.visibility.itemsByMember_restricted = false;
+        $scope.visibility.itemsByMember_private = false;
+
+        switch( $scope.groupbuy.visibility.itemsByMember ) {
+            case 'public':
+                $scope.visibility.itemsByMember_public = true;
+                break;
+            case 'restricted':
+                $scope.visibility.itemsByMember_restricted = true;
+                break;
+            case 'private':
+                $scope.visibility.itemsByMember_private = true;
+                break;
+            default:
+        }
+
+        // paymentStatus
+        $scope.visibility.paymentStatus_restricted = false;
+        $scope.visibility.paymentStatus_private = false;
+
+        switch( $scope.groupbuy.visibility.paymentStatus ) {
+            case 'restricted':
+                $scope.visibility.paymentStatus_restricted = true;
+                break;
+            case 'private':
+                $scope.visibility.paymentStatus_private = true;
+                break;
+            default:
+        }
+
+        // shipmentsState
+        $scope.visibility.shipmentsState_restricted = false;
+        $scope.visibility.shipmentsState_private = false;
+
+        switch( $scope.groupbuy.visibility.shipmentsState ) {
+            case 'restricted':
+                $scope.visibility.shipmentsState_restricted = true;
+                break;
+            case 'private':
+                $scope.visibility.shipmentsState_private = true;
+                break;
+            default:
+        }
+    };
+
+	// ----------------------
+
 
 // from the top of the file
 }
