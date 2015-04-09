@@ -51,64 +51,73 @@ describe('Item CRUD tests', function() {
 
 	beforeEach(function(done) {
 		// Remove old previous data
-		Item.remove().exec();
-		Groupbuy.remove().exec();
-		User.remove().exec();
-
-		// Create user credentials
-		credentials = {
-			username: 'username1',
-			password: 'password1'
-		};
-
-		user1 = new User({
-			firstName: 'Full',
-			lastName: 'Name',
-			displayName: 'Full Name',
-			email: 'test@test.com',
-			username: credentials.username,
-			password: credentials.password,
-			provider: 'local'
-		});
-
-		// Save a user and 2 groupbuys to the test db
-		user1.save(function(err) {
+		Item.remove(function(err) {
 			if (err) console.error(err);
 
-			groupbuy1 = new Groupbuy({
-				title: 'Groupbuy A',
-				description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras semper suscipit velit, hendrerit fringilla purus mollis vitae. Praesent auctor non lectus ac consectetur. Maecenas quis consequat quam. Nullam sed feugiat neque. In hendrerit sagittis lacinia. Proin venenatis leo quis orci ultrices facilisis. Morbi rutrum augue vel est accumsan feugiat. Vestibulum interdum tincidunt metus in lobortis.<br/><br/>Integer blandit dui ut scelerisque iaculis. Aliquam fringilla pulvinar cursus. Sed porttitor laoreet nunc a ultrices. Ut ac gravida turpis. Proin a ipsum sed erat tempor ultrices in vitae sem. Quisque auctor ex ante, at semper magna rutrum at. Nunc non maximus metus, in rutrum ligula. Nullam accumsan at ante sed ornare. Suspendisse est sem, varius eu mi eu, bibendum finibus neque. Sed vehicula malesuada velit. Maecenas ut augue ligula. Cras blandit libero ut lobortis ornare. Cras varius varius vestibulum.<br/><br/>Nulla a hendrerit enim. Nunc consequat dolor nec orci aliquet, a tempor dolor consequat. Donec elementum nisi lacus, ut cursus nibh facilisis vel. Mauris eget sapien porttitor, elementum dui condimentum, luctus lacus. Aenean quis volutpat lectus. Aenean porta iaculis egestas. Aenean sollicitudin tincidunt interdum.<br/><br/>In maximus nunc sit amet felis molestie, ut imperdiet nunc tincidunt. Etiam in magna quis velit commodo euismod a at elit. Mauris tristique elementum lobortis. Phasellus posuere sollicitudin justo, et rutrum urna varius at. Vivamus facilisis nulla sem, pellentesque maximus lorem bibendum sed. Phasellus aliquet leo a nibh tincidunt ultrices. Nulla a venenatis tortor, accumsan egestas dolor.<br/><br/>Fusce vestibulum lacinia neque quis imperdiet. Curabitur ultricies diam eu tellus maximus vestibulum. Curabitur bibendum turpis vitae lorem fermentum aliquet. Morbi vel odio neque. Cras et dignissim massa, nec aliquam leo. In egestas ut dui eu sodales. In vel sagittis urna, ullamcorper imperdiet ligula. Sed nec malesuada augue, quis facilisis sapien.',
-				manager: [user1.id],
-				member: [user1.id],
-				user: user1.id
-			});
-
-			groupbuy2 = new Groupbuy({
-				title: 'Groupbuy B',
-				description: 'Buscar información en <a href="https://www.google.es/">Google</a>',
-				manager: [user1.id],
-				member: [user1.id],
-				user: user1.id
-			});
-
-			groupbuy1.save(function(err) {
+			Groupbuy.remove(function(err) {
 				if (err) console.error(err);
 
-				groupbuy2.save(function(err) {
+				User.remove(function(err) {
 					if (err) console.error(err);
 
-					// Create two Items to Groupbuy 1
-					item1 = {
-						title: 'Item A1',
-						description: 'Description A1',
-						price: 22.34,
-						maxQuantity: 10,
-						currency: currency.id,
-						user: user1._id
+					// Create user credentials
+					credentials = {
+						username: 'username1',
+						password: 'password1'
 					};
 
-					// Call the assertion callback
-					done();
+					user1 = new User({
+						firstName: 'Full',
+						lastName: 'Name',
+						displayName: 'Full Name',
+						email: 'test@test.com',
+						username: credentials.username,
+						password: credentials.password,
+						provider: 'local',
+						roles: ['user']
+					});
+
+					// Save a user and 2 groupbuys to the test db
+					user1.save(function(err) {
+						if (err) console.error(err);
+
+						groupbuy1 = new Groupbuy({
+							title: 'Groupbuy A',
+							description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras semper suscipit velit, hendrerit fringilla purus mollis vitae. Praesent auctor non lectus ac consectetur. Maecenas quis consequat quam. Nullam sed feugiat neque. In hendrerit sagittis lacinia. Proin venenatis leo quis orci ultrices facilisis. Morbi rutrum augue vel est accumsan feugiat. Vestibulum interdum tincidunt metus in lobortis.<br/><br/>Integer blandit dui ut scelerisque iaculis. Aliquam fringilla pulvinar cursus. Sed porttitor laoreet nunc a ultrices. Ut ac gravida turpis. Proin a ipsum sed erat tempor ultrices in vitae sem. Quisque auctor ex ante, at semper magna rutrum at. Nunc non maximus metus, in rutrum ligula. Nullam accumsan at ante sed ornare. Suspendisse est sem, varius eu mi eu, bibendum finibus neque. Sed vehicula malesuada velit. Maecenas ut augue ligula. Cras blandit libero ut lobortis ornare. Cras varius varius vestibulum.<br/><br/>Nulla a hendrerit enim. Nunc consequat dolor nec orci aliquet, a tempor dolor consequat. Donec elementum nisi lacus, ut cursus nibh facilisis vel. Mauris eget sapien porttitor, elementum dui condimentum, luctus lacus. Aenean quis volutpat lectus. Aenean porta iaculis egestas. Aenean sollicitudin tincidunt interdum.<br/><br/>In maximus nunc sit amet felis molestie, ut imperdiet nunc tincidunt. Etiam in magna quis velit commodo euismod a at elit. Mauris tristique elementum lobortis. Phasellus posuere sollicitudin justo, et rutrum urna varius at. Vivamus facilisis nulla sem, pellentesque maximus lorem bibendum sed. Phasellus aliquet leo a nibh tincidunt ultrices. Nulla a venenatis tortor, accumsan egestas dolor.<br/><br/>Fusce vestibulum lacinia neque quis imperdiet. Curabitur ultricies diam eu tellus maximus vestibulum. Curabitur bibendum turpis vitae lorem fermentum aliquet. Morbi vel odio neque. Cras et dignissim massa, nec aliquam leo. In egestas ut dui eu sodales. In vel sagittis urna, ullamcorper imperdiet ligula. Sed nec malesuada augue, quis facilisis sapien.',
+							managers: [user1.id],
+							members: [user1.id],
+							user: user1.id
+						});
+
+						groupbuy2 = new Groupbuy({
+							title: 'Groupbuy B',
+							description: 'Buscar información en <a href="https://www.google.es/">Google</a>',
+							managers: [user1.id],
+							members: [user1.id],
+							user: user1.id
+						});
+
+						groupbuy1.save(function(err) {
+							if (err) console.error(err);
+
+							groupbuy2.save(function(err) {
+								if (err) console.error(err);
+
+								// Create two Items to Groupbuy 1
+								item1 = {
+									title: 'Item A1',
+									description: 'Description A1',
+									price: 22.34,
+									maxQuantity: 10,
+									currency: currency.id,
+									user: user1._id
+								};
+
+								// Call the assertion callback
+								done();
+							});
+						});
+					});
 				});
 			});
 		});
@@ -132,7 +141,6 @@ describe('Item CRUD tests', function() {
 	 *              0 - Mongoose
 	 *              1 - REST API
 	 *              2 - Pagination, sorting and filtering
-	 *              3 - Permission
 	 *
 	 *          bb) Test number
 	 */
@@ -404,7 +412,7 @@ describe('Item CRUD tests', function() {
 		});
 	});
 
-	it('NU_P_G003_E109: should be able to get prices in local al provider currencies', function(done) {
+	it('NU_P_G003_E109: should be able to get prices in local and provider currencies', function(done) {
 		var yGroupbuy, yItem1, yItem2, yItem3, yItem4, yItem5, yItem6;
 
 		yGroupbuy = new Groupbuy({
@@ -580,6 +588,106 @@ describe('Item CRUD tests', function() {
 			});
 		});
 	});
+
+	it('NU_P_G003_E110: should be able to get a list of Items if signed in', function(done) {
+		// Create new Item model instance
+		var itemObj = new Item(item1);
+		itemObj.groupbuy = groupbuy1.id;
+
+		// Save the Item
+		itemObj.save(function(err) {
+			if (err) console.error(err);
+
+			agent.post('/api/v1/auth/signin')
+				.send(credentials)
+				.expect(200)
+				.end(function(signinErr, signinRes) {
+					// Handle signin error
+					if (signinErr) done(signinErr);
+
+					// Request Items
+					agent.get('/api/v1/groupbuys/' + itemObj.groupbuy + '/items')
+						.expect(200)
+						.end(function(itemsGetErr, itemsGetRes) {
+							if (itemsGetErr) done(itemsGetErr);
+
+							// Get Items list
+							var items = itemsGetRes.body._embedded.items;
+
+							// Set assertions
+							//(itemsGetRes.body).should.not.be.empty;
+							(itemsGetRes.body.numElems).should.match(1);
+							(itemsGetRes.body.totalElems).should.match(1);
+
+							items.should.be.an.Array.with.lengthOf(1);
+							(items[0].title).should.match(item1.title);
+							(items[0].description).should.match(item1.description);
+							(items[0].price).should.match(item1.price);
+							(items[0].currency._id).should.match(item1.currency);
+							(items[0].maxQuantity).should.match(item1.maxQuantity);
+							(items[0].available).should.match(item1.maxQuantity);
+
+							// Call the assertion callback
+							done();
+						});
+				});
+
+		});
+	});
+
+	it('NU_P_G003_E111: should not be able to get a single Item if signed in', function(done) {
+		// Create new Item model instance
+		var itemObj = new Item(item1);
+		itemObj.groupbuy = groupbuy1.id;
+
+		// Save the Item
+		itemObj.save(function(err) {
+			if (err) console.error(err);
+
+			agent.post('/api/v1/auth/signin')
+				.send(credentials)
+				.expect(200)
+				.end(function(signinErr, signinRes) {
+					// Handle signin error
+					if (signinErr) done(signinErr);
+
+					// Request Items
+					agent.get('/api/v1/groupbuys/' + itemObj.groupbuy + '/items')
+						.expect(200)
+						.end(function(itemsGetErr, itemsGetRes) {
+							if (itemsGetErr) done(itemsGetErr);
+
+							// Get Items list
+							var items = itemsGetRes.body._embedded.items;
+
+							// Set assertions
+							items.should.be.an.Array.with.lengthOf(1);
+							items[0].should.have.propertyByPath('_links', 'self', 'href');
+
+							agent.get(items[0]._links.self.href)
+								.expect(200)
+								.end(function(itemGetErr, itemGetRes) {
+									if (itemGetErr) done(itemGetErr);
+
+									// Set assertion
+									(itemGetRes.body).should.have.propertyByPath('_links', 'self', 'href');
+									(itemGetRes.body).should.have.propertyByPath('_links', 'image', 'href');
+
+									(itemGetRes.body.title).should.match(item1.title);
+									(itemGetRes.body.description).should.match(item1.description);
+									(itemGetRes.body.price).should.match(item1.price);
+									(itemGetRes.body.currency._id).should.match(item1.currency);
+									(itemGetRes.body.maxQuantity).should.match(item1.maxQuantity);
+									(itemGetRes.body.available).should.match(item1.maxQuantity);
+
+									// Call the assertion callback
+									done();
+								});
+						});
+				});
+		});
+	});
+
 
 	afterEach(function(done) {
 		agent.get('/api/v1/auth/signout')

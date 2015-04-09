@@ -183,7 +183,6 @@ describe('Item Pagination tests', function() {
 	 *              0 - Mongoose
 	 *              1 - REST API
 	 *              2 - Pagination, sorting and filtering
-	 *              3 - Permission
 	 *
 	 *          bb) Test number
 	 */
@@ -263,7 +262,7 @@ describe('Item Pagination tests', function() {
 
 				// Get the list of items
 				agent.get(itemsURL)
-					.query({ filter: {title: 'España'} })
+					.query({ filter: {title: '/España/'} })
 					.set('Accept', 'application/json')
 					.expect('Content-Type', /json/)
 					.expect(200)

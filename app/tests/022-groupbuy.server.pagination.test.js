@@ -63,8 +63,14 @@ describe('Groupbuy Pagination tests', function() {
 
 		// Remove old previous data
 		Groupbuy.remove(function(err) {
+			if (err) console.error(err);
+
 			User.remove(function(err) {
+				if (err) console.error(err);
+
 				Currency.remove(function(err) {
+					if (err) console.error(err);
+
 					// Save test data
 					currency.save(function(err) {
 						if (err) console.error(err);
@@ -151,7 +157,6 @@ describe('Groupbuy Pagination tests', function() {
 	 *              0 - Mongoose
 	 *              1 - REST API
 	 *              2 - Pagination, sorting and filtering
-	 *              3 - Permission
 	 *
 	 *          bb) Test number
 	 */
@@ -457,7 +462,7 @@ describe('Groupbuy Pagination tests', function() {
 
 				// Get a list of Groupbuys
 				agent.get('/api/v1/groupbuys')
-					.query({ filter: {title: 'su'}, sort: '-name' })
+					.query({ filter: {title: '/su/i'}, sort: '-name' })
 					.set('Accept', 'application/json')
 					.expect('Content-Type', /json/)
 					.expect(200)
@@ -474,7 +479,7 @@ describe('Groupbuy Pagination tests', function() {
 						(groupbuysGetRes.body).should.not.have.propertyByPath('_links', 'next');
 						(groupbuysGetRes.body).should.not.have.propertyByPath('_links', 'last');
 
-						(groupbuysGetRes.body._links.self.href).should.containEql('filter%5Btitle%5D=su').and.containEql('sort=-name');
+						(groupbuysGetRes.body._links.self.href).should.containEql('filter%5Btitle%5D=%2Fsu%2Fi').and.containEql('sort=-name');
 
 						(groupbuysGetRes.body._embedded.groupbuys).should.be.an.Array.with.lengthOf(2);
 
