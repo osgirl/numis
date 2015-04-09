@@ -6,6 +6,7 @@
 var mongoose     = require('mongoose'),
 	core         = require('./core.server.controller'),
 	errorHandler = require('./errors.server.controller'),
+	groupbuys    = require('./groupbuys.server.controller'),
 	_            = require('lodash'),
 	Order        = mongoose.model('Order');
 
@@ -272,10 +273,14 @@ exports.calculateSummary = function(req, res) {
  */
 exports.orderByID = function(req, res, next, id) {
 	Order.findById(id).populate('user', 'username').populate('groupbuy', 'title').exec(function(err, order) {
-		if (err) return next(err);
-		if (! order) return next(new Error('Failed to load Order ' + id));
-		req.order = order ;
-		next();
+		if (err) return res.status(400).send( errorHandler.prepareErrorResponse(err) );
+		if (!order)
+			return res.status(400).send( errorHandler.prepareErrorResponse( new Error('Failed to load Order ' + id) ));
+
+		req.order = order;
+
+		// Call Groupbuy middleware
+		groupbuys.groupbuyByID(req, res, next, order.groupbuy);
 	});
 };
 
