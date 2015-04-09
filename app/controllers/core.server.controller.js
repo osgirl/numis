@@ -110,8 +110,19 @@ exports.prepareQueryParams = function(req, res, next) {
 			var query = {};
 
 			_.forEach(req.query.filter, function(value, key) {
-				query[key] = value.toLowerCase();
+				if (typeof value === 'string') {
+					// Parse regular expresions
+					var match = value.match(new RegExp('^\/(.*?)\/([gimy]*)$'));
+					if (match !== null && match.length > 2) {
+						query[key] = new RegExp(match[1], match[2]);
+					} else {
+						query[key] = value;
+					}
+				} else {
+					query[key] = value;
+				}
 			});
+
 			req.query.filter = query;
 
 		} else {
