@@ -153,7 +153,7 @@ exports.create = function(req, res) {
  * Show the current Item
  */
 exports.read = function(req, res) {
-	res.item.getAvailability(function(err, available) {
+	req.item.getAvailability(function(err, available) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 		}
@@ -365,10 +365,10 @@ exports.itemByID = function(req, res, next, id) {
  * Item authorization middleware
  */
 exports.hasAuthorization = function(req, res, next) {
-	// FIXME: Set a item acces policies
+	// TODO: Set a item access policies
 	if (false && req.item.user.id !== req.user.id) {
 		return res.status(403).send({
-			name: 'Unauthorized',
+			name: 'NotAuthorized',
 			message: 'User is not authorized'
 		});
 	}

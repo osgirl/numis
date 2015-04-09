@@ -240,15 +240,15 @@ exports.delete = function(req, res) {
  * List of Groupbuys
  */
 exports.list = function(req, res) {
-	var query  = req.query.filter || {},
+	var query  = req.query.filter || null,
 		sort,
 		limit  = req.query.limit || 25,
 		page   = req.query.page || 1,
 		fields = req.query.fields || '_id title name description status members manager currencies user';
 
 	// Filter deleted groupbuys
-	if (!query || typeof query.status === 'undefined') {
-		query.status = { $ne: 'deleted' };
+	if (!query) {
+		query = { status: {$ne: 'deleted'} };
 	} else {
 		query = { $and: [query, {status: {$ne: 'deleted'}} ] };
 	}
@@ -375,6 +375,7 @@ exports.deleteMember = function(req, res) {
 				message: errorHandler.getErrorMessage(err)
 			});
 		}
+	}
 };
 
 /**
@@ -382,10 +383,13 @@ exports.deleteMember = function(req, res) {
  */
 exports.getMembersList = function(req, res) {
 	var query   = req.query.filter || null,
-		sort    = _.keys(req.query.sort) || 'username',
-		sortDir = _.values(req.query.sort)[0] || 1,
+		sort,
+		sortDir,
 		limit   = req.query.limit || 25,
 		page    = req.query.page || 1;
+
+	sort    = (req.query.sort && _.keys(req.query.sort).length > 0) ? _.keys(req.query.sort) : 'username';
+	sortDir = (req.query.sort && _.values(req.query.sort).length > 0) ? _.values(req.query.sort)[0] : 1;
 
 	Groupbuy.findById(req.groupbuy._id).populate('members', '_id name username avatar roles').exec(function(err, groupbuy) {
 		if (err) {
@@ -486,10 +490,13 @@ exports.deleteManager = function(req, res) {
  */
 exports.getManagersList = function(req, res) {
 	var query   = req.query.filter || null,
-		sort    = _.keys(req.query.sort) || 'username',
-		sortDir = _.values(req.query.sort)[0] || 1,
+		sort,
+		sortDir,
 		limit   = req.query.limit || 25,
 		page    = req.query.page || 1;
+
+	sort    = (req.query.sort && _.keys(req.query.sort).length > 0) ? _.keys(req.query.sort) : 'username';
+	sortDir = (req.query.sort && _.values(req.query.sort).length > 0) ? _.values(req.query.sort)[0] : 1;
 
 	Groupbuy.findById(req.groupbuy._id).populate('managers', '_id name username avatar roles').exec(function(err, groupbuy) {
 		if (err) {
@@ -531,7 +538,7 @@ exports.groupbuyByID = function(req, res, next, id) {
 		.exec(function(err, groupbuy) {
 			if (err) return res.status(400).send( errorHandler.prepareErrorResponse(err) );
 			if (!groupbuy)
-				return res.status(400).send( errorHandler.prepareErrorResponse( new Error('Failed to load Groupbuy ' + req.groupbuy.id) ));
+				return res.status(400).send( errorHandler.prepareErrorResponse( new Error('Failed to load Groupbuy ' + id) ));
 
 			req.groupbuy = groupbuy;
 			next();
