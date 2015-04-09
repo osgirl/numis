@@ -7,11 +7,11 @@ module.exports = function(app) {
 
 	// Groupbuys Routes
 	app.route('/api/v1/groupbuys')
-		.get(users.requiresLogin, core.prepareQueryParams, groupbuys.list)
-		.post(users.requiresLogin, groupbuys.create);
+		.get(users.requiresLogin, users.hasAuthorization(['user']), core.prepareQueryParams, groupbuys.list)
+		.post(users.requiresLogin, users.hasAuthorization(['user']), groupbuys.create);
 
 	app.route('/api/v1/groupbuys/:groupbuyId')
-		.get(users.requiresLogin, groupbuys.read)
+		.get(users.requiresLogin, users.hasAuthorization(['user']), groupbuys.read)
 		.put(users.requiresLogin, groupbuys.hasAuthorization(['manager']), groupbuys.update)
 		.delete(users.requiresLogin, users.hasAuthorization(['admin']), groupbuys.delete);
 
@@ -22,10 +22,10 @@ module.exports = function(app) {
 	// Groupbuy Members Routes
 	app.route('/api/v1/groupbuys/:groupbuyId/members')
 		.get(users.requiresLogin, groupbuys.hasVisibility('members'), core.prepareQueryParams, groupbuys.getMembersList)
-		.post(users.requiresLogin, groupbuys.addMember);
+		.post(users.requiresLogin, users.hasAuthorization(['user']), groupbuys.addMember);
 
 	app.route('/api/v1/groupbuys/:groupbuyId/members/:userId')
-		.delete(users.requiresLogin, groupbuys.hasAuthorization(['manager']), groupbuys.deleteMember);
+		.delete(users.requiresLogin, users.hasAuthorization(['user']), groupbuys.deleteMember);
 
 	// Groupbuy Managers Routes
 	app.route('/api/v1/groupbuys/:groupbuyId/managers')
@@ -38,7 +38,7 @@ module.exports = function(app) {
 
 	// List Groupbuys form specified user
 	app.route('/api/v1/users/:userId/groupbuys')
-		.get(users.requiresLogin, users.hasAuthorization(['self','admin']), core.prepareQueryParams, groupbuys.list);
+		.get(users.requiresLogin, users.hasAuthorization(['self', 'admin']), core.prepareQueryParams, groupbuys.list);
 
 
 	// Finish by binding the Item middleware

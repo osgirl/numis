@@ -25,7 +25,7 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, re
 		isMember  	 = (isAdmin || groupbuy.isMember(user._id) ),
 		isManager 	 = (isAdmin || groupbuy.isManager(user._id) ),
 		showUpdates  = !reduce && isMember,
-		showVisibilityInfo = !reduce && isManager,
+		showVisibilityInfo = !reduce,
 		showMembers  = !reduce && groupbuy.checkVisibility(user, 'members'),
 		showManagers = !reduce && groupbuy.checkVisibility(user, 'managers'),
 		result 	  	 = {},
@@ -315,22 +315,28 @@ exports.addMember = function(req, res) {
 		userId 	 = (req.body && req.body.userId && mongoose.Types.ObjectId.isValid(req.body.userId)) ? req.body.userId : undefined,
 		err      = null;
 
-	User.findById(userId, function(err, user) {
-		if (!err && !user) {
-			err = {message: 'You can not add the user as member. The user ID (' + userId + ') is not a valid.'};
-		} else {
-			groupbuy.addMember(userId, function(err) {
-				if (err) {
-					return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
-				} else {
-					res.status(204).end();
-				}
-			});
-		}
-		if (err) {
-			return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
-		}
-	});
+	// Check that the user add himself or have admin role
+	if (userId !== req.user.id && !req.user.isAdmin() ) {
+		return res.status(403).send({name: 'NotAuthorized', message: 'User is not authorized'});
+
+	} else {
+		User.findById(userId, function(err, user) {
+			if (!err && !user) {
+				err = {message: 'You can not add the user as member. The user ID (' + userId + ') is not a valid.'};
+			} else {
+				groupbuy.addMember(userId, function(err) {
+					if (err) {
+						return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
+					} else {
+						res.status(204).end();
+					}
+				});
+			}
+			if (err) {
+				return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
+			}
+		});
+	}
 };
 
 /**
@@ -342,28 +348,33 @@ exports.deleteMember = function(req, res) {
 		err      = null,
 		index;
 
-	// Check if user is a member of selected Groupbuy
-	if ( (index = groupbuy.members.indexOf(member._id)) !== -1) {
-		groupbuy.members.splice(index, 1);
+	// Check that the user add himself or have admin role
+	if (member.id !== req.user.id && !groupbuy.isManager(req.user._id) && !req.user.isAdmin() ) {
+		return res.status(403).send({name: 'NotAuthorized', message: 'User is not authorized'});
 
-		groupbuy.save(function(err) {
-			if (err) {
-				return res.status(400).send({
-					message: errorHandler.getErrorMessage(err)
-				});
-			} else {
-				res.status(204).end();
-			}
-		});
 	} else {
-		err = {message: 'You can not remove the user as member in this Groupbuy. The user is not member.'};
-	}
+		// Check if user is a member of selected Groupbuy
+		if ( (index = groupbuy.members.indexOf(member._id)) !== -1) {
+			groupbuy.members.splice(index, 1);
 
-	if (err) {
-		return res.status(400).send({
-			message: errorHandler.getErrorMessage(err)
-		});
-	}
+			groupbuy.save(function(err) {
+				if (err) {
+					return res.status(400).send({
+						message: errorHandler.getErrorMessage(err)
+					});
+				} else {
+					res.status(204).end();
+				}
+			});
+		} else {
+			err = {message: 'You can not remove the user as member in this Groupbuy. The user is not member.'};
+		}
+
+		if (err) {
+			return res.status(400).send({
+				message: errorHandler.getErrorMessage(err)
+			});
+		}
 };
 
 /**
