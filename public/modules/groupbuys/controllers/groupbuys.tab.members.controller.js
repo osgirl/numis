@@ -1,7 +1,7 @@
 'use strict';
 
-// Buyers tab controller
-angular.module('groupbuys').controller('GroupbuysTabBuyersController', ['$scope', 'Restangular', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys',
+// Members tab controller
+angular.module('groupbuys').controller('GroupbuysTabMembersController', ['$scope', 'Restangular', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys',
   function($scope, Restangular, $stateParams, $location, $translate, Authentication, Groupbuys) {
     $scope.authentication = Authentication;
 
@@ -10,8 +10,8 @@ angular.module('groupbuys').controller('GroupbuysTabBuyersController', ['$scope'
 
     /**
     * @ngdoc method
-    * @name groupbuys.controller:GroupbuysTabBuyersController.$scope.loadMembersData
-    * @methodOf groupbuys.controller:GroupbuysTabBuyersController
+    * @name groupbuys.controller:GroupbuysTabMembersController.$scope.loadMembersData
+    * @methodOf groupbuys.controller:GroupbuysTabMembersController
     *
     * @description
     * Loads the members data and set the visibility of the list.

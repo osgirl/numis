@@ -250,7 +250,7 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 		$translate([
 			'groupbuys.Information',
 			'groupbuys.Items',
-			'groupbuys.Buyers',
+			'groupbuys.Members',
 			'groupbuys.Requests',
 			'groupbuys.Requests_summary',
 			'groupbuys.Messaging',
@@ -270,8 +270,8 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 								title: translations['groupbuys.Items'],
 								template:'/modules/groupbuys/views/tabs/items-groupbuy.client.view.html'
 							},{
-								title: translations['groupbuys.Buyers'],
-								template:'/modules/groupbuys/views/tabs/buyers-groupbuy.client.view.html'
+								title: translations['groupbuys.Members'],
+								template:'/modules/groupbuys/views/tabs/members-groupbuy.client.view.html'
 							},{
 								title: translations['groupbuys.Requests'],
 								template:'/modules/groupbuys/views/tabs/requests-groupbuy.client.view.html'
@@ -306,8 +306,8 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 									title: translations['groupbuys.Items'],
 									template:'/modules/groupbuys/views/tabs/items-groupbuy.client.view.html'
 								},{
-									title: translations['groupbuys.Buyers'],
-									template:'/modules/groupbuys/views/tabs/buyers-groupbuy.client.view.html'
+									title: translations['groupbuys.Members'],
+									template:'/modules/groupbuys/views/tabs/members-groupbuy.client.view.html'
 								},{
 									title: translations['groupbuys.Messaging'],
 									template:'/modules/groupbuys/views/tabs/messaging-groupbuy.client.view.html'
