@@ -1,8 +1,8 @@
 'use strict';
 
 // Information tab controller
-angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope','Restangular', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys',
-  function($scope, Restangular, $stateParams, $location, $translate, Authentication, Groupbuys) {
+angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope', 'Restangular', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys', '$window',
+  function($scope, Restangular, $stateParams, $location, $translate, Authentication, Groupbuys, $window) {
     $scope.authentication = Authentication;
 
     $scope.newUpdate = '';
@@ -11,7 +11,7 @@ angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope','
 
     /*
     @ngdoc method
-    * @name groupbuys.controller:GroupbuysTabInfoController.$scope.addUpdate
+    * @name groupbuys.controller:GroupbuysTabInfoController.addUpdate
     * @methodOf groupbuys.controller:GroupbuysTabInfoController
 
     @description
@@ -43,32 +43,53 @@ angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope','
 
     /*
     @ngdoc method
-    * @name groupbuys.controller:GroupbuysTabInfoController.$scope.joinGroupbuy
+    * @name groupbuys.controller:GroupbuysTabInfoController.joinGroupbuy
     * @methodOf groupbuys.controller:GroupbuysTabInfoController
 
     @description
     * Adds an member to the groupbuy.
     */
     $scope.joinGroupbuy = function() {
-        console.log ('UNIRSE A LA COMPRA');
-        // TODO
-        //$location.path('groupbuys/' + $stateParams.groupbuyId );
+
+        // Updating the server via API
+        var payload = {};
+        payload.userId = $scope.authentication.user._id;
+
+        Restangular.one('groupbuys',$stateParams.groupbuyId).all('members').post(payload).then(function() {
+            // Reload
+            $window.location.reload();
+
+        }, function errorCallback() {
+            $scope.error = $translate.instant('core.Error_connecting_server');
+        });
+
     };
 
     // ----------------
 
     /*
     @ngdoc method
-    * @name groupbuys.controller:GroupbuysTabInfoController.$scope.leaveGroupbuy
+    * @name groupbuys.controller:GroupbuysTabInfoController.leaveGroupbuy
     * @methodOf groupbuys.controller:GroupbuysTabInfoController
 
     @description
     * Removes an member from the groupbuy.
     */
     $scope.leaveGroupbuy = function() {
-        console.log (' ABANDONAR COMPRA');
-        // TODO
-        //$location.path('groupbuys/);
+
+        // Updating the server via API
+        var payload = {};
+        payload.userId = $scope.authentication.user._id;
+
+        Restangular.one('groupbuys',$stateParams.groupbuyId).one('members',$scope.authentication.user._id).remove().then(function() {
+
+            // Reload
+            $window.location.reload();
+
+        }, function errorCallback() {
+            $scope.error = $translate.instant('core.Error_connecting_server');
+        });
+
     };
 
 
