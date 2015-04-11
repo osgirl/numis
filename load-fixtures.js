@@ -15,7 +15,8 @@ var init     = require('./config/init')(),
 var idCurrencies = {},
     idUsers      = {},
     idGroupbuys  = {},
-    idItems      = {};
+    idItems      = {},
+    idOrders     = {};
 
 
 // Bootstrap db connection
@@ -31,6 +32,37 @@ config.getGlobbedFiles('./app/models/**/*.js').forEach(function(modelPath) {
     require(path.resolve(modelPath));
 });
 
+
+
+/*
+ * Auxiliary functions
+ */
+var createEmptyOrders = function (groupbuy, createCallback) {
+    var Order = mongoose.model('Order'),
+        members = groupbuy.members;
+
+    // 1st para in async.each() is the array of items
+    async.each(members,
+    // 2nd param is the function that each item is passed to
+    function(member, callback) {
+        var order = new Order({ user: member, groupbuy: groupbuy._id });
+
+        order.save(function(err) {
+            if (err) console.log(chalk.red(err));
+
+            console.log ('        Creating order to ' + order.user + ' in groupbuy ' + order.groupbuy);
+            idOrders[order.user + '-' + order.groupbuy] = order.id;
+
+            callback();
+        });
+    },
+    // 3rd param is the function to call when everything's done
+    function(err) {
+        if (createCallback) {
+            createCallback();
+        }
+    });
+};
 
 
 /*
@@ -170,13 +202,13 @@ var loadGroupbuys = function(groupbuysCallback) {
         groupbuy.currencies.provider = idCurrencies[groupbuy.currencies.provider];
 
         // Find if groupbuy exists
-        Groupbuy.findOne({name: groupbuy.name}, 'id name title', function(err, groupbuy2) {
+        Groupbuy.findOne({name: groupbuy.name}, 'id name title members', function(err, groupbuy2) {
             if (!err && groupbuy2) {
                 idGroupbuys[groupbuy2.name] = groupbuy2.id;
                 console.log (chalk.blue('    >>> ' + groupbuy2.title));
 
-                // Async call is done, alert via callback
-                callback();
+                // Create an empty order for each member
+                createEmptyOrders(groupbuy2, callback);
             } else {
                 // Save groupbuy
                 groupbuy = new Groupbuy(groupbuy);
@@ -187,10 +219,10 @@ var loadGroupbuys = function(groupbuysCallback) {
                     } else {
                         idGroupbuys[groupbuy.name] = groupbuy.id;
                         console.log ('    ' + groupbuy.title);
-                    }
 
-                    // Async call is done, alert via callback
-                    callback();
+                        // Create an empty order for each member
+                        createEmptyOrders(groupbuy, callback);
+                    }
                 });
             }
         });
@@ -263,28 +295,114 @@ var loadItems = function(itemsCallback) {
 };
 
 
+/*
+ * Load orders fixtures in DB
+ */
+var loadOrders = function(section, ordersCallback) {
+    section = section || 'first';
+
+    var Order      = mongoose.model('Order'),
+        orders     = JSON.parse(fs.readFileSync('./fixtures/orders.json', 'utf8')),
+        length     = orders.length,
+        order;
+
+
+    console.log(chalk.green(' * Loading requests for section \'' + section + '\'...'));
+
+    // 1st para in async.each() is the array of items
+    async.each(orders[section],
+    // 2nd param is the function that each item is passed to
+    function(order, callback) {
+        // Get array of items to make the request
+        var items = order.items;
+        // Replace order with IDs
+        var orderInfo = {
+            user:     idUsers[order.user],
+            groupbuy: idGroupbuys[order.groupbuy]
+        };
+
+        // Find if groupbuy exists
+        Order.findOne(orderInfo, function(err, order2) {
+            if (err) {
+                console.log(chalk.red(err));
+                callback(err);
+            }
+            else if (!order2) {
+                console.log(chalk.red('Order not found. Invalid user ' + orderInfo.user + ' and groupbuy ' + orderInfo.groupbuy));
+                callback();
+            }
+            else {
+                // Add new request to the order
+                var request = {items: []};
+                // Replace items by IDs
+                for (var i = 0; i < items.length; i++) {
+                    request.items.push ({
+                        item: idItems[items[i].title],
+                        quantity: items[i].num
+                    });
+                }
+
+                order2.addRequest (request, order2.user, function(err) {
+                    if (err) {
+                        console.log(chalk.red(order2, '\n\n', request.items, '\n\n\n'));
+                        console.log(chalk.red(err));
+                        callback(err);
+                    } else {
+                        console.log ('Added request to ' + order2.user + ' and groupbuy ' + order2.groupbuy);
+                        callback();
+                    }
+                });
+            }
+        });
+    },
+    // 3rd param is the function to call when everything's done
+    function(err) {
+        console.log(chalk.green(' * Requests fixtures loaded.'));
+
+        if (ordersCallback) {
+            ordersCallback();
+        }
+    });
+};
+
+
 
 /*
  * Main code
  */
 console.log(chalk.green('Start Loading fixtures!'));
 
+mongoose.model('Order').remove(function(err) {
+    if (err) console.error(err);
 
-loadCurrencies(function(err) {
-    if (err) console.log(chalk.red(err));
-
-    loadUsers(function(err) {
+    loadCurrencies(function(err) {
         if (err) console.log(chalk.red(err));
 
-        loadGroupbuys(function(err) {
+        loadUsers(function(err) {
             if (err) console.log(chalk.red(err));
 
-            loadItems(function(err) {
+            loadGroupbuys(function(err) {
                 if (err) console.log(chalk.red(err));
 
-                // Exit
-                console.log(chalk.green('- End fixtures -'));
-                process.exit();
+                loadItems(function(err) {
+                    if (err) console.log(chalk.red(err));
+
+                    loadOrders('first', function(err) {
+                        if (err) console.log(chalk.red(err));
+
+                        loadOrders('second', function(err) {
+                            if (err) console.log(chalk.red(err));
+
+                            loadOrders('third', function(err) {
+                                if (err) console.log(chalk.red(err));
+
+                                // Exit
+                                console.log(chalk.green('- End fixtures -'));
+                                process.exit();
+                            });
+                        });
+                    });
+                });
             });
         });
     });

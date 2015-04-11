@@ -1,0 +1,146 @@
+{
+    "first": [
+        {
+            "user":     "atoriyama",
+            "groupbuy": "jap-n-500-yenes-serie-prefecturas-septiembre-2014",
+            "items": [
+                {"title": "33 - Ehime",     "num": 1},
+                {"title": "34 - Yamagata",  "num": 1},
+                {"title": "35 - Mie",       "num": 1}
+            ]
+        },
+        {
+            "user":     "tobata",
+            "groupbuy": "jap-n-500-yenes-serie-prefecturas-septiembre-2014",
+            "items": [
+                {"title": "33 - Ehime",     "num": 3},
+                {"title": "34 - Yamagata",  "num": 3},
+                {"title": "35 - Mie",       "num": 3}
+            ]
+        },
+        {
+            "user":     "toba",
+            "groupbuy": "jap-n-500-yenes-serie-prefecturas-septiembre-2014",
+            "items": [
+                {"title": "29 - Okayama",   "num": 1},
+                {"title": "27 - Hiroshima", "num": 1},
+                {"title": "22 - Miyazaki",  "num": 1},
+                {"title": "21 - Kanagawa",  "num": 1},
+                {"title": "20 - Okinawa",   "num": 1},
+                {"title": "16 - Kumamoto",  "num": 1},
+                {"title": "09 - Gifu",      "num": 1},
+                {"title": "08 - Kochi",     "num": 1},
+                {"title": "07 - Nara",      "num": 1},
+                {"title": "04 - Nagano",    "num": 1},
+                {"title": "02 - Kyoto",     "num": 1},
+                {"title": "01 - Hokkaido",  "num": 1}
+            ]
+        },
+        {
+            "user":     "gremi",
+            "groupbuy": "ast-rix-y-los-valores-de-la-rep-blica-francesa",
+            "items": [
+                {"title": "Caja completa", "num": 2}
+            ]
+        },
+        {
+            "user":     "administrator",
+            "groupbuy": "ast-rix-y-los-valores-de-la-rep-blica-francesa",
+            "items": [
+                {"title": "Caja completa", "num": 1}
+            ]
+        },
+        {
+            "user":     "atoriyama",
+            "groupbuy": "ast-rix-y-los-valores-de-la-rep-blica-francesa",
+            "items": [
+                {"title": "Primeras 12 monedas de 10€", "num": 1}
+            ]
+        },
+        {
+            "user":     "toba",
+            "groupbuy": "ast-rix-y-los-valores-de-la-rep-blica-francesa",
+            "items": [
+                {"title": "Primera moneda de 50 €",     "num": 1},
+                {"title": "Primeras 12 monedas de 10€", "num": 1}
+            ]
+        },
+        {
+            "user":     "ppicapiedra",
+            "groupbuy": "ast-rix-y-los-valores-de-la-rep-blica-francesa",
+            "items": [
+                {"title": "Primeras 12 monedas de 10€", "num": 2}
+            ]
+        }
+    ],
+    "second": [
+        {
+            "user":     "atoriyama",
+            "groupbuy": "jap-n-500-yenes-serie-prefecturas-septiembre-2014",
+            "items": [
+                {"title": "33 - Ehime",     "num": 2},
+                {"title": "34 - Yamagata",  "num": 1},
+                {"title": "35 - Mie",       "num": 1},
+                {"title": "32 - Kagoshima", "num": 1},
+                {"title": "31 - Yamanashi", "num": 1},
+                {"title": "30 - Shizuoka",  "num": 1},
+                {"title": "29 - Okayama",   "num": 1},
+                {"title": "28 - Gunma",     "num": 1},
+                {"title": "27 - Hiroshima", "num": 1},
+                {"title": "26 - Miyagi",    "num": 1},
+                {"title": "25 - Hyogo",     "num": 1},
+                {"title": "24 - Oita",      "num": 1},
+                {"title": "23 - Yochigi",   "num": 1},
+                {"title": "22 - Miyazaki",  "num": 1},
+                {"title": "21 - Kanagawa",  "num": 1},
+                {"title": "20 - Okinawa",   "num": 1},
+                {"title": "19 - Akita",     "num": 1},
+                {"title": "18 - Iwate",     "num": 1},
+                {"title": "17 - Shiga",     "num": 1},
+                {"title": "16 - Kumamoto",  "num": 1},
+                {"title": "15 - Tottori",   "num": 1},
+                {"title": "14 - Toyama",    "num": 1},
+                {"title": "13 - Saga",      "num": 1},
+                {"title": "12 - Aomori",    "num": 1},
+                {"title": "11 - Aichi",     "num": 1},
+                {"title": "10 - Fukui",     "num": 1},
+                {"title": "09 - Gifu",      "num": 1},
+                {"title": "08 - Kochi",     "num": 1},
+                {"title": "07 - Nara",      "num": 1},
+                {"title": "06 - Ibaraki",   "num": 1},
+                {"title": "05 - Niigata",   "num": 1},
+                {"title": "04 - Nagano",    "num": 1},
+                {"title": "03 - Shimane",   "num": 1},
+                {"title": "02 - Kyoto",     "num": 1},
+                {"title": "01 - Hokkaido",  "num": 1}
+            ]
+        },
+        {
+            "user":     "tobata",
+            "groupbuy": "jap-n-500-yenes-serie-prefecturas-septiembre-2014",
+            "items": [
+                {"title": "33 - Ehime",     "num": -1},
+                {"title": "34 - Yamagata",  "num": -1},
+                {"title": "35 - Mie",       "num": -1}
+            ]
+        }
+    ],
+    "third": [
+        {
+            "user":     "atoriyama",
+            "groupbuy": "jap-n-500-yenes-serie-prefecturas-septiembre-2014",
+            "items": [
+                {"title": "33 - Ehime",     "num": -1}
+            ]
+        },
+        {
+            "user":     "tobata",
+            "groupbuy": "jap-n-500-yenes-serie-prefecturas-septiembre-2014",
+            "items": [
+                {"title": "33 - Ehime",     "num": 1},
+                {"title": "34 - Yamagata",  "num": 1},
+                {"title": "35 - Mie",       "num": 1}
+            ]
+        }
+    ]
+}
