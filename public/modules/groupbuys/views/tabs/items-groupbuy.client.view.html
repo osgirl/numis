@@ -63,7 +63,7 @@
                                 <strong>{{item.title}}</strong><br />
                                 <span data-ng-bind-html="item.description"></span></span><br />
                                 {{'groupbuys.Price' | translate}}: <span>{{item.price}} {{item.currency.symbol}}</span><br />
-                                {{'groupbuys.Max_Quantity' | translate}}: <span>{{item.maxQuantity}}</span><br />
+                                {{'groupbuys.Max_Quantity' | translate}}: <span ng-show="( item.maxQuantity != 0) ">{{item.maxQuantity}}</span><span ng-show="( item.maxQuantity == 0) ">{{'groupbuys.No_Max_Quantity' | translate}}.</span><br />
                                 {{'groupbuys.Available' | translate}}: <span>{{item.available}}</span><br />
 
 

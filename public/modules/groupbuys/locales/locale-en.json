@@ -74,6 +74,7 @@
         "Image": "Image",
         "Save": "Save",
         "Cancel": "Cancelar",
-        "Available": "Available"
+        "Available": "Available",
+        "No_Max_Quantity": "Without limit"
     }
 }
