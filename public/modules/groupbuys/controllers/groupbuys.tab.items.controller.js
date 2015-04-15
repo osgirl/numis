@@ -210,7 +210,7 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
         if (itemId !== ''){
             var position = $scope.findPosition(itemId, $scope.groupbuy.items);
 
-            if ($scope.request[itemId] < $scope.groupbuy.items[position].available){
+            if ( ($scope.groupbuy.items[position].available === null) || ($scope.request[itemId] < $scope.groupbuy.items[position].available) ){
                 $scope.request[itemId]++ ;
             }
         }
