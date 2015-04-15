@@ -73,6 +73,7 @@
         "Price_In_Groupbuys_Currency": "Price in groupbuy's currency",
         "Image": "Image",
         "Save": "Save",
-        "Cancel": "Cancelar"
+        "Cancel": "Cancelar",
+        "Available": "Available"
     }
 }

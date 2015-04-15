@@ -73,6 +73,7 @@
         "Price_In_Groupbuys_Currency": "Precio en divisa de la compra",
         "Image": "Imagen",
         "Save": "Guardar",
-        "Cancel": "Cancelar"
+        "Cancel": "Cancelar",
+        "Available": "Disponible"
     }
 }

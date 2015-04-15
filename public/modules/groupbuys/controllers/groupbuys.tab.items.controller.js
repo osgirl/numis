@@ -36,6 +36,16 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
 
                 $scope.groupbuy.items = data;
 
+                // Request items
+                $scope.request = [];
+                for ( var i=0; i<$scope.groupbuy.items.length; i++ ) {
+
+                    var itemId = $scope.groupbuy.items[i]._id;
+                    //$scope.request.push(itemId);
+                    $scope.request[itemId] = 0;
+                }
+
+
         }, function errorCallback() {
             $scope.error = $translate.instant('core.Error_connecting_server');
         });
@@ -72,6 +82,7 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
             $scope.groupbuy.items.newItem = item;
             // show the edit area
             $scope.addNewItemHide = false;
+            // TODO: Move focus
         }
     };
 
@@ -186,6 +197,72 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
 
     // ----------------------
 
+
+    /*
+    @ngdoc method
+    * @name groupbuys.controller:GroupbuysTabItemsController.addItemRequest
+    * @methodOf groupbuys.controller:GroupbuysTabItemsController
+
+    @description
+    * Add an item request.
+    */
+    $scope.addItemRequest = function(itemId) {
+        if (itemId !== ''){
+            var position = $scope.findPosition(itemId, $scope.groupbuy.items);
+
+            if ($scope.request[itemId] < $scope.groupbuy.items[position].available){
+                $scope.request[itemId]++ ;
+            }
+        }
+    };
+
+    // ----------------
+
+    /*
+    @ngdoc method
+    * @name groupbuys.controller:GroupbuysTabItemsController.removeItemRequest
+    * @methodOf groupbuys.controller:GroupbuysTabItemsController
+
+    @description
+    * Remove an item request.
+    */
+    $scope.removeItemRequest = function(itemId) {
+        if (itemId !== '' && $scope.request[itemId] > 0){
+            $scope.request[itemId]-- ;
+        }
+    };
+
+    // ----------------
+
+    /*
+    @ngdoc method
+    * @name groupbuys.controller:GroupbuysTabItemsController.requestItems
+    * @methodOf groupbuys.controller:GroupbuysTabItemsController
+
+    @description
+    * Request items to server.
+    */
+    $scope.requestItems = function() {
+
+        console.log('Requesting stuff');
+
+        var payload = [];
+        payload.items = [];
+
+        for ( var key in $scope.request) {
+            var item = {
+                    item:     key,
+                    quantity: $scope.request[key]
+            };
+
+            payload.items.push(item);
+        }
+
+        console.log( payload );
+
+    };
+
+    // ----------------
 
  }
 ]);
