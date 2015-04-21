@@ -126,7 +126,7 @@ module.exports = function(db) {
 	if (process.env.NODE_ENV === 'development') {
 		// Documentación online '/apiDocs/'
 		var docs = require('express-mongoose-docs');
-		docs(app);
+		docs(app, require('mongoose'));
 
 		// Docuemntación en el log al arrancar.
 		var space = function (x) {
