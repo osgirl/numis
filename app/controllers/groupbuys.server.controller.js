@@ -9,7 +9,8 @@ var mongoose 	 = require('mongoose'),
 	users 		 = require('./users.server.controller'),
 	_ 			 = require('lodash'),
 	User 		 = mongoose.model('User'),
-	Groupbuy 	 = mongoose.model('Groupbuy'),
+	Groupbuy     = mongoose.model('Groupbuy'),
+	Order        = mongoose.model('Order'),
 	allStates    = ['new', 'published', 'acceptance', 'payments', 'paid', 'shipments', 'closed', 'cancelled', 'deleted'],
 	cicleOfLife  = _.dropRight(allStates, 2), // All states except cancelled and deleted
 	goToStates   = _.dropRight(_.drop(allStates)); // All states except new and deleted
@@ -32,8 +33,6 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, re
 		i;
 
 	/* visibility TODO
-			shipmentsState: 'restricted',
-			paymentStatus: 'restricted',
 			itemNumbers: 'public',
 	*/
 
@@ -327,9 +326,21 @@ exports.addMember = function(req, res) {
 				groupbuy.addMember(userId, function(err) {
 					if (err) {
 						return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
-					} else {
-						res.status(204).end();
 					}
+
+					// Create empty order for the new member
+					var order = new Order({
+							user: userId,
+							groupbuy: groupbuy.id
+					});
+
+					order.save(function(err) {
+						if (err) {
+							return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
+						}
+
+						res.status(204).end();
+					});
 				});
 			}
 			if (err) {
@@ -358,13 +369,16 @@ exports.deleteMember = function(req, res) {
 			groupbuy.members.splice(index, 1);
 
 			groupbuy.save(function(err) {
-				if (err) {
-					return res.status(400).send({
-						message: errorHandler.getErrorMessage(err)
-					});
-				} else {
+				if (err)
+					return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
+
+				// Remove all order associated to this user in this groupbuy
+				Order.findOneAndRemove({user: member.id, groupbuy: groupbuy.id}, function(err) {
+					if (err)
+						return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
+
 					res.status(204).end();
-				}
+				});
 			});
 		} else {
 			err = {message: 'You can not remove the user as member in this Groupbuy. The user is not member.'};
@@ -434,9 +448,21 @@ exports.addManager = function(req, res) {
 			groupbuy.addManager(userId, function(err) {
 				if (err) {
 					return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
-				} else {
-					res.status(204).end();
 				}
+
+				// Create empty order for the new manager
+				var order = new Order({
+						user: userId,
+						groupbuy: groupbuy.id
+				});
+
+				order.save(function(err) {
+					if (err) {
+						return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
+					}
+
+					res.status(204).end();
+				});
 			});
 		}
 		if (err) {
@@ -463,13 +489,16 @@ exports.deleteManager = function(req, res) {
 			groupbuy.managers.splice(index, 1);
 
 			groupbuy.save(function(err) {
-				if (err) {
-					return res.status(400).send({
-						message: errorHandler.getErrorMessage(err)
-					});
-				} else {
+				if (err)
+					return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
+
+				// Remove all order associated to this user in this groupbuy
+				Order.findOneAndRemove({user: manager.id, groupbuy: groupbuy.id}, function(err) {
+					if (err)
+						return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
+
 					res.status(204).end();
-				}
+				});
 			});
 		} else {
 			err = {message: 'You can not remove the user as manager in this Groupbuy. The user is not manager.'};
