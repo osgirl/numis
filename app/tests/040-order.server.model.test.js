@@ -214,7 +214,7 @@ describe('Order Model Unit Tests:', function() {
 			});
 		});
 
-		it('NU_P_G004_E005: should be able to save order with one request with nevative quantity without problems', function(done) {
+		it('NU_P_G004_E005: should be able to save order with one request with negative quantity without problems', function(done) {
 			var request = {
 				user: user,
 				items: [ {item: item1, quantity: -1} ]

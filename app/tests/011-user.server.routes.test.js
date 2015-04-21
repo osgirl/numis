@@ -1270,33 +1270,6 @@ describe('User CRUD tests', function() {
 			});
 	});
 
-	it('NU_P_G001_E135: should not be able to upload an image to use as another user avatar if signed in', function(done) {
-		// Sign in
-		agent.post('/api/v1/auth/signin')
-			.send(credentials1)
-			.expect(200)
-			.expect('Content-Type', /json/)
-			.end(function(signinErr, signinRes) {
-				// Handle signin error
-				if (signinErr) done(signinErr);
-
-				// Get the userId
-				var userId = admin.id;
-
-				// Sign out
-				agent.get('/api/v1/auth/signout')
-					.expect(302)	// Redirect to '/'
-					.end(function(signoutErr, signoutRes) {
-						// Handle signin error
-						if (signoutErr) done(signoutErr);
-
-						(signoutRes.header.location).should.be.eql('/');
-
-						done();
-					});
-			});
-	});
-
 	it('NU_P_G001_E136: should be able to request suspend my user account if signed it', function(done) {
 		agent.post('/api/v1/auth/signin')
 			.send(credentials1)

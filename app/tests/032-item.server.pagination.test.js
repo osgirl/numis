@@ -188,7 +188,7 @@ describe('Item Pagination tests', function() {
 	 */
 
 
-	it('NU_P_G003_E201: should be able to get the first page of the list of Groupbuys', function(done) {
+	it('NU_P_G003_E201: should be able to get the first page of the list of Items in a Groupbuy', function(done) {
 		agent.post('/api/v1/auth/signin')
 			.send(credentialsA)
 			.expect(200)
