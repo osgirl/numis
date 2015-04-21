@@ -109,8 +109,10 @@ var formattingOrderList = function(orders, req, options) {
  * Create an Order
  */
 exports.create = function(req, res) {
-	var order = new Order(req.body);
-	order.user = req.user;
+	var order = new Order({
+			user: req.user,
+			groupbuy: req.groupbuy
+	});
 
 	order.save(function(err) {
 		if (err) {
@@ -130,12 +132,11 @@ exports.read = function(req, res) {
 
 /**
  * Update an Order
+ * only fields providerShippingCost, shippingCost and otherCosts can be updated.
  */
 exports.update = function(req, res) {
 	var order = req.order,
 		dirty = false;
-
-	// TODO: Only groupbuy managers can update a request costs
 
 	if (req.body !== undefined && req.body.shippingCost !== undefined) {
 		order.shippingCost = req.body.shippingCost;
@@ -198,6 +199,11 @@ exports.list = function(req, res) {
 		/* /groupbuys/:groupbuyId/orders -- Show orders filtered by groupbuy */
 		query = {groupbuy: req.groupbuy};
 		sort  = req.query.sort || 'user.username';
+
+	} else if (req.profile && typeof req.profile !== 'undefined' && req.groupbuy && typeof req.groupbuy !== 'undefined') {
+		/* /groupbuys/:groupbuyId/users/:userId/orders -- Show orders filtered by user and groupbuy */
+		query = {user: req.profile, groupbuy: req.groupbuy};
+		sort  = req.query.sort || '-updated';
 
 	} else {
 		// Invalid
@@ -282,14 +288,4 @@ exports.orderByID = function(req, res, next, id) {
 		// Call Groupbuy middleware
 		groupbuys.groupbuyByID(req, res, next, order.groupbuy);
 	});
-};
-
-/**
- * Order authorization middleware
- */
-exports.hasAuthorization = function(req, res, next) {
-	if (req.order.user.id !== req.user.id) {
-		return res.status(403).send({name: 'NotAuthorized', message: 'User is not authorized'});
-	}
-	next();
 };

@@ -1765,7 +1765,7 @@ describe('Groupbuy CRUD tests', function() {
 		});
 	});
 
-	it('NU_P_G002_E143: should not be able change Groupbuy state to published if have not manager role and actual state is new', function(done) {
+	it('NU_P_G002_E143: should not be able to restore a cancelled a Groupbuy if have manager role', function(done) {
 		// Create new Groupbuy model instance
 		groupbuy.status = 'cancelled';
 		var groupbuyObj = new Groupbuy(groupbuy);

@@ -129,6 +129,13 @@ var OrderSchema = new Schema({
         get: getPrice,
         set: setPrice
 	},
+	providerShippingCost: {
+		type: Number,
+		min: [0, 'The provider shipping cost can not be negative.'],
+		default: 0,
+        get: getPrice,
+        set: setPrice
+	},
 	shippingCost: {
 		type: Number,
 		min: [0, 'The shipping cost can not be negative.'],
