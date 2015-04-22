@@ -272,10 +272,7 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
     */
     $scope.requestItems = function() {
 
-        console.log('Requesting stuff');
-
-        var payload = [];
-        payload.items = [];
+        var payload = {items: []};
 
         for ( var key in $scope.request) {
             var item = {
@@ -286,7 +283,13 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
             payload.items.push(item);
         }
 
-        console.log( payload );
+        Restangular.one('orders',$scope.orderId).post('add-request',payload).then(function(data) {
+
+        }, function errorCallback() {
+            $scope.error = $translate.instant('core.Error_connecting_server');
+        });
+
+
 
     };
 
