@@ -17,7 +17,7 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
     */
     $scope.loadItemsData = function() {
 
-        // Otras variables
+        // Other vars
         $scope.addNewItemHide = true;
 
         // Currencies
@@ -31,12 +31,14 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
         });
 
 
-        // Items de la compra
+        // Groupbuy items
         Restangular.one('groupbuys',$stateParams.groupbuyId).all('items').getList().then(function(data) {
 
-                $scope.groupbuy.items = data;
+            $scope.groupbuy.items = data;
 
-                // Request items
+            if ($scope.userRole === 'member' ){
+
+                // Create a request for all items
                 $scope.request = [];
                 for ( var i=0; i<$scope.groupbuy.items.length; i++ ) {
 
@@ -45,6 +47,32 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
                     $scope.request[itemId] = 0;
                 }
 
+                // Populate the request for the requested ones
+                Restangular.one('groupbuys',$stateParams.groupbuyId).one('users',$scope.authentication.user._id).one('orders').getList().then(function(data) {
+
+                    // Populate requested items
+                    for ( var i=0; i<data[0].summary.length; i++ ) {
+
+                        var itemId = data[0].summary[i].item;
+                        var itemQuantity = data[0].summary[i].quantity;
+
+                        $scope.request[itemId] = itemQuantity;
+                    }
+
+                    // Populate order_id
+                    $scope.orderId = data[0]._id;
+
+                    // populate shipping data
+                    // TODO
+
+                    // populate payment data
+                    // TODO
+
+                }, function errorCallback() {
+                    $scope.error = $translate.instant('core.Error_connecting_server');
+                });
+
+            } // From userRole == member
 
         }, function errorCallback() {
             $scope.error = $translate.instant('core.Error_connecting_server');
