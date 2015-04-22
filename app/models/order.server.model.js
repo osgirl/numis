@@ -226,11 +226,7 @@ OrderSchema.pre('save', function(next) {
  * Hook a pre save method to re-calculate summary and subtotal.
  */
 OrderSchema.pre('save', function(next) {
-	if (this.summary && this.summary.length > 0) {
-		calculatePrices(this, next);
-	} else {
-		next();
-	}
+	calculatePrices(this, next);
 });
 
 /**
@@ -296,11 +292,7 @@ OrderSchema.methods.addRequest = function(request, user, callback) {
 				_this.requests = request;
 			}
 
-			if (_this.summary && _this.summary.length > 0) {
-				_this.calculateSummary(callback);
-			} else {
-				_this.save(callback);
-			}
+			_this.calculateSummary(callback);
 		}
 	});
 
@@ -315,11 +307,7 @@ OrderSchema.methods.removeRequest = function(id, callback) {
 	// Remove the request from requests list
 	this.requests.pull(id);
 
-	if (this.summary && this.summary.length > 0) {
-		this.calculateSummary(callback);
-	} else {
-		this.save(callback);
-	}
+	this.calculateSummary(callback);
 };
 
 /**
