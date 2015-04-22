@@ -220,7 +220,8 @@ exports.list = function(req, res) {
 };
 
 /**
- * Adding a request to an Order
+ * Adding a request (delta values) to an Order
+ * @deprecated
  */
 exports.addRequest = function(req, res) {
 	var order   = req.order,
@@ -228,6 +229,55 @@ exports.addRequest = function(req, res) {
 		user    = req.user;
 
 	// TODO: Only groupbuy managers or Order user can add requests
+
+	order.addRequest(request, user, function(err) {
+		if (err) {
+			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
+		} else {
+			res.jsonp( formattingOrder(order, req) );
+		}
+	});
+};
+
+/**
+ * Adding a request (final values) to an Order
+ */
+exports.addRequestBySummary = function(req, res) {
+	var findByItemId = function(source, itemId) {
+  		for (var i = 0; i < source.length; i++) {
+    		if (source[i].item == itemId) {
+      			return i;
+    		}
+  		}
+  		return -1;
+	};
+
+	var order   = req.order,
+		newData = req.body,
+		user    = req.user,
+		request = {items: []},
+		i;
+
+	// TODO: Only groupbuy managers or Order user can add requests
+
+	if (typeof newData === 'undefined' || typeof newData.items === 'undefined') {
+		return res.status(400).send( errorHandler.prepareErrorResponse( new Error('Invalid data for order') ));
+	}
+
+	// Create request with delta to nullify the order
+	for (i = 0; i < order.summary.length; i++) {
+		request.items.push({ item: order.summary[i].item, quantity: -order.summary[i].quantity});
+	}
+
+	for (var j = 0; j < newData.items.length; j++) {
+		i = findByItemId(request.items, newData.items[j].item);
+
+		if (i === -1) {
+			request.items.push(newData.items[j]);
+		} else {
+			request.items[i].quantity += newData.items[j].quantity;
+		}
+	}
 
 	order.addRequest(request, user, function(err) {
 		if (err) {
@@ -255,6 +305,7 @@ exports.removeRequest = function(req, res) {
 		}
 	});
 };
+
 
 /**
  * Removing a request from an Order

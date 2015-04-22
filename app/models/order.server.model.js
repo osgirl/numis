@@ -167,6 +167,11 @@ var OrderSchema = new Schema({
 	        default: '',
 	        trim: true
 	    },
+		infoManagers: {
+	        type: String,
+	        default: '',
+	        trim: true
+	    },
 	    confirmedBy: {
 	        type: Schema.ObjectId,
 	        ref: 'User'

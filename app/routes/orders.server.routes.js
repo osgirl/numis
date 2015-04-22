@@ -19,7 +19,7 @@ module.exports = function(app) {
 
 	// Add a request to an existing order
 	app.route('/api/v1/orders/:orderId/add-request')
-		.post(users.requiresLogin, groupbuys.hasAuthorization(['member']), orders.addRequest);
+		.post(users.requiresLogin, groupbuys.hasAuthorization(['member']), orders.addRequestBySummary);
 
 	// Remove a request from an order
 	app.route('/api/v1/orders/:orderId/remove-request')
