@@ -17,7 +17,7 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
     */
     $scope.loadItemsData = function() {
 
-        // Otras variables
+        // Other vars
         $scope.addNewItemHide = true;
 
         // Currencies
@@ -31,10 +31,48 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
         });
 
 
-        // Items de la compra
+        // Groupbuy items
         Restangular.one('groupbuys',$stateParams.groupbuyId).all('items').getList().then(function(data) {
 
-                $scope.groupbuy.items = data;
+            $scope.groupbuy.items = data;
+
+            if ($scope.userRole === 'member' ){
+
+                // Create a request for all items
+                $scope.request = [];
+                for ( var i=0; i<$scope.groupbuy.items.length; i++ ) {
+
+                    var itemId = $scope.groupbuy.items[i]._id;
+                    //$scope.request.push(itemId);
+                    $scope.request[itemId] = 0;
+                }
+
+                // Populate the request for the requested ones
+                Restangular.one('groupbuys',$stateParams.groupbuyId).one('users',$scope.authentication.user._id).one('orders').getList().then(function(data) {
+
+                    // Populate requested items
+                    for ( var i=0; i<data[0].summary.length; i++ ) {
+
+                        var itemId = data[0].summary[i].item;
+                        var itemQuantity = data[0].summary[i].quantity;
+
+                        $scope.request[itemId] = itemQuantity;
+                    }
+
+                    // Populate order_id
+                    $scope.orderId = data[0]._id;
+
+                    // populate shipping data
+                    // TODO
+
+                    // populate payment data
+                    // TODO
+
+                }, function errorCallback() {
+                    $scope.error = $translate.instant('core.Error_connecting_server');
+                });
+
+            } // From userRole == member
 
         }, function errorCallback() {
             $scope.error = $translate.instant('core.Error_connecting_server');
@@ -72,6 +110,7 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
             $scope.groupbuy.items.newItem = item;
             // show the edit area
             $scope.addNewItemHide = false;
+            // TODO: Move focus
         }
     };
 
@@ -186,6 +225,75 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
 
     // ----------------------
 
+
+    /*
+    @ngdoc method
+    * @name groupbuys.controller:GroupbuysTabItemsController.addItemRequest
+    * @methodOf groupbuys.controller:GroupbuysTabItemsController
+
+    @description
+    * Add an item request.
+    */
+    $scope.addItemRequest = function(itemId) {
+        if (itemId !== ''){
+            var position = $scope.findPosition(itemId, $scope.groupbuy.items);
+
+            if ( ($scope.groupbuy.items[position].available === null) || ($scope.request[itemId] < $scope.groupbuy.items[position].available) ){
+                $scope.request[itemId]++ ;
+            }
+        }
+    };
+
+    // ----------------
+
+    /*
+    @ngdoc method
+    * @name groupbuys.controller:GroupbuysTabItemsController.removeItemRequest
+    * @methodOf groupbuys.controller:GroupbuysTabItemsController
+
+    @description
+    * Remove an item request.
+    */
+    $scope.removeItemRequest = function(itemId) {
+        if (itemId !== '' && $scope.request[itemId] > 0){
+            $scope.request[itemId]-- ;
+        }
+    };
+
+    // ----------------
+
+    /*
+    @ngdoc method
+    * @name groupbuys.controller:GroupbuysTabItemsController.requestItems
+    * @methodOf groupbuys.controller:GroupbuysTabItemsController
+
+    @description
+    * Request items to server.
+    */
+    $scope.requestItems = function() {
+
+        var payload = {items: []};
+
+        for ( var key in $scope.request) {
+            var item = {
+                    item:     key,
+                    quantity: $scope.request[key]
+            };
+
+            payload.items.push(item);
+        }
+
+        Restangular.one('orders',$scope.orderId).post('add-request',payload).then(function(data) {
+
+        }, function errorCallback() {
+            $scope.error = $translate.instant('core.Error_connecting_server');
+        });
+
+
+
+    };
+
+    // ----------------
 
  }
 ]);

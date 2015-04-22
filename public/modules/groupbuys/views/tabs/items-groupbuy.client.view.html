@@ -63,10 +63,39 @@
                                 <strong>{{item.title}}</strong><br />
                                 <span data-ng-bind-html="item.description"></span></span><br />
                                 {{'groupbuys.Price' | translate}}: <span>{{item.price}} {{item.currency.symbol}}</span><br />
-                                {{'groupbuys.Max_Quantity' | translate}}: <span>{{item.maxQuantity}}</span><br />
+                                {{'groupbuys.Max_Quantity' | translate}}: <span ng-show="( item.maxQuantity != 0) ">{{item.maxQuantity}}</span><span ng-show="( item.maxQuantity == 0) ">{{'groupbuys.No_Max_Quantity' | translate}}.</span><br />
+                                {{'groupbuys.Available' | translate}}: <span>{{item.available}}</span><br />
+
+
+                                <div class="col-lg-2" ng-show="(userRole === 'member')">
+                                    <div class="input-group">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button" ng-click="addItemRequest(item._id);">
+                                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                            </button>
+                                        </span>
+                                        <input type="text" disabled class="form-control" ng-model="request[item._id]">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button" ng-click="removeItemRequest(item._id);">
+                                                <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <br />
+
                                 <div data-ng-hide="$last">
                                     <hr />
                                 </div>
+                            </div>
+
+                            <br /><br />
+
+                            <div class="btn-group" ng-show="(userRole === 'member')">
+                                <button class="btn btn-default" type="button" ng-click="requestItems();">
+                                    <span class="glyphicon glyphicon-check" aria-hidden="true">Solicitar lo especificado</span>
+                                </button>
                             </div>
 
                         </form>
@@ -109,7 +138,7 @@
 
                                         <input type="hidden" data-ng-model="groupbuy.items.newItem._id"><br />
                                         {{'groupbuys.Name' | translate}}:
-                                        <input type="text" data-ng-model="groupbuy.items.newItem.title"><br />
+                                        <input type="text" id="newItemTitle" data-ng-model="groupbuy.items.newItem.title"><br />
                                         {{'groupbuys.Max_Quantity' | translate}} ({{'groupbuys.0_No_Limit' | translate}})
                                         <input type="text" data-ng-model="groupbuy.items.newItem.maxQuantity"><br />
                                         {{'groupbuys.Price_In_Groupbuys_Currency' | translate}}:
