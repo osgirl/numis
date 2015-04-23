@@ -66,7 +66,6 @@ var formattingOrder = function(order, req, reduce) {
 		// Remove fields
 		delete result.__v;
 		delete result.groupbuy;
-		delete result.user;
 	}
 
 	return result;
