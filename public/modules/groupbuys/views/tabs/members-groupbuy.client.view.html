@@ -12,15 +12,16 @@
                     </div>
 
                     <!-- Visibilidad NO permitida -->
-                    <div class="panel-body" data-ng-hide="visibility.show_members_list">
+                <!--    <div class="panel-body" data-ng-hide="visibility.show_members_list">
                         <div>
                             {{'groupbuys.Information_Not_Available' | translate}}.
                         </div>
-                    </div>
+                    </div> -->
                     <!-- FIN Visibilidad NO permitida -->
 
                     <!-- Visibilidad permitida -->
-                    <div class="panel-body" data-ng-show="visibility.show_members_list">
+                    <!--<div class="panel-body" data-ng-show="visibility.show_members_list">-->
+                    <div class="panel-body">
                         <div>
                             <div class="member" data-ng-repeat="member in groupbuy.members_extended_data track by $index">
                                 <img class="img-responsive img-circle" ng-src="{{member.avatar}}?size=sm" fb-src="['/modules/users/img/no-user-image-square-sm.jpg']" alt="avatar" /><span>{{member.username}}</span>
