@@ -1,0 +1,9 @@
+
+div.member .img-responsive {
+	display: inline;
+	margin: 0 7px 5px 10px;
+}
+
+div.member.selected {
+	background-color: #afb;
+}
