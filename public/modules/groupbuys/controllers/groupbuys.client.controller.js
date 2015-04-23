@@ -263,9 +263,6 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 								title: translations['groupbuys.Requests'],
 								template:'/modules/groupbuys/views/tabs/requests-groupbuy.client.view.html'
 							},{
-								title: translations['groupbuys.Requests_summary'],
-								template:'/modules/groupbuys/views/tabs/requests-summary-groupbuy.client.view.html'
-							},{
 								title: translations['groupbuys.Messaging'],
 								template:'/modules/groupbuys/views/tabs/messaging-groupbuy.client.view.html'
 							},{
