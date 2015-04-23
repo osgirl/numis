@@ -22,7 +22,7 @@
                     <!-- Visibilidad permitida -->
                     <div class="panel-body" data-ng-show="visibility.show_members_list">
                         <div>
-                            <div data-ng-repeat="member in groupbuy.members_extended_data track by $index">
+                            <div class="member" data-ng-repeat="member in groupbuy.members_extended_data track by $index">
                                 <img class="img-responsive img-circle" ng-src="{{member.avatar}}?size=sm" fb-src="['/modules/users/img/no-user-image-square-sm.jpg']" alt="avatar" /><span>{{member.username}}</span>
                             </div>
                         </div>

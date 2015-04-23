@@ -1,84 +1,32 @@
-<section data-ng-controller="GroupbuysTabMessagingController" data-ng-init="loadDeliveriesData()">
+<section data-ng-controller="GroupbuysTabMessagingController" data-ng-init="loadMessagesData()">
     <div class="panel panel-default">
         <div class="panel-body">
 
             <!-- Vista de participante -->
             <div data-ng-show="(userRole !== 'manager')">
-                <form data-ng-submit="joinGroupbuy()" name="memberManagerForm" novalidate>
-
+                <form data-ng-submit="sendMessage()" name="MessagesForm" novalidate>
 
                     <!-- Conversacion -->
                     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Conversación con los gestores de la compra</h3>
-                        </div>
                         <div class="panel-body">
-
-
-                            <div class="col-md-12">
-                                <div class="pull-right">
-                                    <div class="alert-success">
-                                        <span>Este es el contenido del comentario 1</span>
+                            <div data-ng-repeat="message in messages track by $index">
+                                <div class="col-md-12">
+                                    <div ng-class="{'pull-left': message.from === selectedMember.username, 'pull-right': message.from !== selectedMember.username}">
+                                        <div ng-class="{'alert-info': message.from === selectedMember.username, 'alert-success': message.from !== selectedMember.username}">
+                                            <span>{{message.text}}</span>
+                                        </div>
+                                        <span>{{'groupbuys.Written_on' | translate}}: {{message.date | date:'d/M/yyyy H:mm:ss'}}</span>
+                                        <span ng-if="message.from !== selectedMember.username">({{message.from}})</span>
                                     </div>
-                                    <span>Escrito el 16/05/13 a las 14:22</span>
                                 </div>
                             </div>
-
-                            <div class="col-md-12">
-                                <div class="pull-left">
-                                    <div class="alert-info">
-                                        <span>Este es el contenido del comentario 1</span>
-                                    </div>
-                                    <span>Escrito el 16/05/13 a las 14:22</span>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12">
-                                <div class="pull-right">
-                                    <div class="alert-success">
-                                        <span>Este es el contenido del comentario 2</span>
-                                    </div>
-                                    <span>Escrito el 16/05/13 a las 14:22</span>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12">
-                                <div class="pull-left">
-                                    <div class="alert-info">
-                                        <span>Este es el contenido del comentario 3</span>
-                                    </div>
-                                    <span>Escrito el 16/05/13 a las 14:22</span>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12">
-                                <div class="pull-right">
-                                    <div class="alert-success">
-                                        <span>Este es el contenido del comentario 4</span>
-                                    </div>
-                                    <span>Escrito el 16/05/13 a las 14:22</span>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12">
-                                <div class="pull-right">
-                                    <div class="alert-success">
-                                        <span>Este es el contenido del comentario 5</span>
-                                    </div>
-                                    <span>Escrito el 16/05/13 a las 14:22</span>
-                                </div>
-                            </div>
-
-
-
+                            <!-- Escribir -->
+                            <textarea id="messageText" data-ng-model="messageText" name="messageText" class="form-control" rows="5" placeholder="Escribe algo..."></textarea>
+                            <input type="submit" value="Enviar" class="btn btn-default">
+                            <!-- FIN Escribir-->
                         </div>
-                        <!-- Escribir -->
-                        <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Escribe algo..."></textarea>
-                        <input type="submit" value="Enviar" class="btn btn-default">
-                        <!-- FIN Escribir-->
                     </div>
-                </div>
-                <!-- FIN Conversacion-->
+                    <!-- FIN Conversacion-->
 
                 </form>
             </div>
@@ -88,87 +36,34 @@
             <!-- Vista de gestor -->
             <div data-ng-show="(userRole == 'manager')">
 
-                <form data-ng-submit="joinGroupbuy()" name="PaymentManagerForm" novalidate>
+                <form data-ng-submit="sendMessage()" name="MessagesForm" novalidate>
                     <!-- Panel de informacion del pago -->
+
                             <div class="row">
                                 <div class="col-md-3">
-                                    <ul class="nav nav-pills nav-stacked">
-                                        <li role="presentation" class="active"><a href="#"><img src="#" />Usuario 1</a></li>
-                                        <li role="presentation"><a href="#"><img src="#" />Usuario 2</a></li>
-                                        <li role="presentation"><a href="#"><img src="#" />Usuario 3</a></li>
-                                        <li role="presentation"><a href="#"><img src="#" />Usuario 4</a></li>
-                                        <li role="presentation"><a href="#"><img src="#" />Usuario 5</a></li>
-                                        <li role="presentation"><a href="#"><img src="#" />Usuario 6</a></li>
-                                        <li role="presentation"><a href="#"><img src="#" />Usuario 7</a></li>
-                                    </ul>
+                                    <div>
+                                        <div class="member {{selected}}" data-ng-repeat="member in groupbuy.members_extended_data track by $index" data-ng-click="selectDestMember(member);">
+                                            <img class="img-responsive img-circle" ng-src="{{member.avatar}}?size=sm" fb-src="['/modules/users/img/no-user-image-square-sm.jpg']" alt="avatar" /><span>{{member.username}}</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-9">
                                     <!-- Conversacion -->
                                     <div class="panel panel-default">
                                         <div class="panel-body">
-                                            <div>
-
-
-
+                                            <div data-ng-repeat="message in messages track by $index">
                                                 <div class="col-md-12">
-                                                    <div class="pull-left">
-                                                        <div class="alert-info">
-                                                            <span>Este es el contenido del comentario 1</span>
+                                                    <div ng-class="{'pull-left': message.from === selectedMember.username, 'pull-right': message.from !== selectedMember.username}">
+                                                        <div ng-class="{'alert-info': message.from === selectedMember.username, 'alert-success': message.from !== selectedMember.username}">
+                                                            <span>{{message.text}}</span>
                                                         </div>
-                                                        <span>Escrito el 16/05/13 a las 14:22</span>
+                                                        <span>{{'groupbuys.Written_on' | translate}}: {{message.date | date:'d/M/yyyy H:mm:ss'}}</span>
+                                                        <span ng-if="message.from !== selectedMember.username">({{message.from}})</span>
                                                     </div>
                                                 </div>
-
-                                                <div class="col-md-12">
-                                                    <div class="pull-right">
-                                                        <div class="alert-success">
-                                                            <span>Este es el contenido del comentario 1</span>
-                                                        </div>
-                                                        <span>Escrito el 16/05/13 a las 14:22</span>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-12">
-                                                    <div class="pull-left">
-                                                        <div class="alert-info">
-                                                            <span>Este es el contenido del comentario 2</span>
-                                                        </div>
-                                                        <span>Escrito el 16/05/13 a las 14:22</span>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-12">
-                                                    <div class="pull-right">
-                                                        <div class="alert-success">
-                                                            <span>Este es el contenido del comentario 3</span>
-                                                        </div>
-                                                        <span>Escrito el 16/05/13 a las 14:22</span>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-12">
-                                                    <div class="pull-left">
-                                                        <div class="alert-info">
-                                                            <span>Este es el contenido del comentario 4</span>
-                                                        </div>
-                                                        <span>Escrito el 16/05/13 a las 14:22</span>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-12">
-                                                    <div class="pull-left">
-                                                        <div class="alert-info">
-                                                            <span>Este es el contenido del comentario 5</span>
-                                                        </div>
-                                                        <span>Escrito el 16/05/13 a las 14:22</span>
-                                                    </div>
-                                                </div>
-
-
-
                                             </div>
                                             <!-- Escribir -->
-                                            <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Escribe algo..."></textarea>
+                                            <textarea id="messageText" data-ng-model="messageText" name="messageText" class="form-control" rows="5" placeholder="Escribe algo..."></textarea>
                                             <input type="submit" value="Enviar" class="btn btn-default">
                                             <!-- FIN Escribir-->
                                         </div>
