@@ -47,7 +47,8 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, re
 				collection: { href: parentURL,             title: 'Groupbuys list' },
 				members:    { href: selfURL + '/members',  title: 'Manage members' },
 				managers:   { href: selfURL + '/managers', title: 'Manage managers' },
-				items:      { href: selfURL + '/items',    title: 'Items list' }
+				items:      { href: selfURL + '/items',    title: 'Items list' },
+				messages:   { href: selfURL + '/messages', title: 'Conversations' }
 			},
 			_id:         groupbuy._id,
 			name:        groupbuy.name,
@@ -162,6 +163,9 @@ exports.create = function(req, res) {
 			if (err) {
 				return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 			}
+
+			var socketio = req.app.get('socketio');
+			socketio.sockets.emit('groupbuy.created', groupbuy);
 
 			res.status(201).jsonp( formattingGroupbuy(groupbuy, req) );
 		});
