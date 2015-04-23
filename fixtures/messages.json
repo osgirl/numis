@@ -1,0 +1,32 @@
+[
+    {
+        "groupbuy": "jap-n-500-yenes-serie-prefecturas-septiembre-2014",
+        "from":     "atoriyama",
+        "to":       "tobata",
+        "text":     "¿Se pueden conseguir todas las monedas?"
+    },
+    {
+        "groupbuy": "jap-n-500-yenes-serie-prefecturas-septiembre-2014",
+        "from":     "tobata",
+        "to":       "atoriyama",
+        "text":     "Habría que consultar al proveedor su disponibilidad, pero en principio sí que la hay."
+    },
+    {
+        "groupbuy": "jap-n-500-yenes-serie-prefecturas-septiembre-2014",
+        "from":     "atoriyama",
+        "to":       "tobata",
+        "text":     "Ah, vale. Muchas gracias"
+    },
+    {
+        "groupbuy": "jap-n-500-yenes-serie-prefecturas-septiembre-2014",
+        "from":     "atoriyama",
+        "to":       "tobata",
+        "text":     "¿Hasta que fecha tengo para confirmar mi solicitud?"
+    },
+    {
+        "groupbuy": "jap-n-500-yenes-serie-prefecturas-septiembre-2014",
+        "from":     "tobata",
+        "to":       "atoriyama",
+        "text":     "Hasta el domingo."
+    }
+]

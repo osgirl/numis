@@ -366,6 +366,48 @@ var loadOrders = function(section, ordersCallback) {
 };
 
 
+/*
+ * Load orders fixtures in DB
+ */
+var loadMessages = function(messagesCallback) {
+    var Message  = mongoose.model('Message'),
+        messages = JSON.parse(fs.readFileSync('./fixtures/messages.json', 'utf8')),
+        length   = messages.length,
+        order;
+
+
+    console.log(chalk.green(' * Loading messages...'));
+
+    // 1st para in async.each() is the array of items
+    async.each(messages,
+    // 2nd param is the function that each item is passed to
+    function(message, callback) {
+        // Replace message with IDs
+        message.groupbuy = idGroupbuys[message.groupbuy];
+        message.from =     idUsers[message.from];
+        message.to =       idUsers[message.to];
+
+        message = new Message(message);
+
+        message.save(function(err) {
+            if (err)
+                console.log(chalk.red(err));
+
+            // Async call is done, alert via callback
+            callback();
+        });
+
+    },
+    // 3rd param is the function to call when everything's done
+    function(err) {
+        console.log(chalk.green(' * Requests fixtures loaded.'));
+
+        if (messagesCallback) {
+            messagesCallback();
+        }
+    });
+};
+
 
 /*
  * Main code
@@ -396,9 +438,13 @@ mongoose.model('Order').remove(function(err) {
                             loadOrders('third', function(err) {
                                 if (err) console.log(chalk.red(err));
 
-                                // Exit
-                                console.log(chalk.green('- End fixtures -'));
-                                process.exit();
+                                loadMessages(function(err) {
+                                    if (err) console.log(chalk.red(err));
+
+                                    // Exit
+                                    console.log(chalk.green('- End fixtures -'));
+                                    process.exit();
+                                });
                             });
                         });
                     });
