@@ -1,8 +1,8 @@
 'use strict';
 
 // Items tab controller
-angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope', 'Restangular', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys',
-  function($scope, Restangular, $stateParams, $location, $translate, Authentication, Groupbuys) {
+angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope', 'Restangular', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys', '$window',
+  function($scope, Restangular, $stateParams, $location, $translate, Authentication, Groupbuys, $window) {
     $scope.authentication = Authentication;
 
     // ----------------------
@@ -66,7 +66,18 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
                     // TODO
 
                     // populate payment data
-                    // TODO
+                    $scope.payment.total = data[0].total;
+                    $scope.payment.otherCosts = data[0].otherCosts;
+                    $scope.payment.shippingCost = data[0].shippingCost;
+                    $scope.payment.providerShippingCost = data[0].providerShippingCost;
+                    $scope.payment.subtotal = data[0].subtotal;
+                    $scope.payment.info = data[0].payment.info;
+                    $scope.payment.infoManagers = '';
+                    // //$scope.payment.infoManagers = data[0].payment.infoManagers;
+                    $scope.payment.paid = true;
+                    $scope.payment.received = true;
+                    //
+                    console.log ($scope.payment);
 
                 }, function errorCallback() {
                     $scope.error = $translate.instant('core.Error_connecting_server');
@@ -289,7 +300,7 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
             $scope.error = $translate.instant('core.Error_connecting_server');
         });
 
-
+        $window.location.reload();
 
     };
 
