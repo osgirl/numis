@@ -37,13 +37,15 @@ exports.getAvatar = function(req, res) {
 		fileExt  = path.extname(user.avatar.path);
 		fileName = path.dirname(user.avatar.path) + path.sep + path.basename(user.avatar.path, fileExt);
 
-		res.sendFile(fileName + '-' + size + fileExt, options, function (err) {
+		fileName = fileName + '-' + size + fileExt;
+
+		res.sendFile(fileName, options, function (err) {
 			if (err) {
 				res.status(err.status).end();
 			}
 		});
 	} else {
-		res.status(404).end();
+		res.redirect('/modules/users/img/no-user-image-square-' + size + '.jpg');
 	}
 };
 
