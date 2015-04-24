@@ -48,7 +48,7 @@ angular.module('groupbuys').controller('GroupbuysTabMessagingController', ['$sco
     * @methodOf groupbuys.controller:GroupbuysTabMessagingController
     *
     * @description
-    * Loads the messages.
+    * Select active member.
     */
     $scope.selectDestMember = function(member) {
         $scope.selectedMember = member;

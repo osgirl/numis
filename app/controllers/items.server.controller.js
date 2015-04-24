@@ -275,14 +275,18 @@ exports.getImage = function(req, res) {
 		fileExt  = path.extname(item.image.path);
 		fileName = path.dirname(item.image.path) + path.sep + path.basename(item.image.path, fileExt);
 
-		res.sendFile(fileName + '-' + size + fileExt, options, function (err) {
+		fileName = fileName + '-' + size + fileExt;
+
+		res.sendFile(fileName, options, function (err) {
 			if (err) {
 				res.status(err.status).end();
 			}
 		});
 	} else {
-		res.status(404).end();
+		res.redirect('/modules/groupbuys/img/no-item-image-' + size + '.png');
 	}
+
+
 };
 
 /**

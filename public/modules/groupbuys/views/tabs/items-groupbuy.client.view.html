@@ -59,7 +59,7 @@
                         <form data-ng-submit="joinGroupbuy()" name="memberManagerForm" novalidate>
 
                             <div data-ng-repeat="item in groupbuy.items track by $index">
-                                <img ng-src="{{item._links.image.href}}?size=sm"  fb-src="['/modules/items/img/no-image-sm.png']" /><br />
+                                <img ng-src="{{item._links.image.href}}?size=sm"  fb-src="['/modules/groupbuys/img/no-item-image-sm.png']" /><br />
                                 <strong>{{item.title}}</strong><br />
                                 <span data-ng-bind-html="item.description"></span></span><br />
                                 {{'groupbuys.Price' | translate}}: <span>{{item.price}} {{item.currency.symbol}}</span><br />
@@ -109,7 +109,7 @@
 
 
                             <div data-ng-repeat="item in groupbuy.items track by $index">
-                                <img ng-src="{{item._links.image.href}}?size=sm"  fb-src="['/modules/items/img/no-image-sm.png']" /><br />
+                                <img ng-src="{{item._links.image.href}}?size=sm"  fb-src="['/modules/groupbuys/img/no-item-image-sm.png']" /><br />
                                 <strong>{{item.title}}</strong><br />
                                 <span data-ng-bind-html="item.description"></span></span><br />
                                 {{'groupbuys.Price' | translate}}: <span>{{item.price}} {{groupbuy.currencies.provider.symbol}}</span><br />
