@@ -70,7 +70,9 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, re
 				},
 				exchangeRate: groupbuy.currencies.exchangeRate,
 				multiplier:   groupbuy.currencies.multiplier
-			}
+			},
+			shippingCost: groupbuy.shippingCost,
+			otherCosts: groupbuy.otherCosts
 		};
 
 		// Add next state property
