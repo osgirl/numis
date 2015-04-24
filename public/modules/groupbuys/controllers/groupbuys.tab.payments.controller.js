@@ -43,9 +43,21 @@ angular.module('groupbuys').controller('GroupbuysTabPaymentsController', ['$scop
 
                 // add some necessary info
                 for ( var i=0; i<$scope.allPaymentData.length; i++ ) {
+                    // Member names
                     var position = $scope.findPosition($scope.allPaymentData[i].user , $scope.groupbuy.members_extended_data);
                     if (position !== -1) {
                         $scope.allPaymentData[i].username = $scope.groupbuy.members_extended_data[position].username;
+                    }
+                    // Item names
+                    for ( var j=0; j<$scope.allPaymentData[i].requests.length; j++ ) {
+                        for ( var k=0; k<$scope.allPaymentData[i].requests[j].items.length; k++ ) {
+
+                            var itemPosition = $scope.findPosition($scope.allPaymentData[i].requests[j].items[k].item , $scope.groupbuy.items);
+                            if (itemPosition !== -1) {
+                                $scope.allPaymentData[i].requests[j].items[k].itemName = $scope.groupbuy.items[itemPosition].title;
+                            }
+
+                        }
                     }
                 }
 
