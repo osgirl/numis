@@ -1,5 +1,52 @@
-<section data-ng-controller="GroupbuysTabRequestsController">
-<p>
-  PESTAÑA DE LAS PETICIONES
-</p>
+<section data-ng-controller="GroupbuysTabPaymentsController" data-ng-init="loadAllPaymentData()">
+    <div class="panel panel-default">
+        <div class="panel-body">
+
+            <!-- Vista de gestor -->
+            <div data-ng-show="(userRole == 'manager')">
+
+                    <!-- Panel de informacion del pago -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Solicitudes de los participantes</h3>
+                        </div>
+                        <div class="panel-body">
+                                <div ng-repeat="payment in allPaymentData track by $index">
+                                    <strong>Participante: </strong>{{payment.username}}<br />
+                                    <strong>Peticiónes: </strong><br />
+
+                                    <div class="requestDate" ng-repeat="request in payment.requests track by $index">
+                                        <strong>Fecha: </strong>{{request.requestDate | date : 'd/M/yyyy H:mm:ss'}}<br />
+                                        <strong>Productos: </strong>
+
+                                        <div class="requestProducts"  ng-repeat="item in request.items track by $index">
+                                            <!--<strong>Producto: </strong>{{item.item}}<br />
+                                            <strong>Cantidad: </strong>{{item.quantity}} unidades.-->
+                                            {{item.quantity}} <strong> x </strong>{{item.itemName}}
+                                        </div>
+
+                                    </div>
+
+                                    <div data-ng-hide="$last">
+                                        <hr />
+                                    </div>
+                                </div>
+                                <div>
+                                    <strong>NOTA: </strong>Las cantidades indicadas no son cantidades finales, son variaciones sobre lo solicitado anteriormente.
+                                </div>
+
+                        </div>
+                    </div>
+                    <!-- FIN Panel de informacion del pago -->
+
+                </form>
+            </div>
+            <!-- FIN Vista de gestor -->
+
+
+
+          </div>
+    </div>
+<!--  FIN Panel de la pestaña -->
+
 </section>
