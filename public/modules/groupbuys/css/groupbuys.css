@@ -7,3 +7,35 @@ div.member .img-responsive {
 div.member.selected {
 	background-color: #afb;
 }
+
+th.paymentCell {
+	text-align: center;
+	padding: 5px;
+	vertical-align: middle;
+	border-color: lightgray;
+	border-bottom-style: solid;
+	border-width: 1px;
+	border-right-style: dotted;
+}
+
+td.paymentCell {
+	padding: 5px;
+	vertical-align: middle;
+	text-align: center;
+	border-color: lightgray;
+	border-bottom-style: solid;
+	border-width: 1px;
+	border-right-style: dotted;
+}
+
+table.paymentTable {
+	border-style:solid;
+	border-width:2px;
+	border-color: lightgray;
+}
+
+div.paymentNotes{
+	border: 1px solid grey;
+	padding: 10px;
+	margin-top: 10px;
+}

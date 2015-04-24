@@ -1,4 +1,4 @@
-<section data-ng-controller="GroupbuysTabPaymentsController" data-ng-init="loadPaymentData()">
+<section data-ng-controller="GroupbuysTabPaymentsController" data-ng-init="loadAllPaymentData()">
     <div class="panel panel-default">
         <div class="panel-body">
 
@@ -12,7 +12,7 @@
                         </div>
                         <div class="panel-body">
                             <div class="form-group">
-                                <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Información sobre el pago" disabled readonly></textarea>
+                                <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" ng-model="payment.info" placeholder="Notas de los gestores" disabled readonly></textarea>
                             </div>
                         </div>
                     </div>
@@ -24,14 +24,12 @@
                             <h3 class="panel-title">Cantidad a pagar</h3>
                         </div>
                         <div class="panel-body">
-                            <b>Precio items: </b><span>XXX</span> +<br />
-                            <b>Envio proporcional: </b><span>XXX</span> +<br />
-                            <b>Envio Propio: </b><span>XXX</span> +<br />
-                            <b>Otros: </b><span>XXX</span><br />
+                            <b>Precio items: </b><span>{{payment.subtotal}} €</span> +<br />
+                            <b>Envio proporcional: </b><span>{{payment.providerShippingCost}} €</span> +<br />
+                            <b>Envio Propio: </b><span>{{payment.shippingCost}} €</span> +<br />
+                            <b>Otros: </b><span>{{payment.otherCosts}} €</span><br />
                             <span>---------------------</span><br />
-                            <b>TOTAL: </b><span>XXX</span><br />
-
-
+                            <b>TOTAL: </b><span>{{payment.total}} €</span><br />
                         </div>
                     </div>
                     <!-- FIN Panel de cantidad a pagar -->
@@ -43,16 +41,16 @@
                         </div>
                         <div class="panel-body">
                             <div class="form-group">
-                                <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Notas sobre el pago para los gestores" ></textarea>
+                                <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" ng-model="payment.infoManagers"  placeholder="Notas sobre el pago para los gestores" ></textarea>
                             </div>
                         </div>
                         <div>
-                            <input type="checkbox"></td><span>Pagado</span><br />
-                            <input type="checkbox" disabled readonly></td><span>Recibido</span>
+                            <input type="checkbox" ng-model="payment.paid" ></td><span>Pagado</span><br />
+                            <input type="checkbox" disabled readonly ng-model="payment.received" ></td><span>Recibido</span>
                         </div>
                     </div>
                     <!-- FIN Panel de notas sobre el pago -->
-                    <input type="submit" value="Guardar" class="btn btn-default">
+                    <input type="submit" value="Guardar" class="btn btn-default" ng-click="savePaymentData()">
                 </form>
             </div>
             <!-- FIN Vista de participante -->
@@ -82,7 +80,7 @@
                         </div>
                         <div class="panel-body">
                             <span>Coste del envio entre el proveedor y el gestor (a partes iguales):</span>
-                            <input type="text">
+                            <input type="text"> €
                         </div>
                     </div>
                     <!-- FIN Panel de costes de envio -->
@@ -93,57 +91,47 @@
                             <h3 class="panel-title">Desglose de participantes</h3>
                         </div>
                         <div class="panel-body">
-                            <table class="tg" style="border-style:solid; border-width:1px;">
+                            <table class="paymentTable">
                                 <tr>
-                                <th class=>Participante</th>
-                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Precio Items</th>
-                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Envio porporcional</th>
-                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Envio Propio</th>
-                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Otros</th>
-                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Total</th>
-                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Pagado</th>
-                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Notas de pago</th>
-                                <th class="tg-031e" style="border-style:solid; border-width:1px;">Recibido</th>
+                                    <th class="paymentCell">Participante</th>
+                                    <th class="paymentCell">Precio Items</th>
+                                    <th class="paymentCell">Envio porporcional</th>
+                                    <th class="paymentCell">Envio Propio</th>
+                                    <th class="paymentCell">Otros</th>
+                                    <th class="paymentCell">Total</th>
+                                    <th class="paymentCell">Pagado</th>
+                                    <th class="paymentCell">Notas de pago</th>
+                                    <th class="paymentCell">Recibido</th>
                                 </tr>
-                                <tr>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;">Uno</td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="text"></td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="text"></td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="checkbox" disabled readonly></td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;">Ver notas</td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="checkbox"></td>
+                                <tr ng-repeat="payment in allPaymentData track by $index">
+                                    <td class="paymentCell">{{payment.username}}</td>
+                                    <td class="paymentCell">{{payment.subtotal}} €</td>
+                                    <td class="paymentCell">{{payment.providerShippingCost}} €</td>
+                                    <td class="paymentCell"><input type="text" ng-model="payment.shippingCost"> €</td>
+                                    <td class="paymentCell"><input type="text" ng-model="payment.otherCosts"> €</td>
+                                    <td class="paymentCell">{{payment.total}} €</td>
+                                    <td class="paymentCell"><input type="checkbox" disabled readonly></td>
+                                    <td class="paymentCell">
+                                        <button type="button" class="btn btn-info" aria-label="" data-ng-click="showPaymentNotes(payment._id)">
+                                            <span>Ver notas</span>
+                                        </button>
+                                    </td>
+                                    <td class="paymentCell"><input type="checkbox"></td>
                                 </tr>
-                                <tr>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;">Dos</td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="text"></td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="text"></td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="checkbox" disabled readonly></td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;">Ver notas</td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="checkbox"></td>
-                                </tr>
-                                <tr>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;"></td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="text"></td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="text"></td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;">XXX</td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="checkbox" disabled readonly></td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;">Ver notas</td>
-                                <td class="tg-031e" style="border-style:solid; border-width:1px;"><input type="checkbox"></td>
-                                </tr>
-                                </table>
+                            </table>
+
+                            <div ng-show="paymentNoteShow" class="paymentNotes">
+                                <strong>Nota del participante:</strong><br />
+                                <p>{{paymentNote}}</p>
+                                <button type="button" class="btn btn-success" aria-label="" data-ng-click="showPaymentNotes(0)">
+                                    <span>Cerrar</span>
+                                </button>
+                            </div>
 
                         </div>
                     </div>
                     <!-- FIN Panel de participantes -->
-                    <input type="submit" value="Guardar" class="btn btn-default">
+                    <input type="submit" value="Guardar" class="btn btn-default"  ng-click="saveAllPaymentData()">
                 </form>
             </div>
             <!-- FIN Vista de gestor -->
