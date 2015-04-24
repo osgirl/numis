@@ -397,13 +397,17 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
     * @methodOf groupbuys.controller:GroupbuysController
     *
     * @description
-    * Loads the visibility options of a Groupbuy.
+    * Loads options of a Groupbuy.
     */
     $scope.loadConfig = function() {
 
+		// Create payment elements
+		$scope.payment = [];
+		$scope.allPaymentData = [];
+
 		// Create the visibility options list
 		$scope.visibility = [];
-		
+
         // members
         $scope.visibility.members_public = false;
         $scope.visibility.members_restricted = false;
