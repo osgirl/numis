@@ -95,7 +95,7 @@ angular.module('groupbuys').controller('GroupbuysTabPaymentsController', ['$scop
 	* Toogles notes view
 	*/
 	$scope.showPaymentNotes = function(paymentId) {
-        if (paymentId == 0) {
+        if (paymentId === 0) {
             $scope.paymentNoteShow = false;
         } else {
             $scope.paymentNoteShow = true;
