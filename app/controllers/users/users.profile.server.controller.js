@@ -145,16 +145,8 @@ exports.update = function(req, res) {
 			// Bad Request
     		return res.status(400).send( errorHandler.prepareErrorResponse (err) );
     	} else {
-    		req.login(user, function(err) {
-    			if (err) {
-					// Bad Request
-					res.status(400).send( errorHandler.prepareErrorResponse (err) );
-    			} else {
-					// OK.
-					res.jsonp( formattingUser(user, req) );
-    			}
-    		});
-		}
+			res.jsonp( formattingUser(user, req) );
+    	}
 	});
 };
 
