@@ -84,10 +84,6 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 		$scope.tabs = [
 		{
-			title: 'Acciones pendientes',
-			template: '/modules/groupbuys/views/admin/tabs/actions.admin.view.html',
-			active: true
-		},{
 			title: 'Usuarios',
 			template:'/modules/groupbuys/views/admin/tabs/users.admin.view.html'
 		},{
