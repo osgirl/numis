@@ -2,6 +2,13 @@
 	<div class="page-header">
 		<h1>Administración</h1>
 	</div>
+
+	<!-- Error area -->
+	<div data-ng-show="error" class="alert alert-danger" role="alert">
+		<strong data-ng-bind="error"></strong>
+	</div>
+	<!-- END error area-->
+	
 	<tabset>
 		<tab ng-repeat="tab in tabs" heading="{{tab.title}}" active="tab.active" disabled="tab.disabled">
 			<div ng-include="tab.template"></div>
