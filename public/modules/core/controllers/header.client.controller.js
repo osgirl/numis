@@ -19,9 +19,9 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
 
 		// TODO Filter roles for admin link
 		//if (typeof $scope.authentication.user.roles !== 'undefined' && $scope.authentication.user.roles.indexOf('admin') !== -1 ) {
-		//	Menus.addMenuItem('topbar',  'Administrar a fuego', 'groupbuys/create');
+		//	Menus.addMenuItem('topbar',  'Administrar', 'groupbuys/create');
 		//}
-		Menus.addMenuItem('topbar',  'Administrar a fuego', 'admin');
+		Menus.addMenuItem('topbar',  'Administrar', 'admin');
 
 
 		$scope.menu = Menus.getMenu('topbar');
