@@ -16,7 +16,16 @@ angular.module('core').controller('HeaderController', ['$scope', 'Authentication
 	function($scope, Authentication, Menus) {
 		$scope.authentication = Authentication;
 		$scope.isCollapsed = false;
+
+		// TODO Filter roles for admin link
+		//if (typeof $scope.authentication.user.roles !== 'undefined' && $scope.authentication.user.roles.indexOf('admin') !== -1 ) {
+		//	Menus.addMenuItem('topbar',  'Administrar a fuego', 'groupbuys/create');
+		//}
+		Menus.addMenuItem('topbar',  'Administrar a fuego', 'admin');
+
+
 		$scope.menu = Menus.getMenu('topbar');
+
 
 		/**
 		* @ngdoc method

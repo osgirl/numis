@@ -102,7 +102,6 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 	*/
 	$scope.create = function(isValid) {
 		if (isValid) {
-			console.log('create-begin');
 
 			var newGroupbuy = {};
 			newGroupbuy.title = $scope.groupbuy.title;

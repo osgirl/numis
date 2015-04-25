@@ -74,10 +74,9 @@ angular.module('groupbuys').controller('GroupbuysTabItemsController', ['$scope',
                     $scope.payment.info = data[0].payment.info;
                     $scope.payment.infoManagers = '';
                     // //$scope.payment.infoManagers = data[0].payment.infoManagers;
-                    $scope.payment.paid = true;
-                    $scope.payment.received = true;
-                    //
-                    console.log ($scope.payment);
+                    // TODO - Get this from server:
+                    $scope.payment.paid = false;
+                    $scope.payment.received = false;
 
                 }, function errorCallback() {
                     $scope.error = $translate.instant('core.Error_connecting_server');

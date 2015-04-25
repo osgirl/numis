@@ -24,6 +24,10 @@ angular.module('groupbuys').config(['$stateProvider',
 			state('manageGroupbuy', {
 				url: '/groupbuys/:groupbuyId/manage',
 				templateUrl: 'modules/groupbuys/views/view-groupbuy.client.view.html'
+			}).
+			state('admin', {
+				url: '/admin',
+				templateUrl: 'modules/groupbuys/views/admin/admin.view.html'
 			});
 	}
 ]);
