@@ -1,10 +1,10 @@
-<section data-ng-controller="GroupbuysTabDeliveriesController" data-ng-init="loadDeliveriesData()">
+<section data-ng-controller="GroupbuysTabDeliveriesController" data-ng-init="loadDeliveryData()">
     <div class="panel panel-default">
         <div class="panel-body">
 
             <!-- Vista de participante -->
             <div data-ng-show="(userRole !== 'manager')">
-                <form data-ng-submit="joinGroupbuy()" name="memberManagerForm" novalidate>
+                <form data-ng-submit="saveDeliveryData()" name="memberManagerForm" novalidate>
                     <!-- Panel de informacion del pago -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -12,7 +12,7 @@
                         </div>
                         <div class="panel-body">
                             <div class="form-group">
-                                <textarea id="deliveryAddress" data-ng-model="authentication.user.deliveryAddress"  name="deliveryAddress" class="form-control" rows="5" placeholder="Dirección del envio"></textarea>
+                                <textarea id="deliveryAddress" data-ng-model="delivery.address"  name="deliveryAddress" class="form-control" rows="5" placeholder="Dirección del envio"></textarea>
                             </div>
                             <input type="button" value="Copiar dirección del perfil" ng-click="copyHomeAdress()" class="btn btn-default">
                         </div>
@@ -26,12 +26,14 @@
                         </div>
                         <div class="panel-body">
                             <div class="form-group">
-                                <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Información sobre el pago" disabled readonly></textarea>
+                                <textarea id="deliveryInfo" name="deliveryInfo" ng-model="delivery.info" class="form-control" rows="5" placeholder="Información sobre el pago" disabled readonly></textarea>
                             </div>
                         </div>
-                        <div>
-                            <input type="checkbox" disabled readonly></td><span>Enviado</span><br />
-                            <input type="checkbox"></td><span>Recibido</span>
+                        <div style="text-align: center; padding-bottom: 10px;">
+                            <div>
+                                <input type="checkbox" ng-model="delivery.shipped" disabled readonly><span>Enviado</span>
+                                <input type="checkbox" ng-model="delivery.received" style="margin-left: 20px;"><span>Recibido</span>
+                            </div>
                         </div>
                     </div>
                     <!-- FIN Panel de notas sobre el pago -->
@@ -42,21 +44,17 @@
 
 
             <!-- Vista de gestor -->
-            <div data-ng-show="(userRole == 'manager')">
+            <div data-ng-show="(userRole === 'manager')">
 
-                <form data-ng-submit="joinGroupbuy()" name="PaymentManagerForm" novalidate>
+                <form data-ng-submit="saveDeliveryData()" name="PaymentManagerForm" novalidate>
                     <!-- Panel de informacion del envio -->
                     <div class="row">
                         <div class="col-md-3">
-                            <ul class="nav nav-pills nav-stacked">
-                                <li role="presentation" class="active"><a href="#"><img src="#" />Usuario 1</a></li>
-                                <li role="presentation"><a href="#"><img src="#" />Usuario 2</a></li>
-                                <li role="presentation"><a href="#"><img src="#" />Usuario 3</a></li>
-                                <li role="presentation"><a href="#"><img src="#" />Usuario 4</a></li>
-                                <li role="presentation"><a href="#"><img src="#" />Usuario 5</a></li>
-                                <li role="presentation"><a href="#"><img src="#" />Usuario 6</a></li>
-                                <li role="presentation"><a href="#"><img src="#" />Usuario 7</a></li>
-                            </ul>
+                            <div>
+                                <div class="member {{selected}}" data-ng-repeat="member in groupbuy.members_extended_data track by $index" data-ng-click="selectMember(member);">
+                                    <img class="img-responsive img-circle" ng-src="{{member.avatar}}?size=sm" fb-src="['/modules/users/img/no-user-image-square-sm.jpg']" alt="avatar" /><span>{{member.username}}</span>
+                                </div>
+                            </div>
                         </div>
                         <div class="col-md-9">
                             <!-- Direccion envio -->
@@ -66,7 +64,7 @@
                                 </div>
                                 <div class="panel-body">
                                     <div class="form-group">
-                                        <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Información sobre el pago" disabled readonly></textarea>
+                                        <textarea id="deliveryAddress" name="deliveryAddress" ng-model="delivery.address" class="form-control" rows="5" placeholder="Información sobre el pago" disabled readonly></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -78,12 +76,14 @@
                                 </div>
                                 <div class="panel-body">
                                     <div class="form-group">
-                                        <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Información sobre el pago"></textarea>
+                                        <textarea id="deliveryInfo" name="deliveryInfo" ng-model="delivery.info" class="form-control" rows="5" placeholder="Información sobre el pago"></textarea>
                                     </div>
                                 </div>
-                                <div>
-                                    <input type="checkbox" ></td><span>Enviado</span><br />
-                                    <input type="checkbox" disabled readonly></td><span>Recibido</span>
+                                <div style="text-align: center; padding-bottom: 10px;">
+                                    <div>
+                                        <input type="checkbox" ng-model="delivery.shipped"><span>Enviado</span>
+                                        <input type="checkbox" ng-model="delivery.received" style="margin-left: 20px;" disabled readonly><span>Recibido</span>
+                                    </div>
                                 </div>
                                 <input type="submit" value="Guardar" class="btn btn-default">
                             </div>
