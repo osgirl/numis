@@ -29,6 +29,14 @@ module.exports = function(app) {
 	app.route('/api/v1/orders/:orderId/calculate')
 		.post(users.requiresLogin, groupbuys.hasAuthorization(['manager']), orders.calculateSummary);
 
+	// Update payment data for an order
+	app.route('/api/v1/orders/:orderId/payment')
+		.post(users.requiresLogin, groupbuys.hasAuthorization(['member']), orders.updatePayment);
+
+	// Update shipping data for an order
+	app.route('/api/v1/orders/:orderId/shipping')
+		.post(users.requiresLogin, groupbuys.hasAuthorization(['member']), orders.updateShipping);
+
 	// Get all orders belong to an user
 	app.route('/api/v1/users/:userId/orders')
 		.get(users.requiresLogin, users.hasAuthorization(['self','admin']), core.prepareQueryParams, orders.list);

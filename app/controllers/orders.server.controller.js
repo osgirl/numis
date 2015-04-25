@@ -63,6 +63,14 @@ var formattingOrder = function(order, req, reduce) {
 			result._links.groupbuy = { href: groupbuyURL, title: 'Groupbuy to which belongs to' };
 		}
 
+		// payment
+		if (result.payment.confirmationDate !== null) result.payment.received = true;
+		if (result.payment.date !== null)             result.payment.paid = true;
+
+		// shipping
+		if (result.shipping.confirmationDate !== null) result.shipping.received = true;
+		if (result.shipping.date !== null)             result.shipping.shipped = true;
+
 		// Remove fields
 		delete result.__v;
 	}
@@ -293,8 +301,7 @@ exports.removeRequest = function(req, res) {
 	var order = req.order,
 		id    = req.body.id;
 
-	// TODO: Only platform admins can remove requests
-
+	// Only platform admins can remove requests
 	order.removeRequest(id, function(err) {
 		if (err) {
 			return res.status(400).send( errorHandler.prepareErrorResponse (err) );
@@ -324,10 +331,111 @@ exports.calculateSummary = function(req, res) {
 
 
 /**
+ * Update payment data for an Order
+ */
+exports.updatePayment = function(req, res) {
+	var order     = req.order,
+	    groupbuy  = req.groupbuy,
+		user      = req.user,
+		isAdmin   = user.isAdmin(),
+		isManager = (isAdmin || groupbuy.isManager(user._id) ),
+		changedPayment = (req.body.paid === true) !== (order.shipping.confirmationDate !== null),
+		paidDate        = (req.body.paid === true) ? Date.now() : null,
+		payment         = {};
+
+	if (isManager) {
+		var changedReceived = (req.body.received === true) !== (order.payment.date !== null);
+
+		payment.infoManagers = req.body.infoManagers;
+
+		if (changedReceived) {
+			payment.confirmationDate = (req.body.paid === true) ? Date.now() : null;
+			payment.confirmedBy = (req.body.paid === true) ? req.user.id : null;
+		}
+
+		// I'm a manager but i am editing myself payment info
+		if (user.id === order.user.id) {
+			payment.info = req.body.info;
+			if (changedPayment) {
+				payment.date = paidDate;
+			}
+		}
+	} else {
+		payment.info = req.body.info;
+		if (changedPayment) {
+			payment.date = paidDate;
+		}
+	}
+
+	payment = _.extend(order.payment , payment);
+
+	// Saving it...
+	order.update({ $set: {payment: payment}}, {}, function(err) {
+		if (err) {
+			return res.status(400).send({message: errorHandler.getErrorMessage(err) });
+		} else {
+			res.jsonp(payment);
+		}
+	});
+};
+
+
+/**
+ * Update shipping data for an Order
+ */
+exports.updateShipping = function(req, res) {
+	var order     = req.order,
+	    groupbuy  = req.groupbuy,
+		user      = req.user,
+		isAdmin   = user.isAdmin(),
+		isManager = (isAdmin || groupbuy.isManager(user._id) ),
+		changedReceived = (req.body.received === true) !== (order.shipping.confirmationDate !== null),
+		receivedDate    = (req.body.received === true) ? Date.now() : null,
+		shipping        = {};
+
+	if (isManager) {
+		var changedShipped = (req.body.shipped === true) !== (order.shipping.date !== null);
+
+		shipping.info = req.body.info;
+
+		if (changedShipped) {
+			shipping.date = (req.body.shipped === true) ? Date.now() : null;
+			shipping.shippedBy = (req.body.shipped === true) ? req.user.id : null;
+		}
+
+
+		// I'm a manager but i am editing myself shipping info
+		if (user.id === order.user.id) {
+			shipping.address = req.body.address;
+			if (changedReceived) {
+				shipping.confirmationDate = receivedDate;
+			}
+		}
+	} else {
+		shipping.address = req.body.address;
+		if (changedReceived) {
+			shipping.confirmationDate = receivedDate;
+		}
+	}
+
+	shipping = _.extend(order.shipping, shipping);
+	// Saving it...
+	order.update({ $set: {shipping: shipping}}, {}, function(err, order) {
+		if (err) {
+			return res.status(400).send({message: errorHandler.getErrorMessage(err) });
+		} else {
+			res.jsonp(order.shipping);
+		}
+	});
+};
+
+
+
+/**
  * Order middleware
  */
 exports.orderByID = function(req, res, next, id) {
-	Order.findById(id).populate('user', 'username').populate('groupbuy', 'title').exec(function(err, order) {
+	Order.findById(id).populate('user', 'id username').populate('groupbuy', 'title').exec(function(err, order) {
 		if (err) return res.status(400).send( errorHandler.prepareErrorResponse(err) );
 		if (!order)
 			return res.status(400).send( errorHandler.prepareErrorResponse( new Error('Failed to load Order ' + id) ));
