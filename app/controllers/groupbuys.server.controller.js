@@ -249,7 +249,7 @@ exports.list = function(req, res) {
 		sort,
 		limit  = req.query.limit || 25,
 		page   = req.query.page || 1,
-		fields = req.query.fields || '_id title name description status members manager currencies user';
+		fields = req.query.fields || '_id title name description status members managers currencies user';
 
 	// Filter deleted groupbuys
 	if (!query) {
