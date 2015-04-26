@@ -477,7 +477,7 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 		var statusesENG = ['new', 'published', 'acceptance', 'payments', 'paid', 'shipments', 'closed'];
 		var statusesESP = ['Nueva', 'Publicada', 'Aceptación', 'Pagos', 'Pagada', 'Envios', 'Cerrada'];
 
-		for (var i = 0 ; i < 6 ; i++){
+		for (var i = 0 ; i < statusesENG.length ; i++){
 			var elem = [];
 			elem.name = statusesENG[i];
 			elem.nombre = statusesESP[i];
