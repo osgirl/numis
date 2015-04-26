@@ -130,13 +130,20 @@ exports.read = function(req, res) {
  */
 exports.update = function(req, res) {
 	// Init Variables
-	var user = req.profile;
+	var user = req.profile,
+		data = {};
+
+	if (typeof req.body.username !== 'undefined') {
+		data = req.body;
+	} else if (typeof req.query.username !== 'undefined') {
+		data = req.query;
+	}
 
 	// For security measurement we remove the roles from the req.body object
-	delete req.body.roles;
+	delete data.roles;
 
 	// Merge existing user
-    user = _.extend(user, req.body);
+    user = _.extend(user, data);
     //user.updated = Date.now();	// It'll be done in pre-save hook.
     user.displayName = user.firstName + ' ' + user.lastName;
 
