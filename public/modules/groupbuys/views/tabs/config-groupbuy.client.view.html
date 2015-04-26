@@ -1,4 +1,4 @@
-<section data-ng-controller="GroupbuysTabConfigController" data-ng-init="loadConfig()">
+<section data-ng-controller="GroupbuysTabConfigController" >
     <div class="panel panel-default" data-ng-show="(userRole == 'manager')">
         <div class="panel-body">
 
@@ -10,27 +10,19 @@
                 </div>
                 <div class="panel-body">
 
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-default disabled">{{'groupbuys.New' | translate}}</button>
-                        <button type="button" class="btn btn-default disabled">{{'groupbuys.Published' | translate}}</button>
-                        <button type="button" class="btn btn-default disabled">{{'groupbuys.Consolidate' | translate}}</button>
-                        <button type="button" class="btn btn-success disabled active">{{'groupbuys.Payments' | translate}}</button>
-                        <button type="button" class="btn btn-warning" ng-click="changeState('paid')">{{'groupbuys.Paid' | translate}}</button>
-                        <button type="button" class="btn btn-info disabled">{{'groupbuys.Shipments' | translate}}</button>
-                        <button type="button" class="btn btn-info disabled">{{'groupbuys.Closed' | translate}}</button>
+                    <div class="btn-group" role="group" ng-repeat="status in groupbuy.allStatus track by $index">
+                        <button type="button" class="{{status.btnClass}}" ng-click="changeState(status.name)">{{status.nombre}}</button>
                     </div>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-danger">{{'groupbuys.Cancelled' | translate}}</button>
+                    <div class="btn-group" role="group" ng-show="groupbuy.showCancel">
+                        <button type="button" class="btn btn-danger" ng-click="changeState('cancelled')">{{'groupbuys.Cancelled' | translate}}</button>
                     </div>
-                    <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-danger">{{'groupbuys.Deleted' | translate}}</button>
+                    <div class="btn-group" role="group" ng-show="groupbuy.showDelete">
+                        <button type="button" class="btn btn-danger" ng-click="changeState('deleted')">{{'groupbuys.Deleted' | translate}}</button>
                     </div>
                     <br />
                     <div>
                         <span>{{'groupbuys.Legend' | translate}}: </span>
-                        <span class="label label-default">{{'groupbuys.Previous_States' | translate}}</span>
-                        <span class="label label-success">{{'groupbuys.Actual_State' | translate}}</span>
-                        <span class="label label-warning">{{'groupbuys.Next_State' | translate}}</span>
+                        <span class="label label-success">{{'groupbuys.Next_State' | translate}}</span>
                         <span class="label label-danger">{{'groupbuys.Special_States' | translate}}</span>
                     </div>
                 </div>

@@ -470,6 +470,52 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
                 break;
             default:
         }
+
+		// Load groupbuy states
+
+		$scope.groupbuy.allStatus = [];
+		var statusesENG = ['new', 'published', 'acceptance', 'payments', 'paid', 'shipments', 'closed'];
+		var statusesESP = ['Nueva', 'Publicada', 'Aceptación', 'Pagos', 'Pagada', 'Envios', 'Cerrada'];
+
+		for (var i = 0 ; i < 6 ; i++){
+			var elem = [];
+			elem.name = statusesENG[i];
+			elem.nombre = statusesESP[i];
+			elem.btnClass = 'btn btn-link disabled';
+			$scope.groupbuy.allStatus.push(elem);
+		}
+
+		// Mark current and next status
+		for (var j = 0 ; j < $scope.groupbuy.allStatus.length ; j++){
+			if ($scope.groupbuy.allStatus[j].name === $scope.groupbuy.status) {
+				$scope.groupbuy.allStatus[j].btnClass = 'btn btn-default disabled active';
+				if (j < $scope.groupbuy.allStatus.length-1) {
+					// Avoid this in the last status
+					$scope.groupbuy.allStatus[j+1].btnClass = 'btn btn-success';
+				}
+			}
+		}
+
+		// Special Status
+		switch( $scope.groupbuy.status ) {
+            case 'new':
+			case 'published':
+				$scope.groupbuy.showCancel = false;
+				$scope.groupbuy.showDelete = true;
+				break;
+            case 'acceptance':
+			case 'payments':
+			case 'paid':
+			case 'shipments':
+			case 'closed':
+				$scope.groupbuy.showCancel = true;
+				$scope.groupbuy.showDelete = false;
+				break;
+			default:
+                $scope.groupbuy.showCancel = false;
+				$scope.groupbuy.showDelete = false;
+        }
+
     };
 
 	// ----------------------

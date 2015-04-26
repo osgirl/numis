@@ -1,8 +1,8 @@
 'use strict';
 
 // Configuration tab controller
-angular.module('groupbuys').controller('GroupbuysTabConfigController', ['$scope', 'Restangular', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys',
-  function($scope, Restangular, $stateParams, $location, $translate, Authentication, Groupbuys) {
+angular.module('groupbuys').controller('GroupbuysTabConfigController', ['$scope', 'Restangular', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys', '$window',
+  function($scope, Restangular, $stateParams, $location, $translate, Authentication, Groupbuys, $window) {
     $scope.authentication = Authentication;
 
 
@@ -17,8 +17,13 @@ angular.module('groupbuys').controller('GroupbuysTabConfigController', ['$scope'
     * Changes the state of a Groupbuy.
     */
     $scope.changeState = function(newState) {
-
         console.log('estado: '+newState);
+
+        Restangular.one('groupbuys',$stateParams.groupbuyId).all('go-to').all(newState).post().then(function(data) {
+            $window.location.reload();
+        }, function(serverResponse) {
+            $scope.error = $translate.instant('core.Error_connecting_server');
+        });
     };
 
 
