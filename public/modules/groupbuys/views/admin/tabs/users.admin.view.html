@@ -91,13 +91,12 @@
                 </div>
                 <div class="panel-body">
                     <form>
-                        User_id: HIDDEN
-                        <input type="text" data-ng-model="editingUser._id"><br />
-                        Apodo:
+                        <input type="hidden" data-ng-model="editingUser._id"><br />
+                        <strong>Apodo:</strong>
                         <input type="text" data-ng-model="editingUser.username"><br />
-                        Email:
+                        <strong>Email:</strong>
                         <input type="text" data-ng-model="editingUser.email"><br />
-                        Dirección:<br />
+                        <strong>Dirección:</strong><br />
                         <textarea class="form-control" data-ng-model="editingUser.homeAddress" rows="5" placeholder="Direcci&oacute;n"></textarea>
                         <br />
                         <button type="submit" class="btn btn-warning" aria-label="Left Align" ng-click="sendPasswdMail()">
