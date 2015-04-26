@@ -21,42 +21,42 @@
 
                         <table class="paymentTable">
                             <tr>
-                                <th class="paymentCell"></th>
-                                <th class="paymentCell">Usuario</th>
-                                <th class="paymentCell">Ver perfil</th>
-                                <th class="paymentCell">Suspender/Reactivar cuenta</th>
-                                <th class="paymentCell">Permisos de administración</th>
+                                <th class="paymentCell headerCell"></th>
+                                <th class="paymentCell headerCell">Usuario</th>
+                                <th class="paymentCell headerCell">Ver perfil</th>
+                                <th class="paymentCell headerCell">Suspender/Reactivar cuenta</th>
+                                <th class="paymentCell headerCell">Permisos de administración</th>
                             </tr>
                             <tr ng-repeat="user in usersList | filter:filterUsers track by $index ">
 
 
-                                <th class="paymentCell">
+                                <td class="paymentCell">
                                     <input type="checkbox" name="user" value="{{user._id}}" ng-model="user.Selected">
-                                </th>
-                                <th class="paymentCell">
+                                </td>
+                                <td class="paymentCell">
                                     <img class="img-responsive img-circle" ng-src="{{user.avatar}}?size=sm" fb-src="['/modules/users/img/no-user-image-square-sm.jpg']" alt="avatar" /> <span>{{user.username}}</span>
-                                </th>
-                                <th class="paymentCell">
+                                </td>
+                                <td class="paymentCell">
                                     <button type="button" class="btn btn-info" aria-label="" data-ng-click="showProfile(user._id);">
                                         <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
                                     </button>
-                                </th>
-                                <th class="paymentCell">
+                                </td>
+                                <td class="paymentCell">
                                     <button type="button" class="btn btn-warning" aria-label="" data-ng-click="enableUser(user._id);"  ng-hide="user.isUser">
                                         <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span>
                                     </button>
                                     <button type="button" class="btn btn-danger" aria-label="" data-ng-click="disableUser(user._id);" ng-show="user.isUser">
                                         <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                                     </button>
-                                </th>
-                                <th class="paymentCell">
+                                </td>
+                                <td class="paymentCell">
                                     <button type="button" class="btn btn-success" aria-label="" data-ng-click="addAdmin(user._id);"  ng-hide="user.isAdmin">
                                         <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
                                     </button>
                                     <button type="button" class="btn btn-danger" aria-label="" data-ng-click="removeAdmin(user._id);"  ng-show="user.isAdmin">
                                         <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
                                     </button>
-                                </th>
+                                </td>
                             </tr>
                         </table>
 
