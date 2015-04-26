@@ -28,6 +28,29 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 
 	// ----------------------
 
+	/*
+	@ngdoc method
+	* @name groupbuys.controller:AdminController.findPosition
+	* @methodOf groupbuys.controller:AdminController
+	@description
+	* Finds the first appearance of an element that cointains an _id property with the value provided.
+	* Otherwise returns -1
+	*/
+	$scope.findPosition = function(value, list) {
+		var position = -1;
+		if (value !== '' && list !== '' ) {
+			for (var i = 0 ; i < list.length ; i++){
+				if (list[i]._id === value) {
+					position = i;
+					break;
+				}
+			}
+		}
+		return position;
+	};
+
+	// ----------------------
+
 	/**
 	* @ngdoc method
 	* @name groupbuys.controller:AdminController.$scope.loadAdminData
@@ -77,12 +100,42 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 					$scope.error = $translate.instant('core.Error_connecting_server');
 				});
 			}
+
+			// - - - - - - - -
+			// Load groupbuys data
+			$scope.activeGroupbuys = [];
+			$scope.oldGroupbuys = [];
+
+			Restangular.all('groupbuys').getList().then(function(data) {
+				for (var i=0; i<data.length; i++) {
+					// Add managers
+					data[i].managersList = [];
+					for (var j=0; j<data[i].managers.length; j++) {
+						var position = $scope.findPosition(data[i].managers[j], $scope.usersList);
+						if (position !== -1) {
+							data[i].managersList.push($scope.usersList[position].username);
+						}
+					}
+					// Add members number
+					data[i].membersLength = data[i].members.length;
+
+					// Short it
+					if (data[i].status === 'closed' || data[i].status === 'cancelled' || data[i].status === 'deleted' ) {
+						$scope.oldGroupbuys.push(data[i]);
+					} else {
+						$scope.activeGroupbuys.push(data[i]);
+					}
+
+				}
+			}, function(serverResponse) {
+				$scope.error = $translate.instant('core.Error_connecting_server');
+			});
+
+			// --- end groupbuys
+
 		}, function(serverResponse) {
 			$scope.error = $translate.instant('core.Error_connecting_server');
 		});
-		// - - - - - - - -
-		// Load groupbuys data
-
 	};
 
 	// ----------------------
@@ -106,29 +159,6 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 			template:'/modules/groupbuys/views/admin/tabs/groupbuys.admin.view.html'
 		}
 		];
-	};
-
-	// ----------------------
-
-	/*
-	@ngdoc method
-	* @name groupbuys.controller:AdminController.findPosition
-	* @methodOf groupbuys.controller:AdminController
-	@description
-	* Finds the first appearance of an element that cointains an _id property with the value provided.
-	* Otherwise returns -1
-	*/
-	$scope.findPosition = function(value, list) {
-		var position = -1;
-		if (value !== '' && list !== '' ) {
-			for (var i = 0 ; i < list.length ; i++){
-				if (list[i]._id === value) {
-					position = i;
-					break;
-				}
-			}
-		}
-		return position;
 	};
 
 	// ----------------------
@@ -299,16 +329,17 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 	* Changes the state of a Groupbuy.
 	*/
 	$scope.saveEditedUser = function() {
-        var payload = {
-			username:    $scope.editingUser.username,
-	        email:       $scope.editingUser.email,
-	        homeAddress: $scope.editingUser.homeAddress,
-			firstName:   $scope.editingUser.firstName,
-			lastName:    $scope.editingUser.lastName
-		};
+        var payload = {};
+        payload.username = $scope.editingUser.username;
+        payload.email = $scope.editingUser.email;
+        payload.homeAddress = $scope.editingUser.homeAddress;
+// TODO FIX THIS!!!
+		payload.firstName = $scope.editingUser.firstName;
+		payload.lastName = $scope.editingUser.lastName;
+		payload.displayName = payload.firstName + ' ' + payload.lastName;
 
         // Updating the server via API
-        Restangular.one('users', $scope.editingUser._id).put(payload).then(function(data) {
+        Restangular.one('users',$scope.editingUser._id).put(payload).then(function(data) {
 			$scope.showUserEditArea = false;
 			var position = $scope.findPosition($scope.editingUser._id, $scope.usersList);
 			if (position !== -1) {
@@ -318,8 +349,6 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
             $scope.error = $translate.instant('core.Error_connecting_server');
         });
 	};
-
-
 	// ----------------------
 	/**
 	* @ngdoc method

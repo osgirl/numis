@@ -10,6 +10,31 @@
                 </div>
                 <div class="panel-body">
 
+                    <table class="paymentTable">
+                        <tr>
+                            <th class="paymentCell headerCell">Nombre de la compra</th>
+                            <th class="paymentCell headerCell">Estado</th>
+                            <th class="paymentCell headerCell">Gestores</th>
+                            <th class="paymentCell headerCell">Nº de participantes</th>
+                            <th class="paymentCell headerCell"></th>
+                        </tr>
+                        <tr ng-repeat="groupbuy in activeGroupbuys track by $index ">
+                            <td class="paymentCell">{{groupbuy.title}}</td>
+                            <td class="paymentCell">{{groupbuy.status}}</td>
+                            <td class="paymentCell">
+                                <span ng-repeat="manager in groupbuy.managersList track by $index ">
+                                    {{manager}}<br />
+                                </span>
+                            </td>
+                            <td class="paymentCell">{{groupbuy.membersLength}} participantes</td>
+                            <td class="paymentCell">
+                                <a class="btn btn-info" data-ng-href="#!/groupbuys/{{groupbuy._id}}">
+                                    <span class="glyphicon glyphicon-eye-open" aria-hidden="true"> Ir a la compra</span>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+
 
                 </div>
             </div>
@@ -23,6 +48,30 @@
                 </div>
                 <div class="panel-body">
 
+                    <table class="paymentTable">
+                        <tr>
+                            <th class="paymentCell headerCell">Nombre de la compra</th>
+                            <th class="paymentCell headerCell">Estado</th>
+                            <th class="paymentCell headerCell">Gestores</th>
+                            <th class="paymentCell headerCell">Nº de participantes</th>
+                            <th class="paymentCell headerCell"></th>
+                        </tr>
+                        <tr ng-repeat="groupbuy in oldGroupbuys track by $index ">
+                            <th class="paymentCell">{{groupbuy.title}}</th>
+                            <th class="paymentCell">{{groupbuy.status}}</th>
+                            <th class="paymentCell">
+                                <span ng-repeat="manager in groupbuy.managersList track by $index ">
+                                    {{manager}}<br />
+                                </span>
+                            </th>
+                            <th class="paymentCell">{{groupbuy.membersLength}} participantes</th>
+                            <th class="paymentCell">
+                                <a class="btn btn-info" data-ng-href="#!/groupbuys/{{groupbuy._id}}">
+                                    <span class="glyphicon glyphicon-eye-open" aria-hidden="true"> Ir a la compra</span>
+                                </a>
+                            </th>
+                        </tr>
+                    </table>
 
                 </div>
             </div>

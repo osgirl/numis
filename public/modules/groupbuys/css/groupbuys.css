@@ -16,6 +16,7 @@ th.paymentCell {
 	border-bottom-style: solid;
 	border-width: 1px;
 	border-right-style: dotted;
+	font-weight: normal;
 }
 
 td.paymentCell {
@@ -48,4 +49,8 @@ div.requestDate {
 div.requestProducts {
 	margin-left: 20px;
 	margin-bottom: 5px;
+}
+
+th.headerCell{
+	font-weight: bold;
 }
