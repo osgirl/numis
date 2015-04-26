@@ -299,17 +299,16 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
 	* Changes the state of a Groupbuy.
 	*/
 	$scope.saveEditedUser = function() {
-        var payload = {};
-        payload.username = $scope.editingUser.username;
-        payload.email = $scope.editingUser.email;
-        payload.homeAddress = $scope.editingUser.homeAddress;
-// TODO FIX THIS!!!
-		payload.firstName = $scope.editingUser.firstName;
-		payload.lastName = $scope.editingUser.lastName;
-		payload.displayName = payload.firstName + ' ' + payload.lastName;
+        var payload = {
+			username:    $scope.editingUser.username,
+	        email:       $scope.editingUser.email,
+	        homeAddress: $scope.editingUser.homeAddress,
+			firstName:   $scope.editingUser.firstName,
+			lastName:    $scope.editingUser.lastName
+		};
 
         // Updating the server via API
-        Restangular.one('users',$scope.editingUser._id).put(payload).then(function(data) {
+        Restangular.one('users', $scope.editingUser._id).put(payload).then(function(data) {
 			$scope.showUserEditArea = false;
 			var position = $scope.findPosition($scope.editingUser._id, $scope.usersList);
 			if (position !== -1) {
@@ -319,6 +318,8 @@ function($scope, Restangular, $stateParams, $location, $translate, Authenticatio
             $scope.error = $translate.instant('core.Error_connecting_server');
         });
 	};
+
+
 	// ----------------------
 	/**
 	* @ngdoc method
