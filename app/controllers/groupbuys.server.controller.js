@@ -27,8 +27,8 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, re
 		isManager 	 = (isAdmin || groupbuy.isManager(user._id) ),
 		showUpdates  = !reduce && isMember,
 		showVisibilityInfo = !reduce,
-		showMembers  = !reduce && groupbuy.checkVisibility(user, 'members'),
-		showManagers = !reduce && groupbuy.checkVisibility(user, 'managers'),
+		showMembers  = groupbuy.checkVisibility(user, 'members'),
+		showManagers = groupbuy.checkVisibility(user, 'managers'),
 		result 	  	 = {},
 		i;
 
