@@ -2,7 +2,7 @@
     <div class="panel panel-default">
         <div class="panel-body">
 
-            <!-- Panel de usuarios pendientes -->
+            <!-- Panel de usuarios -->
             <div class="panel panel-default">
 
                 <div class="panel-heading">
@@ -10,10 +10,111 @@
                 </div>
                 <div class="panel-body">
 
+                    <form name="usersForm" novalidate>
 
+                        <span>Buscar:</span>
+                        <form>
+                            <input type="text" data-ng-model="filterUsers" id="error" class="form-control" placeholder="Filtrar" >
+                        </form>
+
+                        <br />
+
+                        <table class="paymentTable">
+                            <tr>
+                                <th class="paymentCell"></th>
+                                <th class="paymentCell">Usuario</th>
+                                <th class="paymentCell">Ver perfil</th>
+                                <th class="paymentCell">Suspender/Reactivar cuenta</th>
+                                <th class="paymentCell">Permisos de administración</th>
+                            </tr>
+                            <tr ng-repeat="user in usersList | filter:filterUsers track by $index ">
+
+
+                                <th class="paymentCell">
+                                    <input type="checkbox" name="user" value="{{user._id}}" ng-model="user.Selected">
+                                </th>
+                                <th class="paymentCell">
+                                    <img class="img-responsive img-circle" ng-src="{{user.avatar}}?size=sm" fb-src="['/modules/users/img/no-user-image-square-sm.jpg']" alt="avatar" /> <span>{{user.username}}</span>
+                                </th>
+                                <th class="paymentCell">
+                                    <button type="button" class="btn btn-info" aria-label="" data-ng-click="showProfile(user._id);">
+                                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                                    </button>
+                                </th>
+                                <th class="paymentCell">
+                                    <button type="button" class="btn btn-warning" aria-label="" data-ng-click="enableUser(user._id);"  ng-hide="user.isUser">
+                                        <span class="glyphicon glyphicon-retweet" aria-hidden="true"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-danger" aria-label="" data-ng-click="disableUser(user._id);" ng-show="user.isUser">
+                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                    </button>
+                                </th>
+                                <th class="paymentCell">
+                                    <button type="button" class="btn btn-success" aria-label="" data-ng-click="addAdmin(user._id);"  ng-hide="user.isAdmin">
+                                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                                    </button>
+                                    <button type="button" class="btn btn-danger" aria-label="" data-ng-click="removeAdmin(user._id);"  ng-show="user.isAdmin">
+                                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                    </button>
+                                </th>
+                            </tr>
+                        </table>
+
+                        <br />
+
+                        <button type="button" class="btn btn-danger" aria-label="Left Align" ng-click="checkAll()">
+                            <span class="glyphicon glyphicon-check" aria-hidden="true"> Marcar/Desmarcar todos</span>
+                        </button>
+                        <button type="button" class="btn btn-success" aria-label="Left Align" ng-click="showWriteArea()">
+                            <span class="glyphicon glyphicon-envelope" aria-hidden="true"> Enviar correo electronico</span>
+                        </button>
+                        <br />
+                        <div ng-hide="hideWriteArea">
+                            <strong>Mensaje para los usuarios:</strong>
+                            <div class="form-group">
+                                <textarea class="form-control" data-ng-model="messageBody" ng-required="true" rows="5" placeholder="Mensaje..." ui-tinymce="tinymceOptions"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success" aria-label="Left Align" ng-click="sendMail()">
+                                <span class="glyphicon glyphicon-send" aria-hidden="true"> Enviar</span>
+                            </button>
+                        </div>
+
+                    </form>
                 </div>
             </div>
-            <!-- FIN Panel usuarios pendientes -->
+            <!-- FIN Panel usuarios -->
+
+            <!-- Panel de editar perfil de usuario -->
+            <div class="panel panel-default" ng-show="showUserEditArea">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Editar cuenta de usuario</h3>
+                </div>
+                <div class="panel-body">
+                    <form>
+                        User_id: HIDDEN
+                        <input type="text" data-ng-model="editingUser._id"><br />
+                        Apodo:
+                        <input type="text" data-ng-model="editingUser.username"><br />
+                        Email:
+                        <input type="text" data-ng-model="editingUser.email"><br />
+                        Dirección:<br />
+                        <textarea class="form-control" data-ng-model="editingUser.homeAddress" rows="5" placeholder="Direcci&oacute;n"></textarea>
+                        <br />
+                        <button type="submit" class="btn btn-warning" aria-label="Left Align" ng-click="sendPasswdMail()">
+                            <span class="glyphicon glyphicon-send" aria-hidden="true"> Enviar correo de contraseña olvidada</span>
+                        </button>
+                        <hr>
+                        <button type="submit" class="btn btn-success" aria-label="Left Align" ng-click="saveEditedUser()">
+                            <span class="glyphicon glyphicon-ok" aria-hidden="true"> Guardar</span>
+                        </button>
+                        <button type="cancel" class="btn btn-danger" aria-label="Left Align" ng-click="forgetEditedUser()">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"> Cancelar</span>
+                        </button>
+
+                    </form>
+                </div>
+            </div>
+            <!-- FIN Panel de editar perfil de usuario -->
 
         </div>
     </div>
