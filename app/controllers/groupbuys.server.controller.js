@@ -162,8 +162,10 @@ exports.create = function(req, res) {
 				return res.status(400).send( errorHandler.prepareErrorResponse (err) );
 			}
 
+			/*
 			var socketio = req.app.get('socketio');
 			socketio.sockets.emit('groupbuy.created', groupbuy);
+			*/
 
 			res.status(201).jsonp( formattingGroupbuy(groupbuy, req) );
 		});

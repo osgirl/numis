@@ -385,7 +385,7 @@ describe('Order CRUD tests', function() {
 								// Non-updatable fields
 								(orderUpdateRes.body._id).should.equal(order._id);
 								(orderUpdateRes.body.subtotal).should.equal(0);
-								(orderUpdateRes.body.total).should.equal(0);
+								(orderUpdateRes.body.total).should.equal(order.shippingCost + order.otherCosts);
 								(orderUpdateRes.body.providerShippingCost).should.equal(0);
 								(orderUpdateRes.body.requests).should.be.an.Array.with.lengthOf(0);
 								(orderUpdateRes.body.summary).should.be.an.Array.with.lengthOf(0);
@@ -411,7 +411,7 @@ describe('Order CRUD tests', function() {
 										(orderGetRes.body._links.groupbuy.href).should.containEql(groupbuy.id);
 										// Non-updatable fields
 										(orderGetRes.body.subtotal).should.equal(0);
-										(orderGetRes.body.total).should.equal(0);
+										(orderGetRes.body.total).should.equal(order.shippingCost + order.otherCosts);
 										(orderGetRes.body.providerShippingCost).should.equal(0);
 										(orderGetRes.body.requests).should.be.an.Array.with.lengthOf(0);
 										(orderGetRes.body.summary).should.be.an.Array.with.lengthOf(0);
@@ -613,13 +613,12 @@ describe('Order CRUD tests', function() {
 							var order = addRequestRes.body;
 
 							// Set assertions
-							order.should.have.properties('_id', '_links', 'requests');
+							order.should.have.properties('_id', '_links', 'requests', 'summary');
 							order.should.have.properties({
-														total: 0,
+														total: 110,
 														otherCosts: 0,
 														shippingCost: 0,
-														subtotal: 0,
-														summary: []
+														subtotal: 110
 							});
 							(order._links.user.href).should.containEql(manager1.id);
 							(order._links.groupbuy.href).should.containEql(groupbuy.id);
@@ -675,13 +674,12 @@ describe('Order CRUD tests', function() {
 									var order = addRequestRes.body;
 
 									// Set assertions
-									order.should.have.properties('_id', '_links', 'requests');
+									order.should.have.properties('_id', '_links', 'requests', 'summary');
 									order.should.have.properties({
-																total: 0,
+																total: 445,
 																otherCosts: 0,
 																shippingCost: 0,
-																subtotal: 0,
-																summary: []
+																subtotal: 445
 									});
 									(order._links.user.href).should.containEql(manager1.id);
 									(order._links.groupbuy.href).should.containEql(groupbuy.id);
@@ -699,11 +697,11 @@ describe('Order CRUD tests', function() {
 									(order.requests[1].user).should.containEql(manager1._id);
 									(order.requests[1].items).should.be.an.Array.with.lengthOf(3);
 									(order.requests[1].items[0].item).should.containEql(item1.id);
-									(order.requests[1].items[0].quantity).should.match(request2.items[0].quantity);
+									(order.requests[1].items[0].quantity).should.match(3);
 									(order.requests[1].items[1].item).should.containEql(item2.id);
-									(order.requests[1].items[1].quantity).should.match(request2.items[1].quantity);
+									(order.requests[1].items[1].quantity).should.match(3);
 									(order.requests[1].items[2].item).should.containEql(item3.id);
-									(order.requests[1].items[2].quantity).should.match(request2.items[2].quantity);
+									(order.requests[1].items[2].quantity).should.match(5);
 
 									agent.post('/api/v1/orders/' + order.id + '/calculate')
 										.send(request2)
@@ -729,27 +727,27 @@ describe('Order CRUD tests', function() {
 											(order.requests[0].user).should.containEql(manager1._id);
 											(order.requests[0].items).should.be.an.Array.with.lengthOf(2);
 											(order.requests[0].items[0].item).should.containEql(item1._id);
-											(order.requests[0].items[0].quantity).should.match(request1.items[0].quantity);
+											(order.requests[0].items[0].quantity).should.match(1);
 											(order.requests[0].items[1].item).should.containEql(item2._id);
-											(order.requests[0].items[1].quantity).should.match(request1.items[1].quantity);
+											(order.requests[0].items[1].quantity).should.match(1);
 											(order.requests[1]).should.have.properties('_id', 'user', 'requestDate', 'items');
 											(order.requests[1].user).should.containEql(manager1._id);
 											(order.requests[1].items).should.be.an.Array.with.lengthOf(3);
 											(order.requests[1].items[0].item).should.containEql(item1._id);
-											(order.requests[1].items[0].quantity).should.match(request2.items[0].quantity);
+											(order.requests[1].items[0].quantity).should.match(3);
 											(order.requests[1].items[1].item).should.containEql(item2._id);
-											(order.requests[1].items[1].quantity).should.match(request2.items[1].quantity);
+											(order.requests[1].items[1].quantity).should.match(3);
 											(order.requests[1].items[2].item).should.containEql(item3._id);
-											(order.requests[1].items[2].quantity).should.match(request2.items[2].quantity);
+											(order.requests[1].items[2].quantity).should.match(5);
 
 											// Check summary
 											(order.summary).should.be.an.Array.with.lengthOf(3);
 											(order.summary[0].item).should.containEql(item1._id);
-											(order.summary[0].quantity).should.match(request1.items[0].quantity + request2.items[0].quantity);
+											(order.summary[0].quantity).should.match(4);
 											(order.summary[1].item).should.containEql(item2._id);
-											(order.summary[1].quantity).should.match(request1.items[1].quantity + request2.items[1].quantity);
+											(order.summary[1].quantity).should.match(4);
 											(order.summary[2].item).should.containEql(item3._id);
-											(order.summary[2].quantity).should.match(request2.items[2].quantity);
+											(order.summary[2].quantity).should.match(5);
 
 											done();
 										});
@@ -1135,7 +1133,7 @@ describe('Order CRUD tests', function() {
 		});
 	});
 
-	it('NU_P_G004_E116: should be able to get prices in local al provider currencies', function(done) {
+	it.skip('NU_P_G004_E116: should be able to get prices in local al provider currencies', function(done) {
 		var yGroupbuy, yItem1, yItem2, yItem3, yItem4, yItem5, yItem6;
 		var member1, member2;
 		var order1, order2;
@@ -1307,15 +1305,15 @@ describe('Order CRUD tests', function() {
 																	// Get Orders list
 																	var orders = ordersGetRes.body._embedded.orders;
 
-																	orders[0].subtotal.should.match(0);
+																	orders[0].subtotal.should.match(32.52);
 																	orders[0].shippingCost.should.match(0);
 																	orders[0].otherCosts.should.match(0);
-																	orders[0].total.should.match(0);
+																	orders[0].total.should.match(32.52);
 
-																	orders[1].subtotal.should.match(0);
+																	orders[1].subtotal.should.match(16.38);
 																	orders[1].shippingCost.should.match(0);
 																	orders[1].otherCosts.should.match(0);
-																	orders[1].total.should.match(0);
+																	orders[1].total.should.match(16.38);
 
 																	// Calculate summary and prices for order 1
 																	agent.post('/api/v1/groupbuys/' + yGroupbuy.id + '/orders/:orderId/' + orders[0]._id + '/calculate')
@@ -1324,7 +1322,7 @@ describe('Order CRUD tests', function() {
 																			// Handle error
 																			if (calculateGetErr) done(calculateGetErr);
 
-																			console.log ('Order 0: ', calculateGetRes.body);
+																			//console.log ('Order 0: ', calculateGetRes.body);
 
 
 																			// Calculate summary and prices for order 2
@@ -1339,8 +1337,8 @@ describe('Order CRUD tests', function() {
 																				});
 																		});
 
-															console.log ('Request 0:', orders[0].requests[0]);
-															console.log ('Item 0:', orders[0].requests[0].items[0]);
+															//console.log ('Request 0:', orders[0].requests[0]);
+															//console.log ('Item 0:', orders[0].requests[0].items[0]);
 																});
 														});
 
