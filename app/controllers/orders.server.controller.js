@@ -51,6 +51,18 @@ var formattingOrder = function(order, req, reduce) {
 			}
 		}
 
+		// Number of members in groupbuy
+		try {
+			if (order.groupbuy.shippingCost !== undefined && !isNaN(order.groupbuy.shippingCost) ) {
+				order.providerShippingCost = order.groupbuy.shippingCost / order.groupbuy.members.length;
+
+			} else if (typeof req.groupbuy.shippingCost !== 'undefined' && !isNaN(req.groupbuy.shippingCost) ) {
+				order.providerShippingCost = req.groupbuy.shippingCost / req.groupbuy.members.length;
+			}
+			order.total = order.subtotal + order.providerShippingCost + order.shippingCost + order.otherCosts;
+		} catch (err) {
+		}
+
 		// Duplicate object order
 		result = order.toObject( {depopulate:true, getters: true} );
 
@@ -64,8 +76,8 @@ var formattingOrder = function(order, req, reduce) {
 		}
 
 		// payment
-		if (result.payment.confirmationDate !== null) result.payment.received = true;
-		if (result.payment.date !== null)             result.payment.paid = true;
+		result.payment.received = result.payment.confirmationDate !== undefined && result.payment.confirmationDate !== null;
+		result.payment.paid     = result.payment.date !== undefined && result.payment.date !== null;
 
 		// shipping
 		if (result.shipping.confirmationDate !== null) result.shipping.received = true;
@@ -142,14 +154,22 @@ exports.read = function(req, res) {
  */
 exports.update = function(req, res) {
 	var order = req.order,
-		dirty = false;
+		dirty = false,
+		data = {};
 
-	if (req.body !== undefined && req.body.shippingCost !== undefined) {
-		order.shippingCost = req.body.shippingCost;
+	if (req.body !== undefined && (req.body.shippingCost !== undefined || req.body.otherCosts) ) {
+		data = req.body;
+		
+	} else if (req.query !== undefined && (req.query.shippingCost !== undefined || req.query.otherCosts) ) {
+		data = req.query;
+	}
+
+	if (data.shippingCost !== undefined) {
+		order.shippingCost = data.shippingCost;
 		dirty = true;
 	}
-	if (req.body !== undefined && req.body.otherCosts !== undefined) {
-		order.otherCosts = req.body.otherCosts;
+	if (data.otherCosts !== undefined) {
+		order.otherCosts = data.otherCosts;
 		dirty = true;
 	}
 
@@ -339,18 +359,18 @@ exports.updatePayment = function(req, res) {
 		user      = req.user,
 		isAdmin   = user.isAdmin(),
 		isManager = (isAdmin || groupbuy.isManager(user._id) ),
-		changedPayment = (req.body.paid === true) !== (order.shipping.confirmationDate !== null),
-		paidDate        = (req.body.paid === true) ? Date.now() : null,
-		payment         = {};
+		changedPayment = (req.body.paid === true) !== (order.payment.date !== null && order.payment.date !== undefined),
+		paidDate       = (req.body.paid === true) ? Date.now() : null,
+		payment        = {};
 
 	if (isManager) {
-		var changedReceived = (req.body.received === true) !== (order.payment.date !== null);
+		var changedReceived = (req.body.received === true) !== (order.payment.confirmationDate !== null && order.payment.confirmationDate !== undefined);
 
 		payment.infoManagers = req.body.infoManagers;
 
 		if (changedReceived) {
-			payment.confirmationDate = (req.body.paid === true) ? Date.now() : null;
-			payment.confirmedBy = (req.body.paid === true) ? req.user.id : null;
+			payment.confirmationDate = (req.body.received === true) ? Date.now() : null;
+			payment.confirmedBy = (req.body.received === true) ? req.user.id : null;
 		}
 
 		// I'm a manager but i am editing myself payment info
@@ -435,7 +455,7 @@ exports.updateShipping = function(req, res) {
  * Order middleware
  */
 exports.orderByID = function(req, res, next, id) {
-	Order.findById(id).populate('user', 'id username').populate('groupbuy', 'title').exec(function(err, order) {
+	Order.findById(id).populate('user', 'id username').populate('groupbuy').exec(function(err, order) {
 		if (err) return res.status(400).send( errorHandler.prepareErrorResponse(err) );
 		if (!order)
 			return res.status(400).send( errorHandler.prepareErrorResponse( new Error('Failed to load Order ' + id) ));

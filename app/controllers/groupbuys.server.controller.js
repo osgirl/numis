@@ -32,10 +32,6 @@ var formattingGroupbuy = exports.formattingGroupbuy = function(groupbuy, req, re
 		result 	  	 = {},
 		i;
 
-	/* visibility TODO
-			itemNumbers: 'public',
-	*/
-
 	if (user && user._id && groupbuy && groupbuy._id) {
 		var selfURL = '/api/v1' + groupbuy.toLink(),
 			parentURL = selfURL.replace(/\/[a-f\d]{24}$/i, '');

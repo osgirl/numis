@@ -3,112 +3,134 @@
 // Payments tab controller
 angular.module('groupbuys').controller('GroupbuysTabPaymentsController', ['$scope', 'Restangular', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys',
   function($scope, Restangular, $stateParams, $location, $translate, Authentication, Groupbuys) {
-    $scope.authentication = Authentication;
 
-    // ----------------
+      $scope.authentication = Authentication;
+      $scope.selectedMember = null;
 
     /*
     @ngdoc method
-    * @name groupbuys.controller:GroupbuysTabPaymentsController.savePaymentData
+    * @name groupbuys.controller:GroupbuysTabPaymentsController.loadPaymentData
     * @methodOf groupbuys.controller:GroupbuysTabPaymentsController
 
     @description
     * Request items to server.
     */
-    $scope.savePaymentData = function() {
-        console.log ('save');
-    };
+    $scope.loadPaymentData = function() {
+        $scope.order = {
+            id:           null,
+            subtotal:     0,
+            providerShippingCost: 0,
+            shippingCost: 0,
+            otherCosts:   0,
+            total:        0,
+            payment:      {}
+        };
 
-    // ----------------
+        console.log('$scope.userRole:', $scope.userRole);
+        console.log('$scope.selectedMember:', $scope.selectedMember);
 
-    /*
-    @ngdoc method
-    * @name groupbuys.controller:GroupbuysTabPaymentsController.loadAllPaymentData
-    * @methodOf groupbuys.controller:GroupbuysTabPaymentsController
-
-    @description
-    * Request items to server.
-    */
-    $scope.loadAllPaymentData = function() {
-
-        $scope.paymentNoteShow = false;
-        $scope.paymentNote = '';
-
-        if ($scope.userRole === 'manager' ){
-
-            // Get all orders
-            Restangular.one('groupbuys',$stateParams.groupbuyId).all('orders').getList().then(function(data) {
-
-                $scope.allPaymentData = data;
-
-                // add some necessary info
-                for ( var i=0; i<$scope.allPaymentData.length; i++ ) {
-                    // Member names
-                    var position = $scope.findPosition($scope.allPaymentData[i].user , $scope.groupbuy.members_extended_data);
-                    if (position !== -1) {
-                        $scope.allPaymentData[i].username = $scope.groupbuy.members_extended_data[position].username;
-                    }
-                    // Item names
-                    for ( var j=0; j<$scope.allPaymentData[i].requests.length; j++ ) {
-                        for ( var k=0; k<$scope.allPaymentData[i].requests[j].items.length; k++ ) {
-
-                            var itemPosition = $scope.findPosition($scope.allPaymentData[i].requests[j].items[k].item , $scope.groupbuy.items);
-                            if (itemPosition !== -1) {
-                                $scope.allPaymentData[i].requests[j].items[k].itemName = $scope.groupbuy.items[itemPosition].title;
-                            }
-
-                        }
-                    }
+        if ($scope.userRole === 'member') {
+            console.log('member');
+            // Groupbuy messages for authenticated user
+            Restangular.one('groupbuys',$stateParams.groupbuyId).one('users', $scope.authentication.user._id).all('orders').getList().then(function(data) {
+                if (typeof data !== 'undefined' && typeof data[0] !== 'undefined') {
+                    $scope.order = {
+                        id:           data[0]._id,
+                        subtotal:     data[0].subtotal,
+                        providerShippingCost: data[0].providerShippingCost,
+                        shippingCost: data[0].shippingCost,
+                        otherCosts:   data[0].otherCosts,
+                        total:        data[0].total,
+                        payment:      data[0].payment
+                    };
                 }
 
             }, function errorCallback() {
                 $scope.error = $translate.instant('core.Error_connecting_server');
             });
 
-        } // UserRole == manager
+        } else if ($scope.selectedMember) {
+            console.log('manager');
+            // Groupbuy messages for selected user
+            Restangular.one('groupbuys',$stateParams.groupbuyId).one('users', $scope.selectedMember._id).all('orders').getList().then(function(data) {
+                if (typeof data !== 'undefined' && typeof data[0] !== 'undefined') {
+                    $scope.order = {
+                        id:           data[0]._id,
+                        subtotal:     data[0].subtotal,
+                        providerShippingCost: data[0].providerShippingCost,
+                        shippingCost: data[0].shippingCost,
+                        otherCosts:   data[0].otherCosts,
+                        total:        data[0].total,
+                        payment:      data[0].payment
+                    };
+                }
+
+            }, function errorCallback() {
+                $scope.error = $translate.instant('core.Error_connecting_server');
+            });
+
+        }
 
     };
 
-    // ----------------
+	// ----------------------
 
     /*
     @ngdoc method
-    * @name groupbuys.controller:GroupbuysTabPaymentsController.saveAllPaymentData
+    * @name groupbuys.controller:GroupbuysTabPaymentsController.$scope.savePayment
     * @methodOf groupbuys.controller:GroupbuysTabPaymentsController
 
     @description
-    * Request items to server.
+    * Saves payment info.
     */
-    $scope.saveAllPaymentData = function() {
+    $scope.savePayment = function(memberId) {
+        // Save shipping and other costs
+        var orderData = {
+            shippingCost: $scope.order.shippingCost,
+            otherCosts:   $scope.order.otherCosts
+        };
 
-        console.log ('save all');
+        Restangular.one('orders',$scope.order.id).put(orderData).then(function(data) {
+            $scope.order.subtotal             = data.subtotal;
+            $scope.order.providerShippingCost = data.providerShippingCost;
+            $scope.order.shippingCost         = data.shippingCost;
+            $scope.order.otherCosts           = data.otherCosts;
+            $scope.order.total                = data.total;
+
+        }, function errorCallback() {
+            $scope.error = $translate.instant('core.Error_connecting_server');
+        });
+
+        // Save payment info
+        Restangular.one('orders',$scope.order.id).all('payment').post($scope.order.payment).then(function(data) {
+
+
+        }, function errorCallback() {
+            $scope.error = $translate.instant('core.Error_connecting_server');
+        });
     };
 
-	// ----------------------
+    // ----------------------
 
-	/**
-	* @ngdoc method
-	* @name groupbuys.controller:GroupbuysController.$scope.showPaymentNotes
-	* @methodOf groupbuys.controller:GroupbuysController
-	*
-	* @description
-	* Toogles notes view
-	*/
-	$scope.showPaymentNotes = function(paymentId) {
-        if (paymentId === 0) {
-            $scope.paymentNoteShow = false;
-        } else {
-            $scope.paymentNoteShow = true;
+    /**
+    * @ngdoc method
+    * @name groupbuys.controller:GroupbuysTabPaymentsController.$scope.selectMember
+    * @methodOf groupbuys.controller:GroupbuysTabPaymentsController
+    *
+    * @description
+    * Select active payment.
+    */
+    $scope.selectMember = function(member) {
+        $scope.selectedMember = member;
+
+        if ($scope.lastSelected) {
+            $scope.lastSelected.selected = '';
         }
+        this.selected = 'selected';
+        $scope.lastSelected = this;
 
-        var position = $scope.findPosition(paymentId, $scope.allPaymentData);
-        if (position !== -1) {
-            $scope.paymentNote = $scope.allPaymentData[position].payment.info;
-        }
-
-	};
-
-	// ----------------------
+        this.loadPaymentData();
+    };
 
  }
 ]);

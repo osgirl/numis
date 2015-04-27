@@ -21,6 +21,10 @@
                             {{'groupbuys.Exchange_rate' | translate}}: {{groupbuy.currencies.exchangeRate}} {{groupbuy.currencies.provider.symbol}} = 1€<br />
                             {{'groupbuys.Multiplier' | translate}}: {{groupbuy.currencies.multiplier}}<br />
                             <strong>{{'groupbuys.Note' | translate}}:</strong> {{'groupbuys.Multiplier_note' | translate}}
+                            <div class="form-group">
+                                <span>Coste del envio entre el proveedor y el gestor (a partes iguales):</span>
+                                <input type="text" data-ng-model="groupbuy.shippingCost"> €
+                            </div>
                         </p>
                     </div>
                     <!-- FIN Vista de participante -->
@@ -37,7 +41,10 @@
                             </select><br />
                             {{'groupbuys.Exchange_rate' | translate}}: <input type="text" ng-model="groupbuy.currencies.exchangeRate" novalidate />  {{groupbuy.currencies.provider.symbol}} = 1€<br />
                             {{'groupbuys.Multiplier' | translate}}: <input type="text" ng-model="groupbuy.currencies.multiplier" novalidate /><br />
-                            <strong>{{'groupbuys.Note' | translate}}:</strong> {{'groupbuys.Remember_note_currencies_manager' | translate}}.
+                            <div class="form-group">
+                                <span>Coste del envio entre el proveedor y el gestor (a partes iguales):</span>
+                                <input type="text" data-ng-model="groupbuy.shippingCost"> €
+                            </div>
                             <br />
                             <input type="submit" value="{{'groupbuys.Update' | translate}}" class="btn btn-default">
                         </form>

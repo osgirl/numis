@@ -78,14 +78,15 @@
                                     <div class="form-group">
                                         <textarea id="deliveryInfo" name="deliveryInfo" ng-model="delivery.info" class="form-control" rows="5" placeholder="Información sobre el pago"></textarea>
                                     </div>
-                                </div>
-                                <div style="text-align: center; padding-bottom: 10px;">
-                                    <div>
-                                        <input type="checkbox" ng-model="delivery.shipped"><span>Enviado</span>
-                                        <input type="checkbox" ng-model="delivery.received" style="margin-left: 20px;" disabled readonly><span>Recibido</span>
+
+                                    <div style="text-align: center; padding-bottom: 10px;">
+                                        <div>
+                                            <input type="checkbox" ng-model="delivery.shipped"><span>Enviado</span>
+                                            <input type="checkbox" ng-model="delivery.received" style="margin-left: 20px;" disabled readonly><span>Recibido</span>
+                                        </div>
                                     </div>
+                                    <input type="submit" value="Guardar" class="btn btn-default">
                                 </div>
-                                <input type="submit" value="Guardar" class="btn btn-default">
                             </div>
                             <!-- FIN Detalles envio-->
                         </div>

@@ -1,10 +1,10 @@
-<section data-ng-controller="GroupbuysTabPaymentsController" data-ng-init="loadAllPaymentData()">
+<section data-ng-controller="GroupbuysTabPaymentsController" data-ng-init="loadPaymentData()">
     <div class="panel panel-default">
         <div class="panel-body">
 
             <!-- Vista de participante -->
             <div data-ng-show="(userRole !== 'manager')">
-                <form data-ng-submit="joinGroupbuy()" name="memberManagerForm" novalidate>
+                <form data-ng-submit="savePayment()" name="memberManagerForm" novalidate>
                     <!-- Panel de informacion del pago -->
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -12,7 +12,7 @@
                         </div>
                         <div class="panel-body">
                             <div class="form-group">
-                                <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" ng-model="payment.info" placeholder="Notas de los gestores" disabled readonly></textarea>
+                                <textarea id="paymentInfoManager" name="paymentInfoManager" class="form-control" rows="5" ng-model="payment.infoManager" placeholder="Notas de los gestores" disabled readonly></textarea>
                             </div>
                         </div>
                     </div>
@@ -24,12 +24,12 @@
                             <h3 class="panel-title">Cantidad a pagar</h3>
                         </div>
                         <div class="panel-body">
-                            <b>Precio items: </b><span>{{payment.subtotal}} €</span> +<br />
-                            <b>Envio proporcional: </b><span>{{payment.providerShippingCost}} €</span> +<br />
-                            <b>Envio Propio: </b><span>{{payment.shippingCost}} €</span> +<br />
-                            <b>Otros: </b><span>{{payment.otherCosts}} €</span><br />
+                            <b>Subtotal: </b><span>{{order.subtotal}} {{groupbuy.currencies.local.symbol}}</span><br />
+                            <b>Gastos de envío proveedor-gestor: </b><span>{{order.providerShippingCost}} {{groupbuy.currencies.local.symbol}}</span><br />
+                            <b>Gastos de envío gestor-participante: </b><span>{{order.shippingCost}} {{groupbuy.currencies.local.symbol}}</span><br />
+                            <b>Gastos añadidos: </b><span>{{order.otherCosts}} {{groupbuy.currencies.local.symbol}}</span><br />
                             <span>---------------------</span><br />
-                            <b>TOTAL: </b><span>{{payment.total}} €</span><br />
+                            <b>TOTAL: </b><span>{{order.total}} {{groupbuy.currencies.local.symbol}}</span><br />
                         </div>
                     </div>
                     <!-- FIN Panel de cantidad a pagar -->
@@ -41,97 +41,79 @@
                         </div>
                         <div class="panel-body">
                             <div class="form-group">
-                                <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" ng-model="payment.infoManagers"  placeholder="Notas sobre el pago para los gestores" ></textarea>
+                                <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" ng-model="order.payment.info"  placeholder="Notas sobre el pago para los gestores" ></textarea>
                             </div>
                         </div>
-                        <div>
-                            <input type="checkbox" ng-model="payment.paid" ></td><span>Pagado</span><br />
-                            <input type="checkbox" disabled readonly ng-model="payment.received" ></td><span>Recibido</span>
+                        <div style="text-align: center; padding-bottom: 10px;">
+                            <div>
+                                <input type="checkbox" ng-model="order.payment.paid" ></td><span>Pagado</span>
+                                <input type="checkbox" ng-model="order.payment.received" style="margin-left: 20px;" disabled readonly ></td><span>Recibido</span>
+                            </div>
                         </div>
                     </div>
                     <!-- FIN Panel de notas sobre el pago -->
-                    <input type="submit" value="Guardar" class="btn btn-default" ng-click="savePaymentData()">
+                    <input type="submit" value="Guardar" class="btn btn-default">
                 </form>
             </div>
             <!-- FIN Vista de participante -->
 
-
             <!-- Vista de gestor -->
-            <div data-ng-show="(userRole == 'manager')">
+            <div data-ng-show="(userRole === 'manager')">
 
-                <form data-ng-submit="joinGroupbuy()" name="PaymentManagerForm" novalidate>
-                    <!-- Panel de informacion del pago -->
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Información sobre el pago</h3>
-                        </div>
-                        <div class="panel-body">
-                            <div class="form-group">
-                                <textarea id="paymentInfo" name="paymentInfo" class="form-control" rows="5" placeholder="Información sobre el pago" ></textarea>
+                <!-- Panel de informacion del pago -->
+                <form data-ng-submit="savePayment()" name="PaymentManagerForm" novalidate>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div>
+                                <div class="member {{selected}}" data-ng-repeat="member in groupbuy.members_extended_data track by $index" data-ng-click="selectMember(member);">
+                                    <img class="img-responsive img-circle" ng-src="{{member.avatar}}?size=sm" fb-src="['/modules/users/img/no-user-image-square-sm.jpg']" alt="avatar" /><span>{{member.username}}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- FIN Panel de informacion del pago -->
+                        <div class="col-md-9">
+                            <form data-ng-submit="savePayments()" name="PaymentManagerForm" novalidate>
+                                <!-- Información del miembro -->
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Información del participante sobre el pago</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <textarea id="paymentInfo" name="paymentInfo" ng-model="order.payment.info" class="form-control" rows="5" placeholder="Información sobre el pago" disabled readonly></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- FIN Información del miembro -->
+                                <!-- Información del gestor -->
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Detalles del gestor sobre pago</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <textarea id="paymentInfoManagers" name="paymentInfoManagers" ng-model="order.payment.infoManagers" class="form-control" rows="5" placeholder="Información sobre el pago"></textarea>
+                                        </div>
+                                        Subtotal: <span>{{order.subtotal}} {{groupbuy.currencies.local.symbol}}</span><br />
+                                        Gastos de envío proveedor-gestor: <span>{{order.providerShippingCost}} {{groupbuy.currencies.local.symbol}}</span><br />
+                                        Gastos de envío gestor-participante: <span><input class="" type="text" ng-model="order.shippingCost"> {{groupbuy.currencies.local.symbol}}</span><br />
+                                        Gastos añadidos: <span><input type="text" ng-model="order.otherCosts"> {{groupbuy.currencies.local.symbol}}</span><br />
+                                        <hr/>
+                                        TOTAL: <span>{{order.total}} {{groupbuy.currencies.local.symbol}}</span><br />
 
-                    <!-- Panel de costes de envio -->
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Costes de envio entre el proveedor y gestores</h3>
-                        </div>
-                        <div class="panel-body">
-                            <span>Coste del envio entre el proveedor y el gestor (a partes iguales):</span>
-                            <input type="text"> €
-                        </div>
-                    </div>
-                    <!-- FIN Panel de costes de envio -->
+                                        <div style="text-align: center; padding-bottom: 10px;">
+                                            <div>
+                                                <input type="checkbox" ng-model="order.payment.paid" disabled readonly><span>Pagado</span>
+                                                <input type="checkbox" ng-model="order.payment.received" style="margin-left: 20px;"><span>Recibido</span>
+                                            </div>
+                                        </div>
+                                        <input type="submit" value="Guardar" class="btn btn-default">
+                                    </div>
 
-                    <!-- Panel de participantes -->
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Desglose de participantes</h3>
-                        </div>
-                        <div class="panel-body">
-                            <table class="paymentTable">
-                                <tr>
-                                    <th class="paymentCell">Participante</th>
-                                    <th class="paymentCell">Precio Items</th>
-                                    <th class="paymentCell">Envio porporcional</th>
-                                    <th class="paymentCell">Envio Propio</th>
-                                    <th class="paymentCell">Otros</th>
-                                    <th class="paymentCell">Total</th>
-                                    <th class="paymentCell">Pagado</th>
-                                    <th class="paymentCell">Notas de pago</th>
-                                    <th class="paymentCell">Recibido</th>
-                                </tr>
-                                <tr ng-repeat="payment in allPaymentData track by $index">
-                                    <td class="paymentCell">{{payment.username}}</td>
-                                    <td class="paymentCell">{{payment.subtotal}} €</td>
-                                    <td class="paymentCell">{{payment.providerShippingCost}} €</td>
-                                    <td class="paymentCell"><input type="text" ng-model="payment.shippingCost"> €</td>
-                                    <td class="paymentCell"><input type="text" ng-model="payment.otherCosts"> €</td>
-                                    <td class="paymentCell">{{payment.total}} €</td>
-                                    <td class="paymentCell"><input type="checkbox" disabled readonly></td>
-                                    <td class="paymentCell">
-                                        <button type="button" class="btn btn-info" aria-label="" data-ng-click="showPaymentNotes(payment._id)">
-                                            <span>Ver notas</span>
-                                        </button>
-                                    </td>
-                                    <td class="paymentCell"><input type="checkbox"></td>
-                                </tr>
-                            </table>
-
-                            <div ng-show="paymentNoteShow" class="paymentNotes">
-                                <strong>Nota del participante:</strong><br />
-                                <p>{{paymentNote}}</p>
-                                <button type="button" class="btn btn-success" aria-label="" data-ng-click="showPaymentNotes(0)">
-                                    <span>Cerrar</span>
-                                </button>
-                            </div>
-
+                                </div>
+                                <!-- FIN Información del gestor -->
+                            </form>
                         </div>
                     </div>
-                    <!-- FIN Panel de participantes -->
-                    <input type="submit" value="Guardar" class="btn btn-default"  ng-click="saveAllPaymentData()">
                 </form>
             </div>
             <!-- FIN Vista de gestor -->
