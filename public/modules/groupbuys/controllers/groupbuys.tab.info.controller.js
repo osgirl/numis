@@ -1,6 +1,20 @@
 'use strict';
 
-// Information tab controller
+/**
+ * @ngdoc controller
+ * @name groupbuys.controller:GroupbuysTabInfoController
+ *
+ * @requires $scope
+ * @requires $stateParams
+ * @requires $translate
+ * @requires $location
+ * @requires Restangular
+ * @requires Authentication
+ * @requires Groupbuys
+ *
+ * @description
+ * Information tab controller
+ */
 angular.module('groupbuys').controller('GroupbuysTabInfoController', ['$scope', 'Restangular', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys', '$window',
   function($scope, Restangular, $stateParams, $location, $translate, Authentication, Groupbuys, $window) {
     $scope.authentication = Authentication;

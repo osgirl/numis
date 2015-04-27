@@ -1,6 +1,20 @@
 'use strict';
 
-// Payments tab controller
+/**
+ * @ngdoc controller
+ * @name groupbuys.controller:GroupbuysTabPaymentsController
+ *
+ * @requires $scope
+ * @requires $stateParams
+ * @requires $translate
+ * @requires $location
+ * @requires Restangular
+ * @requires Authentication
+ * @requires Groupbuys
+ *
+ * @description
+ * Payments tab controller
+ */
 angular.module('groupbuys').controller('GroupbuysTabPaymentsController', ['$scope', 'Restangular', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys',
   function($scope, Restangular, $stateParams, $location, $translate, Authentication, Groupbuys) {
 

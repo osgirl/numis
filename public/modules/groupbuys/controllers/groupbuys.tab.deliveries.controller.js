@@ -1,6 +1,20 @@
 'use strict';
 
-// Deliveries tab controller
+/**
+ * @ngdoc controller
+ * @name groupbuys.controller:GroupbuysTabDeliveriesController
+ *
+ * @requires $scope
+ * @requires $stateParams
+ * @requires $translate
+ * @requires $location
+ * @requires Restangular
+ * @requires Authentication
+ * @requires Groupbuys
+ *
+ * @description
+ * Deliveries tab controller
+ */
 angular.module('groupbuys').controller('GroupbuysTabDeliveriesController', ['$scope', 'Restangular', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys',
   function($scope, Restangular, $stateParams, $location, $translate, Authentication, Groupbuys) {
 

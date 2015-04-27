@@ -4,8 +4,12 @@
  * @ngdoc controller
  * @name users.controller:AvatarImageController
  *
- * @requires $cope
+ * @requires $scope
  * @requires $upload
+ * @requires $translate
+ * @requires $timeout
+ * @requires Restangular
+ * @requires Authentication
  *
  * @description
  * Contolador de la imágen de avatar en el perfil de usuario

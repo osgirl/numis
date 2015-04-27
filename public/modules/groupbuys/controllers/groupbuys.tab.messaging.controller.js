@@ -1,6 +1,20 @@
 'use strict';
 
-// Messaging tab controller
+/**
+ * @ngdoc controller
+ * @name groupbuys.controller:GroupbuysTabMessagingController
+ *
+ * @requires $scope
+ * @requires $stateParams
+ * @requires $translate
+ * @requires $location
+ * @requires Restangular
+ * @requires Authentication
+ * @requires Groupbuys
+ *
+ * @description
+ * Messaging tab controller
+ */
 angular.module('groupbuys').controller('GroupbuysTabMessagingController', ['$scope', 'Restangular', '$stateParams', '$location', '$translate', 'Authentication', 'Groupbuys',
   function($scope, Restangular, $stateParams, $location, $translate, Authentication, Groupbuys) {
 
