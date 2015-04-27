@@ -116,7 +116,10 @@
 						<h3 class="panel-title">{{'core.Messaging' | translate}}</h3>
 					</div>
 					<div class="panel-body">
-
+						<a data-ng-repeat="message in myMessages track by $index"  data-ng-href="#!/groupbuys/{{message.groupbuy._id}}" class="list-group-item">
+							<strong>{{message.groupbuy.title}}</span></strong><br />
+							<small>{{message.unread}} mensajes pendientes.</small>
+						</a>
 					</div>
 				</div>
 				<!-- FIN Panel de Mensajes -->

@@ -71,6 +71,11 @@ angular.module('core').controller('HomeController', ['$scope', 'Restangular', '$
 				// Mis avisos
 
 				// Mensajes
+				Restangular.one('users',$scope.authentication.user._id).all('messages').getList().then(function(data) {
+					$scope.myMessages = data;
+				}, function errorCallback() {
+					$scope.error = $translate.instant('core.Error_connecting_server');
+				});
 			}
 		};
 
