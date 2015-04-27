@@ -148,7 +148,10 @@ exports.listRecent = function(req, res) {
 					return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
 
 				// Return messages
-				res.jsonp( {'messages': messages} );
+				res.jsonp( {_embedded: {
+								messages: messages
+								}
+							});
 			});
 		}
 	});
