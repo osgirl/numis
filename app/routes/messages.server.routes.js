@@ -1,7 +1,8 @@
 'use strict';
 
 module.exports = function(app) {
-	var users     = require('../../app/controllers/users.server.controller'),
+	var core      = require('../../app/controllers/core.server.controller'),
+		users     = require('../../app/controllers/users.server.controller'),
 		groupbuys = require('../../app/controllers/groupbuys.server.controller'),
 		messages  = require('../../app/controllers/messages.server.controller');
 
@@ -18,6 +19,9 @@ module.exports = function(app) {
 
 	app.route('/api/v1/groupbuys/:groupbuyId/messages/:messageId')
 		.delete(users.requiresLogin, users.hasAuthorization(['admin']), messages.delete);
+
+	app.route('/api/v1/users/:userId/messages')
+		.get(users.requiresLogin, users.hasAuthorization(['self','admin']), core.prepareQueryParams, messages.listRecent);
 
 	// Finish by binding the Messaging middleware
 	app.param('messageId',  messages.messageByID);

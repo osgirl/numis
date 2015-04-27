@@ -93,7 +93,7 @@ exports.delete = function(req, res) {
 };
 
 /**
- * List of Messages
+ * List of Messages by user in a groupbuy
  */
 exports.list = function(req, res) {
 	var memberId, query;
@@ -122,6 +122,34 @@ exports.list = function(req, res) {
 			res.jsonp( formattingMessageList(messages, req) );
 			// Mark messages received as readed
 			Message.markAsRead(req.groupbuy.id, req.user._id);
+		}
+	});
+};
+
+/**
+ * List of All unread Messages by an user
+ */
+exports.listRecent = function(req, res) {
+	var sort   = req.query.sort || 'unread created',
+		limit  = req.query.limit || 5;
+
+	Message.aggregate([
+	  	{$match: {to: req.profile._id, unread: true} },
+	   	{$group: {_id: null, groupbuy: {'$first': '$groupbuy'}, unread: {$sum: 1}} },
+	   	//{$project: {_id: 0, groupbuy: 1, unread: 1} }
+	], function(err, results) {
+		if (err) {
+			return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
+		} else {
+			//res.jsonp( results );
+
+			Message.populate(results, {path: 'groupbuy', select: 'title'}, function(err, messages) {
+				if (err)
+					return res.status(400).send({ message: errorHandler.getErrorMessage(err) });
+
+				// Return messages
+				res.jsonp( messages );
+			});
 		}
 	});
 };
